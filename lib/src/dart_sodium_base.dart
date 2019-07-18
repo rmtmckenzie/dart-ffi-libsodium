@@ -4,7 +4,7 @@ final libsodium = ffi.DynamicLibrary.open("libsodium");
 var _isInitialized = false;
 
 final _init = libsodium
-    .lookupFunction<ffi.Int64 Function(), int Function()>("sodium_init");
+    .lookupFunction<ffi.Int8 Function(), int Function()>("sodium_init");
 
 void init() {
   if (_isInitialized) {
