@@ -1,6 +1,3 @@
-// TODO: Put public facing types in this file.
+import 'dart:ffi' as ffi;
 
-/// Checks if you are awesome. Spoiler: you are.
-class Awesome {
-  bool get isAwesome => true;
-}
+final x = ffi.Pointer()
