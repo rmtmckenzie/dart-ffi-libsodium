@@ -1,9 +1,12 @@
 import 'dart:ffi';
-import './dart_sodium_base.dart';
+import './ffi_helper.dart';
 
-typedef _PwhashStrNative = Int8 Function(Pointer<Int8> out,
-    Pointer<Int8> passwd, Int64 passwdLen, Int64 opsLimit, Int64 memlimit);
-typedef _PwhashStrDart = int Function(Pointer<Int8> out, Pointer<Int8> passwd,
+import './dart_sodium_base.dart';
+import 'package:meta/meta.dart';
+
+typedef _PwhashStrNative = Int8 Function(Pointer<Uint8> out,
+    Pointer<Uint8> passwd, Uint64 passwdLen, Uint64 opsLimit, Uint64 memlimit);
+typedef _PwhashStrDart = int Function(Pointer<Uint8> out, Pointer<Uint8> passwd,
     int passwdLen, int opsLimit, int memlimit);
 
 final _pwhashStr = libsodium
