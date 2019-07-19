@@ -14,3 +14,20 @@ final _pwhashStr = libsodium
 
 final _STRBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_pwhash_STRBYTES")();
+
+String pwhashStr(String passwd,
+    {@required int opslimit, @required int memlimit}) {
+  final Pointer<Uint8> out = allocate(count: _STRBYTES);
+  final passwdCstr = StringToCstr(passwd);
+  try {
+    final hashResult =
+        _pwhashStr(out, passwdCstr, passwd.length, opslimit, memlimit);
+    if (hashResult < 0) {
+      Exception("dart_sodium pwhashStr failed: $hashResult");
+    }
+    return CstrToString(out, passwd.length);
+  } finally {
+    out.free();
+    passwdCstr.free();
+  }
+}
