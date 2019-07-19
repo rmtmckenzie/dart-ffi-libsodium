@@ -13,7 +13,7 @@ final _pwhashStr = libsodium
     .lookupFunction<_PwhashStrNative, _PwhashStrDart>("crypto_pwhash_str");
 
 final _STRBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
-    "crypto_pwhash_STRBYTES")();
+    "crypto_pwhash_strbytes")();
 
 String pwhashStr(String passwd,
     {@required int opslimit, @required int memlimit}) {
