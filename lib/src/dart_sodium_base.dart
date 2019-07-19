@@ -12,8 +12,8 @@ void init() {
   }
   final result = _init();
   if (result < 0) {
-    throw Exception("""Initialization of sodium failed: $result 
-        Don't rely on dart_sodium at this point because its safety cannot be guaranteed""");
+    throw Exception("""Initialization of dart_sodium failed: $result 
+       Without initialization, dart_sodium isn't safe to use!""");
   }
   _isInitialized = true;
 }
