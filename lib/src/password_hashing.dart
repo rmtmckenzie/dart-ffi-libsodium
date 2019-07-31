@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ffi';
 import './ffi_helper.dart';
 
@@ -112,8 +113,19 @@ String pwhashStr(String passwd, Opslimit opslimit, Memlimit memlimit) {
 bool pwhashStrVerify(String hash, String passwd) {
   Pointer<Int8> hashPtr;
   Pointer<Int8> passwdPtr;
+  if (hash.length > _STRBYTES) {
+    throw ArgumentError("The provided hash is longer than $_STRBYTES: $hash");
+  }
   try {
-    hashPtr = StringToCstr(hash);
+    hashPtr = allocate(count: _STRBYTES);
+    {
+      var i = 0;
+      final buf = ascii.encode(hash);
+      for (; i < hash.length; i++) {
+        hashPtr.elementAt(i).store(buf[i]);
+      }
+      hashPtr.elementAt(i + 1).store(0);
+    }
     passwdPtr = StringToCstr(passwd);
     final verifyResult = _pwhashStrVerify(hashPtr, passwdPtr, passwd.length);
     if (verifyResult == -1) {
