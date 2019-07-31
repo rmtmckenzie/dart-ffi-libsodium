@@ -11,6 +11,15 @@ typedef _PwhashStrDart = int Function(Pointer<Int8> out, Pointer<Int8> passwd,
 final _pwhashStr = libsodium
     .lookupFunction<_PwhashStrNative, _PwhashStrDart>("crypto_pwhash_str");
 
+typedef _PwhashStrVerifyNative = Int16 Function(
+    Pointer<Int8> str, Pointer<Int8> passwd, Uint64 passwdlen);
+typedef _PwhashStrVerifyDart = int Function(
+    Pointer<Int8> str, Pointer<Int8> passwd, int passwdlen);
+
+final _pwhashStrVerify =
+    libsodium.lookupFunction<_PwhashStrVerifyNative, _PwhashStrVerifyDart>(
+        "crypto_pwhash_str_verify");
+
 final _STRBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_pwhash_strbytes")();
 final _OPSLIMIT_MODERATE =
@@ -97,5 +106,22 @@ String pwhashStr(String passwd, Opslimit opslimit, Memlimit memlimit) {
   } finally {
     out?.free();
     passwdCstr?.free();
+  }
+}
+
+bool pwhashStrVerify(String hash, String passwd) {
+  Pointer<Int8> hashPtr;
+  Pointer<Int8> passwdPtr;
+  try {
+    hashPtr = StringToCstr(hash);
+    passwdPtr = StringToCstr(passwd);
+    final verifyResult = _pwhashStrVerify(hashPtr, passwdPtr, passwd.length);
+    if (verifyResult == -1) {
+      return false;
+    }
+    return true;
+  } finally {
+    hashPtr?.free();
+    passwdPtr?.free();
   }
 }
