@@ -4,11 +4,11 @@ import 'dart:typed_data';
 
 Pointer<Int8> StringToCstr(String str) {
   final buf = ascii.encode(str);
-  final Pointer<Int8> ptr = allocate(count: str.length);
+  final Pointer<Int8> ptr = allocate(count: str.length + 1);
   for (var i = 0; i < str.length; i++) {
     ptr.elementAt(i).store(buf[i]);
   }
-
+  ptr.elementAt(str.length).store(0);
   return ptr;
 }
 
