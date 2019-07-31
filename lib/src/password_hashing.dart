@@ -81,11 +81,13 @@ int getMemlimit(Memlimit memlimit) {
 }
 
 String pwhashStr(String passwd, Opslimit opslimit, Memlimit memlimit) {
-  final realOpslimit = getOpslimit(opslimit);
-  final realMemlimit = getMemlimit(memlimit);
-  final out = allocate<Int8>(count: _STRBYTES);
-  final passwdCstr = StringToCstr(passwd);
+  Pointer<Int8> out;
+  Pointer<Int8> passwdCstr;
   try {
+    out = allocate<Int8>(count: _STRBYTES);
+    passwdCstr = StringToCstr(passwd);
+    final realOpslimit = getOpslimit(opslimit);
+    final realMemlimit = getMemlimit(memlimit);
     final hashResult =
         _pwhashStr(out, passwdCstr, passwd.length, realOpslimit, realMemlimit);
     if (hashResult < 0) {
@@ -93,7 +95,7 @@ String pwhashStr(String passwd, Opslimit opslimit, Memlimit memlimit) {
     }
     return CstrToString(out, _STRBYTES);
   } finally {
-    out.free();
-    passwdCstr.free();
+    out?.free();
+    passwdCstr?.free();
   }
 }
