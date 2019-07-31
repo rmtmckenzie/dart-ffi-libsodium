@@ -23,3 +23,19 @@ String CstrToString(Pointer<Int8> ptr, int length) {
   }
   return ascii.decode(buf);
 }
+
+Pointer<Uint8> BufferToUnsignedChar(Uint8List buf) {
+  final Pointer<Uint8> ptr = allocate(count: buf.length);
+  for (var i = 0; i < buf.length; i++) {
+    ptr.elementAt(i).store(buf[i]);
+  }
+  return ptr;
+}
+
+Uint8List UnsignedCharToBuffer(Pointer<Uint8> ptr, int length) {
+  final buf = Uint8List(length);
+  for (var i = 0; i < length; i++) {
+    buf[i] = ptr.elementAt(i).load();
+  }
+  return buf;
+}
