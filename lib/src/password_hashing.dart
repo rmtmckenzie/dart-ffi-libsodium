@@ -2,7 +2,6 @@ import 'dart:ffi';
 import './ffi_helper.dart';
 
 import './dart_sodium_base.dart';
-import 'package:meta/meta.dart';
 
 typedef _PwhashStrNative = Int16 Function(Pointer<Int8> out,
     Pointer<Int8> passwd, Uint64 passwdLen, Uint64 opsLimit, Uint64 memlimit);
