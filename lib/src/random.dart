@@ -7,8 +7,9 @@ final _randomBytesBuf = libsodium.lookupFunction<
     void Function(Pointer<Uint8> buf, int size)>("randombytes_buf");
 
 Uint8List randomBytesBuf(int size) {
-  final Pointer<Uint8> bufptr = allocate(count: size);
+  Pointer<Uint8> bufptr;
   try {
+    bufptr = allocate(count: size);
     _randomBytesBuf(bufptr, size);
     final buf = Uint8List(size);
     for (var i = 0; i < size; i++) {
@@ -16,6 +17,6 @@ Uint8List randomBytesBuf(int size) {
     }
     return buf;
   } finally {
-    bufptr.free();
+    bufptr?.free();
   }
 }
