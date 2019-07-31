@@ -16,6 +16,23 @@ typedef _SecretBoxEasyDart = int Function(Pointer<Uint8> cyphertext,
 final _secretBoxEasy =
     libsodium.lookupFunction<_SecretBoxEasyNative, _SecretBoxEasyDart>(
         "crypto_secretbox_easy");
+
+typedef _SecretBoxOpenEasyNative = Int16 Function(
+    Pointer<Uint8> msg,
+    Pointer<Uint8> cypherText,
+    Uint64 cypherTextLen,
+    Pointer<Uint8> nonce,
+    Pointer<Uint8> key);
+typedef _SecretBoxOpenEasyDart = int Function(
+    Pointer<Uint8> msg,
+    Pointer<Uint8> cypherText,
+    int cypherTextLen,
+    Pointer<Uint8> nonce,
+    Pointer<Uint8> key);
+final _secretBoxOpenEasy =
+    libsodium.lookupFunction<_SecretBoxOpenEasyNative, _SecretBoxOpenEasyDart>(
+        "crypto_secretbox_open_easy");
+
 final _KEYBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_secretbox_keybytes")();
 final _NONCEBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
@@ -53,5 +70,31 @@ Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
     msgPtr?.free();
     noncePtr?.free();
     keyPtr?.free();
+  }
+}
+
+Uint8List secretBoxOpenEasy(
+    Uint8List cypherText, Uint8List nonce, Uint8List key) {
+  Pointer<Uint8> cPtr;
+  Pointer<Uint8> noncePtr;
+  Pointer<Uint8> keyPtr;
+  Pointer<Uint8> msgPtr;
+  try {
+    final msgLen = cypherText.length - _MACBYTES;
+    msgPtr = allocate(count: msgLen);
+    cPtr = BufferToUnsignedChar(cypherText);
+    keyPtr = BufferToUnsignedChar(key);
+    noncePtr = BufferToUnsignedChar(nonce);
+    final result =
+        _secretBoxOpenEasy(msgPtr, cPtr, cypherText.length, noncePtr, keyPtr);
+    if (result == -1) {
+      throw Exception("dart_sodium secretBoxOpenEasy failed: $result");
+    }
+    return UnsignedCharToBuffer(msgPtr, msgLen);
+  } finally {
+    cPtr?.free();
+    noncePtr?.free();
+    keyPtr?.free();
+    msgPtr?.free();
   }
 }
