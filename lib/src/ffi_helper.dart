@@ -15,7 +15,11 @@ Pointer<Int8> StringToCstr(String str) {
 String CstrToString(Pointer<Int8> ptr, int length) {
   final buf = Int8List(length);
   for (var i = 0; i < length; i++) {
-    buf[i] = ptr.elementAt(i).load();
+    int char = ptr.elementAt(i).load();
+    if (char == 0) {
+      break;
+    }
+    buf[i] = char;
   }
   return ascii.decode(buf);
 }
