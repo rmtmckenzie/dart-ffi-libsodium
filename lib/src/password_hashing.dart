@@ -1,21 +1,22 @@
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:typed_data';
 import './ffi_helper.dart';
 
 import './dart_sodium_base.dart';
 
-typedef _PwhashStrNative = Int16 Function(Pointer<Int8> out,
-    Pointer<Int8> passwd, Uint64 passwdLen, Uint64 opsLimit, Uint64 memlimit);
-typedef _PwhashStrDart = int Function(Pointer<Int8> out, Pointer<Int8> passwd,
+typedef _PwhashStrNative = Int16 Function(Pointer<Uint8> out,
+    Pointer<Uint8> passwd, Uint64 passwdLen, Uint64 opsLimit, Uint64 memlimit);
+typedef _PwhashStrDart = int Function(Pointer<Uint8> out, Pointer<Uint8> passwd,
     int passwdLen, int opsLimit, int memlimit);
 
 final _pwhashStr = libsodium
     .lookupFunction<_PwhashStrNative, _PwhashStrDart>("crypto_pwhash_str");
 
 typedef _PwhashStrVerifyNative = Int16 Function(
-    Pointer<Int8> str, Pointer<Int8> passwd, Uint64 passwdlen);
+    Pointer<Uint8> str, Pointer<Uint8> passwd, Uint64 passwdlen);
 typedef _PwhashStrVerifyDart = int Function(
-    Pointer<Int8> str, Pointer<Int8> passwd, int passwdlen);
+    Pointer<Uint8> str, Pointer<Uint8> passwd, int passwdlen);
 
 final _pwhashStrVerify =
     libsodium.lookupFunction<_PwhashStrVerifyNative, _PwhashStrVerifyDart>(
