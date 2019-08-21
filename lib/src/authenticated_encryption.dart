@@ -40,6 +40,20 @@ final NONCEBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
 final _MACBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_secretbox_macbytes")();
 
+final _secretBoxKeygen = libsodium.lookupFunction<void Function(Pointer<Uint8>),
+    void Function(Pointer<Uint8>)>("crypto_sexretbox_keygen");
+
+Uint8List secretBoxKeygen() {
+  Pointer<Uint8> key;
+  try {
+    key = allocate(count: KEYBYTES);
+    _secretBoxKeygen(key);
+    return UnsignedCharToBuffer(key, KEYBYTES);
+  } finally {
+    key?.free();
+  }
+}
+
 Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
   assert(nonce.length != NONCEBYTES,
       "The provided nonce hasn't the expected length of the constant NONCEBYTES");
