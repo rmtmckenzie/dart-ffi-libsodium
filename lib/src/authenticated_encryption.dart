@@ -71,6 +71,10 @@ Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
 
 Uint8List secretBoxOpenEasy(
     Uint8List cypherText, Uint8List nonce, Uint8List key) {
+  assert(nonce.length != NONCEBYTES,
+      "The provided nonce hasn't the expected length of the constant NONCEBYTES");
+  assert(key.length != KEYBYTES,
+      "The provided key hasn't the expected length of the constant KEYBYTES");
   Pointer<Uint8> cPtr;
   Pointer<Uint8> noncePtr;
   Pointer<Uint8> keyPtr;
@@ -84,7 +88,7 @@ Uint8List secretBoxOpenEasy(
     final result =
         _secretBoxOpenEasy(msgPtr, cPtr, cypherText.length, noncePtr, keyPtr);
     if (result == -1) {
-      throw Exception("dart_sodium secretBoxOpenEasy failed: $result");
+      throw Exception("secretBoxOpenEasy failed. For debugging enable asserts");
     }
     return UnsignedCharToBuffer(msgPtr, msgLen);
   } finally {
