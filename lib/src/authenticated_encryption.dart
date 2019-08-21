@@ -33,21 +33,21 @@ final _secretBoxOpenEasy =
     libsodium.lookupFunction<_SecretBoxOpenEasyNative, _SecretBoxOpenEasyDart>(
         "crypto_secretbox_open_easy");
 
-final _KEYBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
+final KEYBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_secretbox_keybytes")();
-final _NONCEBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
+final NONCEBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_secretbox_noncebytes")();
 final _MACBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_secretbox_macbytes")();
 
 Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
-  if (nonce.length != _NONCEBYTES) {
+  if (nonce.length != NONCEBYTES) {
     throw ArgumentError(
-        "The provided nonce hasn't the expected length $_NONCEBYTES: ${nonce.length}");
+        "The provided nonce hasn't the expected length $NONCEBYTES: ${nonce.length}");
   }
-  if (key.length != _KEYBYTES) {
+  if (key.length != KEYBYTES) {
     throw ArgumentError(
-        "The provided key hasn't the expected length $_KEYBYTES: ${key.length}");
+        "The provided key hasn't the expected length $KEYBYTES: ${key.length}");
   }
   Pointer<Uint8> cypherText;
   Pointer<Uint8> msgPtr;
