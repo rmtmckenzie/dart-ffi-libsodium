@@ -43,8 +43,8 @@ final _secretBoxMacBytes =
     libsodium.lookupFunction<Uint64 Function(), int Function()>(
         "crypto_secretbox_macbytes")();
 
-final _secretBoxKeygen = libsodium.lookupFunction<void Function(Pointer<Uint8>),
-    void Function(Pointer<Uint8>)>("crypto_sexretbox_keygen");
+final _secretBoxKeygen = libsodium.lookupFunction<Void Function(Pointer<Uint8>),
+    void Function(Pointer<Uint8>)>("crypto_secretbox_keygen");
 
 Uint8List secretBoxKeygen() {
   Pointer<Uint8> key;
