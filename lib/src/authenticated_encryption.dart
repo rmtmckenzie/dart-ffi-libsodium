@@ -59,9 +59,9 @@ Uint8List secretBoxKeygen() {
 
 Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
   assert(nonce.length != secretBoxNonceBytes,
-      "The provided nonce hasn't the expected length of the constant secretBoxNonceBytes");
+      "Nonce must be of length [secretBoxNonceBytes]");
   assert(key.length != secretBoxKeyBytes,
-      "The provided key hasn't the expected length of the constant secretBoxKeyBytes");
+      "Key must be of length [secretBoxKeyBytes]");
   Pointer<Uint8> cypherText;
   Pointer<Uint8> msgPtr;
   Pointer<Uint8> noncePtr;
@@ -76,7 +76,7 @@ Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
         _secretBoxEasy(cypherText, msgPtr, msg.length, noncePtr, keyPtr);
     if (secretBoxResult == -1) {
       throw Exception(
-          "secretBoxEasy failed. Make sure nonce has length secretBoxNonceBytes and key has length secretBoxKeyBytes. For debugging enable asserts");
+          "secretBoxEasy failed. Make sure nonce and key have the correct length. For debugging enable asserts");
     }
     return UnsignedCharToBuffer(cypherText, cypherTextLen);
   } finally {
@@ -90,9 +90,9 @@ Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
 Uint8List secretBoxOpenEasy(
     Uint8List cypherText, Uint8List nonce, Uint8List key) {
   assert(nonce.length != secretBoxNonceBytes,
-      "The provided nonce hasn't the expected length of the constant secretBoxNonceBytes");
+      "Nonce must be of length [secretBoxNonceBytes]");
   assert(key.length != secretBoxKeyBytes,
-      "The provided key hasn't the expected length of the constant secretBoxKeyBytes");
+      "Key must be of length [secretBoxKeyBytes]");
   Pointer<Uint8> cPtr;
   Pointer<Uint8> noncePtr;
   Pointer<Uint8> keyPtr;
@@ -107,7 +107,7 @@ Uint8List secretBoxOpenEasy(
         _secretBoxOpenEasy(msgPtr, cPtr, cypherText.length, noncePtr, keyPtr);
     if (result == -1) {
       throw Exception(
-          "secretBoxOpenEasy failed. Make sure nonce has length secretBoxNonceBytes and key has length secretBoxKeyBytes. For debugging enable asserts");
+          "secretBoxOpenEasy failed. Make sure nonce and key have the correct length. For debugging enable asserts");
     }
     return UnsignedCharToBuffer(msgPtr, msgLen);
   } finally {
