@@ -41,14 +41,10 @@ final _MACBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_secretbox_macbytes")();
 
 Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
-  if (nonce.length != NONCEBYTES) {
-    throw ArgumentError(
-        "The provided nonce hasn't the expected length $NONCEBYTES: ${nonce.length}");
-  }
-  if (key.length != KEYBYTES) {
-    throw ArgumentError(
-        "The provided key hasn't the expected length $KEYBYTES: ${key.length}");
-  }
+  assert(nonce.length != NONCEBYTES,
+      "The provided nonce hasn't the expected length of the constant NONCEBYTES");
+  assert(key.length != KEYBYTES,
+      "The provided key hasn't the expected length of the constant KEYBYTES");
   Pointer<Uint8> cypherText;
   Pointer<Uint8> msgPtr;
   Pointer<Uint8> noncePtr;
