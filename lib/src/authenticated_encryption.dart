@@ -58,7 +58,8 @@ Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
     final secretBoxResult =
         _secretBoxEasy(cypherText, msgPtr, msg.length, noncePtr, keyPtr);
     if (secretBoxResult == -1) {
-      throw Exception("secretBoxEasy failed. For debugging enable asserts");
+      throw Exception(
+          "secretBoxEasy failed. Make sure nonce has length NONCEBYTES and key has length KEYBYTES. For debugging enable asserts");
     }
     return UnsignedCharToBuffer(cypherText, cypherTextLen);
   } finally {
@@ -88,7 +89,8 @@ Uint8List secretBoxOpenEasy(
     final result =
         _secretBoxOpenEasy(msgPtr, cPtr, cypherText.length, noncePtr, keyPtr);
     if (result == -1) {
-      throw Exception("secretBoxOpenEasy failed. For debugging enable asserts");
+      throw Exception(
+          "secretBoxOpenEasy failed. Make sure nonce has length NONCEBYTES and key has length KEYBYTES. For debugging enable asserts");
     }
     return UnsignedCharToBuffer(msgPtr, msgLen);
   } finally {
