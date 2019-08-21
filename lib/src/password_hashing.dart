@@ -101,7 +101,7 @@ String pwhashStr(String passwd, Opslimit opslimit, Memlimit memlimit) {
     final hashResult =
         _pwhashStr(out, passwdCstr, passwd.length, realOpslimit, realMemlimit);
     if (hashResult < 0) {
-      throw Exception("dart_sodium pwhashStr failed: $hashResult");
+      throw Exception("pwhashStr failed");
     }
     return CstrToString(out, _STRBYTES);
   } finally {
