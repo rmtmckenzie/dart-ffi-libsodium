@@ -13,7 +13,7 @@ final authBytes = libsodium
 
 final authKeyBytes =
     libsodium.lookupFunction<Uint64 Function(), int Function()>(
-        "crypto_auth_KEYBYTES")();
+        "crypto_auth_keybytes")();
 
 final _authKeyGen = libsodium
     .lookupFunction<_AuthKeyGenNative, _AuthKeyGenDart>("crypto_auth_keygen");
