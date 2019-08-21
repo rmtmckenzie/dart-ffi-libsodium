@@ -33,12 +33,15 @@ final _secretBoxOpenEasy =
     libsodium.lookupFunction<_SecretBoxOpenEasyNative, _SecretBoxOpenEasyDart>(
         "crypto_secretbox_open_easy");
 
-final KEYBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
-    "crypto_secretbox_keybytes")();
-final NONCEBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
-    "crypto_secretbox_noncebytes")();
-final _MACBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
-    "crypto_secretbox_macbytes")();
+final secretBoxKeyBytes =
+    libsodium.lookupFunction<Uint64 Function(), int Function()>(
+        "crypto_secretbox_keybytes")();
+final secretBoxNonceBytes =
+    libsodium.lookupFunction<Uint64 Function(), int Function()>(
+        "crypto_secretbox_noncebytes")();
+final _secretBoxMacBytes =
+    libsodium.lookupFunction<Uint64 Function(), int Function()>(
+        "crypto_secretbox_macbytes")();
 
 final _secretBoxKeygen = libsodium.lookupFunction<void Function(Pointer<Uint8>),
     void Function(Pointer<Uint8>)>("crypto_sexretbox_keygen");
@@ -46,25 +49,25 @@ final _secretBoxKeygen = libsodium.lookupFunction<void Function(Pointer<Uint8>),
 Uint8List secretBoxKeygen() {
   Pointer<Uint8> key;
   try {
-    key = allocate(count: KEYBYTES);
+    key = allocate(count: secretBoxKeyBytes);
     _secretBoxKeygen(key);
-    return UnsignedCharToBuffer(key, KEYBYTES);
+    return UnsignedCharToBuffer(key, secretBoxKeyBytes);
   } finally {
     key?.free();
   }
 }
 
 Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
-  assert(nonce.length != NONCEBYTES,
-      "The provided nonce hasn't the expected length of the constant NONCEBYTES");
-  assert(key.length != KEYBYTES,
-      "The provided key hasn't the expected length of the constant KEYBYTES");
+  assert(nonce.length != secretBoxNonceBytes,
+      "The provided nonce hasn't the expected length of the constant secretBoxNonceBytes");
+  assert(key.length != secretBoxKeyBytes,
+      "The provided key hasn't the expected length of the constant secretBoxKeyBytes");
   Pointer<Uint8> cypherText;
   Pointer<Uint8> msgPtr;
   Pointer<Uint8> noncePtr;
   Pointer<Uint8> keyPtr;
   try {
-    final cypherTextLen = _MACBYTES + msg.length;
+    final cypherTextLen = _secretBoxMacBytes + msg.length;
     cypherText = allocate(count: cypherTextLen);
     msgPtr = BufferToUnsignedChar(msg);
     noncePtr = BufferToUnsignedChar(nonce);
@@ -73,7 +76,7 @@ Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
         _secretBoxEasy(cypherText, msgPtr, msg.length, noncePtr, keyPtr);
     if (secretBoxResult == -1) {
       throw Exception(
-          "secretBoxEasy failed. Make sure nonce has length NONCEBYTES and key has length KEYBYTES. For debugging enable asserts");
+          "secretBoxEasy failed. Make sure nonce has length secretBoxNonceBytes and key has length secretBoxKeyBytes. For debugging enable asserts");
     }
     return UnsignedCharToBuffer(cypherText, cypherTextLen);
   } finally {
@@ -86,16 +89,16 @@ Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
 
 Uint8List secretBoxOpenEasy(
     Uint8List cypherText, Uint8List nonce, Uint8List key) {
-  assert(nonce.length != NONCEBYTES,
-      "The provided nonce hasn't the expected length of the constant NONCEBYTES");
-  assert(key.length != KEYBYTES,
-      "The provided key hasn't the expected length of the constant KEYBYTES");
+  assert(nonce.length != secretBoxNonceBytes,
+      "The provided nonce hasn't the expected length of the constant secretBoxNonceBytes");
+  assert(key.length != secretBoxKeyBytes,
+      "The provided key hasn't the expected length of the constant secretBoxKeyBytes");
   Pointer<Uint8> cPtr;
   Pointer<Uint8> noncePtr;
   Pointer<Uint8> keyPtr;
   Pointer<Uint8> msgPtr;
   try {
-    final msgLen = cypherText.length - _MACBYTES;
+    final msgLen = cypherText.length - _secretBoxMacBytes;
     msgPtr = allocate(count: msgLen);
     cPtr = BufferToUnsignedChar(cypherText);
     keyPtr = BufferToUnsignedChar(key);
@@ -104,7 +107,7 @@ Uint8List secretBoxOpenEasy(
         _secretBoxOpenEasy(msgPtr, cPtr, cypherText.length, noncePtr, keyPtr);
     if (result == -1) {
       throw Exception(
-          "secretBoxOpenEasy failed. Make sure nonce has length NONCEBYTES and key has length KEYBYTES. For debugging enable asserts");
+          "secretBoxOpenEasy failed. Make sure nonce has length secretBoxNonceBytes and key has length secretBoxKeyBytes. For debugging enable asserts");
     }
     return UnsignedCharToBuffer(msgPtr, msgLen);
   } finally {
