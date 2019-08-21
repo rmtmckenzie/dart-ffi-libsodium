@@ -72,7 +72,7 @@ class MemLimit {
   static final max = _MEMLIMIT_MAX;
 }
 
-String pwHashStr(String passwd, int opslimit, int memlimit) {
+Uint8List pwHashStr(Uint8List passwd, int opslimit, int memlimit) {
   assert(
       opslimit == OpsLimit.min ||
           opslimit == OpsLimit.interactive ||
@@ -87,45 +87,34 @@ String pwHashStr(String passwd, int opslimit, int memlimit) {
           memlimit == MemLimit.interactive ||
           memlimit == MemLimit.max,
       "memlimit must be a valid value from MemLimit");
-  Pointer<Int8> out;
-  Pointer<Int8> passwdCstr;
+  Pointer<Uint8> out;
+  Pointer<Uint8> passwdCstr;
   try {
-    out = allocate<Int8>(count: pwHashStrBytes);
-    passwdCstr = StringToCstr(passwd);
+    out = allocate(count: pwHashStrBytes);
+    passwdCstr = BufferToUnsignedChar(passwd);
     final hashResult =
         _pwhashStr(out, passwdCstr, passwd.length, opslimit, memlimit);
     if (hashResult < 0) {
       throw Exception(
           "pwhashStr failed. Please make sure opslimit is a value from OpsLimit and memlimit is a value from MemLimit. For debugging enable asserts.");
     }
-    return CstrToString(out, pwHashStrBytes);
+    return UnsignedCharToBuffer(out, pwHashStrBytes);
   } finally {
     out?.free();
     passwdCstr?.free();
   }
 }
 
-bool pwHashStrVerify(String hash, String passwd) {
+bool pwHashStrVerify(Uint8List hash, Uint8List passwd) {
   assert(hash.length > pwHashStrBytes,
       "The provided hash is longer than expected");
-  Pointer<Int8> hashPtr;
-  Pointer<Int8> passwdPtr;
+  Pointer<Uint8> hashPtr;
+  Pointer<Uint8> passwdPtr;
   try {
-    hashPtr = allocate(count: pwHashStrBytes);
-    {
-      var i = 0;
-      final buf = ascii.encode(hash);
-      for (; i < hash.length; i++) {
-        hashPtr.elementAt(i).store(buf[i]);
-      }
-      hashPtr.elementAt(i + 1).store(0);
-    }
-    passwdPtr = StringToCstr(passwd);
+    hashPtr = BufferToUnsignedChar(hash);
+    passwdPtr = BufferToUnsignedChar(passwd);
     final verifyResult = _pwhashStrVerify(hashPtr, passwdPtr, passwd.length);
-    if (verifyResult == -1) {
-      return false;
-    }
-    return true;
+    return verifyResult == 0;
   } finally {
     hashPtr?.free();
     passwdPtr?.free();
