@@ -49,7 +49,7 @@ final _secretBoxMacBytes =
 final _secretBoxKeygen = libsodium.lookupFunction<Void Function(Pointer<Uint8>),
     void Function(Pointer<Uint8>)>("crypto_secretbox_keygen");
 
-/// Generate a randomn key with the correct length. Wrapper around [randomnBytesBuf]
+/// Generate a randomn key with the correct length [secretBoxKeyBytes]. Wrapper around [randomnBytesBuf]
 Uint8List secretBoxKeygen() {
   Pointer<Uint8> key;
   try {
