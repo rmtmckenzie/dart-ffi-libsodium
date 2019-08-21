@@ -21,8 +21,9 @@ final _pwhashStrVerify =
     libsodium.lookupFunction<_PwhashStrVerifyNative, _PwhashStrVerifyDart>(
         "crypto_pwhash_str_verify");
 
-final _STRBYTES = libsodium.lookupFunction<Uint64 Function(), int Function()>(
-    "crypto_pwhash_strbytes")();
+final pwHashStrBytes =
+    libsodium.lookupFunction<Uint64 Function(), int Function()>(
+        "crypto_pwhash_strbytes")();
 final _OPSLIMIT_MODERATE =
     libsodium.lookupFunction<Uint64 Function(), int Function()>(
         "crypto_pwhash_opslimit_moderate")();
@@ -88,7 +89,7 @@ String pwHashStr(String passwd, int opslimit, int memlimit) {
   Pointer<Int8> out;
   Pointer<Int8> passwdCstr;
   try {
-    out = allocate<Int8>(count: _STRBYTES);
+    out = allocate<Int8>(count: pwHashStrBytes);
     passwdCstr = StringToCstr(passwd);
     final hashResult =
         _pwhashStr(out, passwdCstr, passwd.length, opslimit, memlimit);
@@ -96,7 +97,7 @@ String pwHashStr(String passwd, int opslimit, int memlimit) {
       throw Exception(
           "pwhashStr failed. Please make sure opslimit is a value from OpsLimit and memlimit is a value from MemLimit. For debugging enable asserts.");
     }
-    return CstrToString(out, _STRBYTES);
+    return CstrToString(out, pwHashStrBytes);
   } finally {
     out?.free();
     passwdCstr?.free();
@@ -104,11 +105,12 @@ String pwHashStr(String passwd, int opslimit, int memlimit) {
 }
 
 bool pwHashStrVerify(String hash, String passwd) {
-  assert(hash.length > _STRBYTES, "The provided hash is longer than expected");
+  assert(hash.length > pwHashStrBytes,
+      "The provided hash is longer than expected");
   Pointer<Int8> hashPtr;
   Pointer<Int8> passwdPtr;
   try {
-    hashPtr = allocate(count: _STRBYTES);
+    hashPtr = allocate(count: pwHashStrBytes);
     {
       var i = 0;
       final buf = ascii.encode(hash);
