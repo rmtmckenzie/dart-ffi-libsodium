@@ -58,7 +58,7 @@ Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
     final secretBoxResult =
         _secretBoxEasy(cypherText, msgPtr, msg.length, noncePtr, keyPtr);
     if (secretBoxResult == -1) {
-      throw Exception("dart_sodium secretBoxEasy failed: $secretBoxResult");
+      throw Exception("secretBoxEasy failed. For debugging enable asserts");
     }
     return UnsignedCharToBuffer(cypherText, cypherTextLen);
   } finally {
