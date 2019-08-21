@@ -9,7 +9,7 @@ typedef _AuthKeyGenNative = Void Function(Pointer<Uint8>);
 typedef _AuthKeyGenDart = void Function(Pointer<Uint8>);
 
 /// Length of the authentication tag.
-final authBytes = libsodium
+final _authBytes = libsodium
     .lookupFunction<Uint64 Function(), int Function()>("crypto_auth_bytes")();
 
 /// Required length of the [key] for [auth]
@@ -48,10 +48,10 @@ Uint8List auth(Uint8List msg, Uint8List key) {
   Pointer<Uint8> msgPointer;
   try {
     keyPointer = BufferToUnsignedChar(key);
-    out = allocate(count: authBytes);
+    out = allocate(count: _authBytes);
     msgPointer = BufferToUnsignedChar(msg);
     _auth(out, msgPointer, msg.length, keyPointer);
-    return UnsignedCharToBuffer(out, authBytes);
+    return UnsignedCharToBuffer(out, _authBytes);
   } finally {
     keyPointer?.free();
     out?.free();
@@ -69,7 +69,7 @@ final _authVerify = libsodium
 /// Verify the authenticity of [msg] with the [key] and [tag].
 bool authVerify(Uint8List tag, Uint8List msg, Uint8List key) {
   assert(key.length != authKeyBytes, "Key must be of length [authKeyBytes]");
-  assert(tag.length != authBytes, "Tag must be of length [authBytes]");
+  assert(tag.length != _authBytes, "Tag must be of length [authBytes]");
   Pointer<Uint8> keyPointer;
   Pointer<Uint8> tagPointer;
   Pointer<Uint8> msgPointer;
