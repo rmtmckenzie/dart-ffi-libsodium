@@ -90,7 +90,7 @@ int getMemlimit(Memlimit memlimit) {
   }
 }
 
-String pwhashStr(String passwd, Opslimit opslimit, Memlimit memlimit) {
+String pwHashStr(String passwd, Opslimit opslimit, Memlimit memlimit) {
   Pointer<Int8> out;
   Pointer<Int8> passwdCstr;
   try {
@@ -110,7 +110,7 @@ String pwhashStr(String passwd, Opslimit opslimit, Memlimit memlimit) {
   }
 }
 
-bool pwhashStrVerify(String hash, String passwd) {
+bool pwHashStrVerify(String hash, String passwd) {
   Pointer<Int8> hashPtr;
   Pointer<Int8> passwdPtr;
   if (hash.length > _STRBYTES) {
