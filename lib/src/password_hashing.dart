@@ -96,7 +96,7 @@ Uint8List pwHashStr(Uint8List passwd, int opslimit, int memlimit) {
         _pwhashStr(out, passwdCstr, passwd.length, opslimit, memlimit);
     if (hashResult < 0) {
       throw Exception(
-          "pwhashStr failed. Please make sure opslimit is a value from OpsLimit and memlimit is a value from MemLimit. For debugging enable asserts.");
+          "pwhashStr failed. Please make sure opslimit and memlimit have valid values. For debugging enable asserts.");
     }
     return UnsignedCharToBuffer(out, pwHashStrBytes);
   } finally {
@@ -106,8 +106,8 @@ Uint8List pwHashStr(Uint8List passwd, int opslimit, int memlimit) {
 }
 
 bool pwHashStrVerify(Uint8List hash, Uint8List passwd) {
-  assert(hash.length > pwHashStrBytes,
-      "The provided hash is longer than expected");
+  assert(hash.length != pwHashStrBytes,
+      "Hash hasn't expected length of [pwHashStrBytes]");
   Pointer<Uint8> hashPtr;
   Pointer<Uint8> passwdPtr;
   try {
