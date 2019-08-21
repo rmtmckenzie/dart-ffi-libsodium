@@ -8,9 +8,11 @@ import 'dart:ffi';
 typedef _AuthKeyGenNative = Void Function(Pointer<Uint8>);
 typedef _AuthKeyGenDart = void Function(Pointer<Uint8>);
 
+/// Length of the authentication tag.
 final authBytes = libsodium
     .lookupFunction<Uint64 Function(), int Function()>("crypto_auth_bytes")();
 
+/// Required length of the [key] for [auth]
 final authKeyBytes =
     libsodium.lookupFunction<Uint64 Function(), int Function()>(
         "crypto_auth_keybytes")();
@@ -18,6 +20,7 @@ final authKeyBytes =
 final _authKeyGen = libsodium
     .lookupFunction<_AuthKeyGenNative, _AuthKeyGenDart>("crypto_auth_keygen");
 
+/// Generate a key with the correct length of [authKeyBytes]. Wrapper around [randomnBytesBuf].
 Uint8List authKeyGen() {
   Pointer<Uint8> key;
   try {
@@ -35,6 +38,9 @@ typedef _AuthDart = void Function(
     Pointer<Uint8> out, Pointer<Uint8> msg, int msglen, Pointer<Uint8> key);
 
 final _auth = libsodium.lookupFunction<_AuthNative, _AuthDart>("crypto_auth");
+
+/// Sign [msg] with a [key] of length [authKeyBytes].
+/// With [authVerify] you can verify the integrity of the [msg].
 Uint8List auth(Uint8List msg, Uint8List key) {
   assert(key.length != authKeyBytes, "Key must be of length [authKeyBytes]");
   Pointer<Uint8> keyPointer;
@@ -59,6 +65,8 @@ typedef _AuthVerifyDart = int Function(
     Pointer<Uint8> tag, Pointer<Uint8> msg, int msglen, Pointer<Uint8> key);
 final _authVerify = libsodium
     .lookupFunction<_AuthVerifyNative, _AuthVerifyDart>("crypto_auth_verify");
+
+/// Verify the authenticity of [msg] with the [key] and [tag].
 bool authVerify(Uint8List tag, Uint8List msg, Uint8List key) {
   assert(key.length != authKeyBytes, "Key must be of length [authKeyBytes]");
   assert(tag.length != authBytes, "Tag must be of length [authBytes]");
