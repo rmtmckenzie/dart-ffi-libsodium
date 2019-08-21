@@ -1,3 +1,5 @@
+import 'package:dart_sodium/src/ffi_helper.dart';
+
 import 'dart_sodium_base.dart' show libsodium;
 import 'dart:typed_data';
 import 'dart:ffi';
@@ -11,11 +13,7 @@ Uint8List randomBytesBuf(int size) {
   try {
     bufptr = allocate(count: size);
     _randomBytesBuf(bufptr, size);
-    final buf = Uint8List(size);
-    for (var i = 0; i < size; i++) {
-      buf[i] = bufptr.elementAt(i).load();
-    }
-    return buf;
+    return UnsignedCharToBuffer(bufptr, size);
   } finally {
     bufptr?.free();
   }
