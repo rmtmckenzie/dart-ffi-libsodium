@@ -3,7 +3,7 @@
 /// More dartdocs go here.
 library dart_sodium;
 
-export 'src/dart_sodium_base.dart';
+export 'src/dart_sodium_base.dart' show init;
 export 'src/random.dart';
 export 'src/password_hashing.dart';
 
