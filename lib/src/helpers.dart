@@ -11,6 +11,10 @@ typedef _SodiumMemcmpDart = int Function(
 final _memcmp = libsodium
     .lookupFunction<_SodiumMemcmpNative, _SodiumMemcmpDart>("sodium_memcmp");
 
+/// Constant time comparison of two buffers.
+/// You should use this instead of simple comparison using the [==] operator
+/// when you are comparing sensitive information (like authentication tags)
+/// to avoid side-channel attacks like timing-attacks.
 bool memCmp(Uint8List first, Uint8List second) {
   final len = first.length > second.length ? first.length : second.length;
   Pointer<Uint8> firstPtr, secondPtr;
