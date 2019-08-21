@@ -54,54 +54,47 @@ final _MEMLIMIT_MAX =
     libsodium.lookupFunction<Uint64 Function(), int Function()>(
         "crypto_pwhash_memlimit_max")();
 
-enum Opslimit { min, interactive, moderate, sensitive, max }
-enum Memlimit { min, interactive, moderate, sensitive, max }
-int getOpslimit(Opslimit opslimit) {
-  switch (opslimit) {
-    case Opslimit.moderate:
-      return _OPSLIMIT_MODERATE;
-    case Opslimit.interactive:
-      return _OPSLIMIT_INTERACTIVE;
-    case Opslimit.min:
-      return _OPSLIMIT_MIN;
-    case Opslimit.sensitive:
-      return _OPSLIMIT_SENSITIVE;
-    case Opslimit.max:
-      return _OPSLIMIT_MAX;
-    default:
-      throw ArgumentError("Invalid value $opslimit");
-  }
+class OpsLimit {
+  static final min = _OPSLIMIT_MIN;
+  static final interactive = _OPSLIMIT_INTERACTIVE;
+  static final moderate = _OPSLIMIT_MODERATE;
+  static final sensitive = _OPSLIMIT_SENSITIVE;
+  static final max = _OPSLIMIT_MAX;
 }
 
-int getMemlimit(Memlimit memlimit) {
-  switch (memlimit) {
-    case Memlimit.moderate:
-      return _MEMLIMIT_MODERATE;
-    case Memlimit.min:
-      return _MEMLIMIT_MIN;
-    case Memlimit.interactive:
-      return _MEMLIMIT_INTERACTIVE;
-    case Memlimit.sensitive:
-      return _MEMLIMIT_SENSITIVE;
-    case Memlimit.max:
-      return _MEMLIMIT_MAX;
-    default:
-      throw ArgumentError("Invalid value $memlimit");
-  }
+class MemLimit {
+  static final min = _MEMLIMIT_MIN;
+  static final interactive = _MEMLIMIT_INTERACTIVE;
+  static final moderate = _MEMLIMIT_MODERATE;
+  static final sensitive = _MEMLIMIT_SENSITIVE;
+  static final max = _MEMLIMIT_MAX;
 }
 
-String pwHashStr(String passwd, Opslimit opslimit, Memlimit memlimit) {
+String pwHashStr(String passwd, int opslimit, int memlimit) {
+  assert(
+      opslimit == OpsLimit.min ||
+          opslimit == OpsLimit.interactive ||
+          opslimit == OpsLimit.moderate ||
+          opslimit == OpsLimit.interactive ||
+          opslimit == OpsLimit.max,
+      "opslimit must be a valid value from OpsLimit");
+  assert(
+      memlimit == MemLimit.min ||
+          memlimit == MemLimit.interactive ||
+          memlimit == MemLimit.moderate ||
+          memlimit == MemLimit.interactive ||
+          memlimit == MemLimit.max,
+      "memlimit must be a valid value from MemLimit");
   Pointer<Int8> out;
   Pointer<Int8> passwdCstr;
   try {
     out = allocate<Int8>(count: _STRBYTES);
     passwdCstr = StringToCstr(passwd);
-    final realOpslimit = getOpslimit(opslimit);
-    final realMemlimit = getMemlimit(memlimit);
     final hashResult =
-        _pwhashStr(out, passwdCstr, passwd.length, realOpslimit, realMemlimit);
+        _pwhashStr(out, passwdCstr, passwd.length, opslimit, memlimit);
     if (hashResult < 0) {
-      throw Exception("pwhashStr failed");
+      throw Exception(
+          "pwhashStr failed. Please make sure opslimit is a value from OpsLimit and memlimit is a value from MemLimit. For debugging enable asserts.");
     }
     return CstrToString(out, _STRBYTES);
   } finally {
@@ -111,11 +104,9 @@ String pwHashStr(String passwd, Opslimit opslimit, Memlimit memlimit) {
 }
 
 bool pwHashStrVerify(String hash, String passwd) {
+  assert(hash.length > _STRBYTES, "The provided hash is longer than expected");
   Pointer<Int8> hashPtr;
   Pointer<Int8> passwdPtr;
-  if (hash.length > _STRBYTES) {
-    throw ArgumentError("The provided hash is longer than $_STRBYTES: $hash");
-  }
   try {
     hashPtr = allocate(count: _STRBYTES);
     {
