@@ -20,7 +20,8 @@ final authKeyBytes =
 final _authKeyGen = libsodium
     .lookupFunction<_AuthKeyGenNative, _AuthKeyGenDart>("crypto_auth_keygen");
 
-/// Generate a key with the correct length of [authKeyBytes]. Wrapper around [randomnBytesBuf].
+/// Generate a key with the correct length of [authKeyBytes].
+/// You can use this instead of [randomnBytesBuf].
 Uint8List authKeyGen() {
   Pointer<Uint8> key;
   try {
