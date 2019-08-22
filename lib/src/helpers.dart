@@ -16,12 +16,11 @@ final _memcmp = libsodium
 /// when you are comparing sensitive information (like authentication tags)
 /// to avoid side-channel attacks like timing-attacks.
 bool memCmp(Uint8List first, Uint8List second) {
-  final len = first.length > second.length ? first.length : second.length;
   Pointer<Uint8> firstPtr, secondPtr;
   try {
     firstPtr = BufferToUnsignedChar(first);
     secondPtr = BufferToUnsignedChar(second);
-    final result = _memcmp(firstPtr, secondPtr, len);
+    final result = _memcmp(firstPtr, secondPtr, first.length);
     return result == 0;
   } finally {
     firstPtr?.free();
