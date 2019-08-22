@@ -68,6 +68,13 @@ Uint8List secretBoxKeygen() {
 /// or be obtained by another secure scheme like an atomic counter. The [nonce]
 /// needs to be stored alongside the ciphertext for decryption and doesn't need to be secret.
 /// The [key] has to be [secretBoxKeyBytes] long.
+///
+/// ```
+/// final key = ascii.encode("my secret key");
+/// final nonce = sodium.randomnBytesBuf(secretBoxNonceBytes);
+/// final msg = ascii.encode("my plaintext");
+/// final ciphertext = secretBoxEasy(msg, nonce, key);
+/// ```
 Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
   assert(nonce.length != secretBoxNonceBytes,
       "Nonce must be of length [secretBoxNonceBytes]");
