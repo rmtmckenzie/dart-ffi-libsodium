@@ -76,6 +76,10 @@ class MemLimit {
 /// Valid values for [opslimit] and [memlimit] are the static values
 /// of the classes OpsLimit and MemLimit.
 /// The hash needs to be stored and can be used with pwHashStrVerify to verify a password.
+///
+/// The function generates a salt and provides key stretching. You shouldn't invent your own solutions
+/// for that and never feed a hash to a hash function; chances are that instead of achieving better
+/// security the opposite is the case.
 /// ```
 /// final passwd = ascii.encode("my password");
 /// final pwhash = pwHashStr(paswd, OpsLimit.moderate, MemLimit.moderate);
