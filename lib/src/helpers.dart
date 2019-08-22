@@ -13,14 +13,19 @@ final _memcmp = libsodium
 
 /// Constant time comparison of two buffers.
 /// You should use this instead of simple comparison using the [==] operator
-/// when you are comparing sensitive information (like authentication tags)
+/// when you are comparing sensitive information like authentication tags
 /// to avoid side-channel attacks like timing-attacks.
-bool memCmp(Uint8List first, Uint8List second) {
+///
+/// The [buffer] should be a value provided by the user while [compareTo]
+/// is the value the [buffer] gets compared to. This is important because the
+/// comparison depends on the length of [buffer] to avoid leaking information
+/// about the length of [compareTo].
+bool memCmp(Uint8List buffer, Uint8List compareTo) {
   Pointer<Uint8> firstPtr, secondPtr;
   try {
-    firstPtr = BufferToUnsignedChar(first);
-    secondPtr = BufferToUnsignedChar(second);
-    final result = _memcmp(firstPtr, secondPtr, first.length);
+    firstPtr = BufferToUnsignedChar(buffer);
+    secondPtr = BufferToUnsignedChar(compareTo);
+    final result = _memcmp(firstPtr, secondPtr, buffer.length);
     return result == 0;
   } finally {
     firstPtr?.free();
