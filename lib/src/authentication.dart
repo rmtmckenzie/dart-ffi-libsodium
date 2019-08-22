@@ -41,7 +41,8 @@ typedef _AuthDart = void Function(
 final _auth = libsodium.lookupFunction<_AuthNative, _AuthDart>("crypto_auth");
 
 /// Sign [msg] of any data with a [key] of length [authKeyBytes].
-/// With [authVerify] you can verify the integrity of the [msg].
+/// The returned authentication tag needs to be stored and is needed to authenticate the [msg]
+/// with [authVerify].
 Uint8List auth(Uint8List msg, Uint8List key) {
   assert(key.length != authKeyBytes, "Key must be of length [authKeyBytes]");
   Pointer<Uint8> keyPointer;
