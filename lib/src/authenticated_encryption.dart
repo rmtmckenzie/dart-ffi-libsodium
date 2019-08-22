@@ -65,8 +65,8 @@ Uint8List secretBoxKeygen() {
 /// Use for encrypting any kind of data with the XSalsa20 stream cipher.
 /// An authentication tag (Poly1305 MAC) is added to the ciphertext and hasn't to be stored seperately.
 /// The [nonce] can be generated with any cryptographic randomn number generator like [randomnBytesBuf]
-/// or be obtained by another secure scheme like an atomic counter.
-/// It needs to be stored alongside the ciphertext for decryption and doesn't need to be secret.
+/// or be obtained by another secure scheme like an atomic counter. The [nonce]
+/// needs to be stored alongside the ciphertext for decryption and doesn't need to be secret.
 /// The [key] has to be [secretBoxKeyBytes] long.
 Uint8List secretBoxEasy(Uint8List msg, Uint8List nonce, Uint8List key) {
   assert(nonce.length != secretBoxNonceBytes,
