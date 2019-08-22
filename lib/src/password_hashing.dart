@@ -113,6 +113,7 @@ Uint8List pwHashStr(Uint8List passwd, int opslimit, int memlimit) {
   }
 }
 
+/// Verify a [passwd] with its [hash] generated from pwHashStr.
 bool pwHashStrVerify(Uint8List hash, Uint8List passwd) {
   assert(hash.length != pwHashStrBytes,
       "Hash hasn't expected length of [pwHashStrBytes]");
