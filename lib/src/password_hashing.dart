@@ -74,7 +74,8 @@ class MemLimit {
 
 /// Produce strong password hashes with the Argon2 function.
 /// Valid values for [opslimit] and [memlimit] are the static values
-/// of the classes OpsLimit and MemLimit
+/// of the classes OpsLimit and MemLimit.
+/// The hash needs to be stored and can be used with pwHashStrVerify to verify a password.
 /// ```
 /// final passwd = ascii.encode("my password");
 /// final pwhash = pwHashStr(paswd, OpsLimit.moderate, MemLimit.moderate);
