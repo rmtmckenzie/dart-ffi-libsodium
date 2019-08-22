@@ -24,6 +24,9 @@ String CstrToString(Pointer<Int8> ptr, int length) {
   return ascii.decode(buf);
 }
 
+/// Allocates heap memory with the length of [buf] and fills it with its content.
+/// A pointer to the first char gets returned.
+/// The resulting cstr is fixed length and not null terminated.
 Pointer<Uint8> BufferToUnsignedChar(Uint8List buf) {
   if (buf.isEmpty) {
     final Pointer<Uint8> ptr = allocate();
