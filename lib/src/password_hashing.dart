@@ -72,6 +72,13 @@ class MemLimit {
   static final max = _MEMLIMIT_MAX;
 }
 
+/// Produce strong password hashes with the Argon2 function.
+/// Valid values for [opslimit] and [memlimit] are the static values
+/// of the classes OpsLimit and MemLimit
+/// ```
+/// final passwd = ascii.encode("my password");
+/// final pwhash = pwHashStr(paswd, OpsLimit.moderate, MemLimit.moderate);
+/// ```
 Uint8List pwHashStr(Uint8List passwd, int opslimit, int memlimit) {
   assert(
       opslimit == OpsLimit.min ||
