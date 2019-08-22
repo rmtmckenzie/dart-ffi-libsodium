@@ -49,7 +49,7 @@ final _secretBoxMacBytes =
 final _secretBoxKeygen = libsodium.lookupFunction<Void Function(Pointer<Uint8>),
     void Function(Pointer<Uint8>)>("crypto_secretbox_keygen");
 
-/// Generate a randomn key with the correct length [secretBoxKeyBytes].
+/// Generate a random key with the correct length [secretBoxKeyBytes].
 /// You can use this instead of [randomnBytesBuf].
 Uint8List secretBoxKeygen() {
   Pointer<Uint8> key;
@@ -65,7 +65,7 @@ Uint8List secretBoxKeygen() {
 /// Use for encrypting any kind of data with the XSalsa20 stream cipher.
 /// An authentication tag (Poly1305 MAC) is added to the ciphertext and hasn't to be stored seperately.
 /// The [nonce] must be [secretBoxNonceBytes] long and can be generated
-/// with any cryptographic randomn number generator like [randomnBytesBuf]
+/// with any cryptographic random number generator like [randomnBytesBuf]
 /// or be obtained by another secure scheme like an atomic counter, but it must never be the same.
 /// The [nonce] needs to be stored alongside the ciphertext for decryption with [secretBoxOpenEasy]
 /// and doesn't need to be secret.

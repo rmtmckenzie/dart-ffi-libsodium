@@ -8,7 +8,7 @@ final _init = libsodium
 
 /// Initialize sodium. This function should be called before any other function of sodium.
 /// Calling this function several times has no effect and can be safely done.
-/// Initialization is required for the randomn number generator to work correctly
+/// Initialization is required for the random number generator to work correctly
 /// and sodium to be thread safe. Failing to initialize sodium could result in unsafe results.
 /// Should sodium (for whatever reasons) fail to initialize, you should disregard any vaulues
 /// acquired from it.
