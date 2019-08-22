@@ -25,6 +25,11 @@ String CstrToString(Pointer<Int8> ptr, int length) {
 }
 
 Pointer<Uint8> BufferToUnsignedChar(Uint8List buf) {
+  if (buf.isEmpty) {
+    final Pointer<Uint8> ptr = allocate();
+    ptr.elementAt(0).store(0);
+    return ptr;
+  }
   final Pointer<Uint8> ptr = allocate(count: buf.length);
   for (var i = 0; i < buf.length; i++) {
     ptr.elementAt(i).store(buf[i]);
