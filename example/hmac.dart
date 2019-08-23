@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:dart_sodium/dart_sodium.dart';
-import 'package:dart_sodium/src/authentication.dart';
 
 void main() {
   init();
