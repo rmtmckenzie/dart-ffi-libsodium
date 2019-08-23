@@ -11,3 +11,5 @@ Please also notice that this library is work in progress. So far there are only 
 But those are also the most commonly used ones, and I don't plan to change the interface.
 
 I might do some higher level (object oriented) abstractions over some stuff, but at the moment I don't see the point. Libsodium already provides high level functions for most applications. But if you think there might be a solid use case, feel free to deploy your package with a higher level api.
+
+I also try to do proper documentation (only just learned to use dartdoc). You can also look at libsodium's documentation for further information: https://libsodium.gitbook.io/doc/
