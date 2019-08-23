@@ -1,3 +1,4 @@
-## 1.0.0
+## 0.1.0
 
-- Initial version, created by Stagehand
+This is a pre-release with some of its later functionality still missing.
+The api however should be stable.
