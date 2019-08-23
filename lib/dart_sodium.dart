@@ -5,3 +5,4 @@ export 'src/random.dart';
 export 'src/password_hashing.dart';
 export 'src/authenticated_encryption.dart';
 export 'src/authentication.dart';
+export 'src/helpers.dart';
