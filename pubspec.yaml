@@ -1,7 +1,7 @@
 name: dart_sodium
 description: FFI bindings for libsodium
-version: 0.7.0
-homepage: https://gitlab.com/MagicGuitar/dart-sodium
+version: 0.1.0
+repository: https://gitlab.com/MagicGuitar/dart-sodium
 author: Marvin Hannott <marvinhannott@gmail.com>
 
 environment:
