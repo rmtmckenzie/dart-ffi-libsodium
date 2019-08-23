@@ -51,7 +51,7 @@ final _secretBoxKeygen = libsodium.lookupFunction<Void Function(Pointer<Uint8>),
 
 /// Generate a random key with the correct length [secretBoxKeyBytes].
 /// You can use this instead of [randomBytesBuf].
-Uint8List secretBoxKeygen() {
+Uint8List secretBoxKeyGen() {
   Pointer<Uint8> key;
   try {
     key = allocate(count: secretBoxKeyBytes);

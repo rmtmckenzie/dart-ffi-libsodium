@@ -5,7 +5,7 @@ import 'package:dart_sodium/dart_sodium.dart';
 void main() {
   init();
 
-  final key = secretBoxKeygen();
+  final key = secretBoxKeyGen();
   final plaintext = ascii.encode("my plaintext");
   final nonce = randomBytesBuf(secretBoxNonceBytes);
   final ciphertext = secretBoxEasy(plaintext, nonce, key);
