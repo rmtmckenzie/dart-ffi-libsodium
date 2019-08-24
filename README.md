@@ -10,4 +10,9 @@ review and test this library in any way you see fit. I would be happy about any 
 Please also notice that this library is work in progress. So far there are only a few functions available.
 But those are also the most commonly used ones, and I don't plan to change the interface.
 
-I also try to do proper documentation (only just learned to use dartdoc). You can also look at libsodium's documentation for further information: https://libsodium.gitbook.io/doc/
+## How to Use
+
+Unfortunately Dart doesn't have any solution for compiling native dependencies yet.
+Therefore you have to copy the dynamic library file of libsodium into the root directory of your application.
+You can download precompiled packages for your system here: https://libsodium.gitbook.io/doc/installation
+There you also find further information apart from the dartdoc api-reference. 
