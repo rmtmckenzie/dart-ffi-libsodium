@@ -1,6 +1,6 @@
 import 'package:dart_sodium/src/ffi_helper.dart';
 
-import 'dart_sodium_base.dart' show libsodium;
+import './src/dart_sodium_base.dart' show libsodium;
 import 'dart:typed_data';
 import 'dart:ffi';
 

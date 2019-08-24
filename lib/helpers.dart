@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import './dart_sodium_base.dart';
-import './ffi_helper.dart';
+import './src/dart_sodium_base.dart';
+import './src/ffi_helper.dart';
 import 'dart:ffi';
 
 typedef _SodiumMemcmpNative = Int16 Function(
