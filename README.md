@@ -25,34 +25,41 @@ init()
 ````
 ### Authenticated Encryption
 ````dart
-final key = secretBoxKeyGen();
+import 'package:dart_sodium/secretbox.dart' as box;
+import 'package:dart_sodium/random.dart' as rand;
+
+final key = box.keyGen();
 final plaintext = ascii.encode("my plaintext");
-final nonce = randomBytesBuf(secretBoxNonceBytes);
+final nonce = rand.buf(secretBoxNonceBytes);
 
 // encrypt
-final ciphertext = secretBoxEasy(plaintext, nonce, key);
+final ciphertext = box.easy(plaintext, nonce, key);
 
 // decrypt
-final decrypted = secretBoxOpenEasy(ciphertext, nonce, key);
+final decrypted = box.openEasy(ciphertext, nonce, key);
 ````
 ### Password Hashing
 ````dart
+import 'package:dart_sodium/pwhash.dart' as pwhash;
+
 final password = ascii.encode("my password");
 
 // hash password
-final hash = pwHashStr(password,    OpsLimit.interactive, MemLimit.interactive);
+final hash = pwhash.str(password,    OpsLimit.interactive, MemLimit.interactive);
 
 // verify password
-final isValid = pwHashStrVerify(hash, password);
+final isValid = pwhash.strVerify(hash, password);
 ````
 ### Authentication / Signing
 ````dart
-final key = authKeyGen();
+import 'package:dart_sodium/auth.dart' as auth;
+
+final key = auth.keyGen();
 final msg = ascii.encode("some msg");
 
 // generate authentication tag
-final tag = auth(msg, key);
+final tag = auth.auth(msg, key);
 
 // verify integrity of message
-final isValid = authVerify(tag, msg, key);
+final isValid = auth.verify(tag, msg, key);
 ````
