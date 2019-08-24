@@ -16,3 +16,43 @@ Unfortunately Dart doesn't have any solution for compiling native dependencies y
 Therefore you have to copy the dynamic library file of libsodium into the root directory of your application.
 You can download precompiled packages for your system here: https://libsodium.gitbook.io/doc/installation
 There you also find further information apart from the dartdoc api-reference. 
+
+## Examples
+### Init
+````dart
+// always call init before any other function of sodium
+init()
+````
+### Authenticated Encryption
+````dart
+final key = secretBoxKeyGen();
+final plaintext = ascii.encode("my plaintext");
+final nonce = randomBytesBuf(secretBoxNonceBytes);
+
+// encrypt
+final ciphertext = secretBoxEasy(plaintext, nonce, key);
+
+// decrypt
+final decrypted = secretBoxOpenEasy(ciphertext, nonce, key);
+````
+### Password Hashing
+````dart
+final password = ascii.encode("my password");
+
+// hash password
+final hash = pwHashStr(password,    OpsLimit.interactive, MemLimit.interactive);
+
+// verify password
+final isValid = pwHashStrVerify(hash, password);
+````
+### Authentication / Signing
+````dart
+final key = authKeyGen();
+final msg = ascii.encode("some msg");
+
+// generate authentication tag
+final tag = auth(msg, key);
+
+// verify integrity of message
+final isValid = authVerify(tag, msg, key);
+````
