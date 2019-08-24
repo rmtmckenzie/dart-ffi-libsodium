@@ -7,3 +7,6 @@ The api however should be stable.
 - make MemLimit and OpsLimit abstract
 - add examples to readme
 - some work on documentation
+
+## 0.2.0
+- pack belonging together functions into abstract classes

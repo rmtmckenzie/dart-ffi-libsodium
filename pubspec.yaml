@@ -2,7 +2,7 @@ name: dart_sodium
 description: FFI bindings for the libsodium cryptographic library. 
   Libsodium is a robust and well reviewed collection of high- and low-level functions for many kinds of 
   cryptographic use cases.
-version: 0.1.2
+version: 0.2.0
 homepage: https://gitlab.com/MagicGuitar/dart-sodium
 repository: https://gitlab.com/MagicGuitar/dart-sodium
 author: Marvin Hannott <marvinhannott@gmail.com>
