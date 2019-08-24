@@ -5,12 +5,9 @@ import 'package:dart_sodium/dart_sodium.dart';
 void main() {
   init();
 
-  final key = authKeyGen();
-  final msg = randomBytesBuf(16);
-  final tag = auth(msg, key);
-  final encodedTag = base64Encode(tag);
-  print(encodedTag);
+  final key = Auth.keyGen();
+  final msg = RandomBytes.buf(16);
+  final tag = Auth.auth(msg, key);
 
-  final isValid = authVerify(tag, msg, key);
-  print(isValid);
+  final isValid = Auth.verify(tag, msg, key);
 }

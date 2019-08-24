@@ -5,14 +5,10 @@ import 'package:dart_sodium/dart_sodium.dart';
 void main() {
   init();
 
-  final key = secretBoxKeyGen();
+  final key = SecretBox.keyGen();
   final plaintext = ascii.encode("my plaintext");
-  final nonce = randomBytesBuf(secretBoxNonceBytes);
-  final ciphertext = secretBoxEasy(plaintext, nonce, key);
-  final encodedCipertext = base64Encode(ciphertext);
-  print(encodedCipertext);
+  final nonce = RandomBytes.buf(SecretBox.nonceBytes);
+  final ciphertext = SecretBox.easy(plaintext, nonce, key);
 
-  final decrypted = secretBoxOpenEasy(ciphertext, nonce, key);
-  final decoded = ascii.decode(decrypted);
-  print(decoded);
+  final decrypted = SecretBox.openEasy(ciphertext, nonce, key);
 }

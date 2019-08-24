@@ -5,11 +5,8 @@ import 'package:dart_sodium/dart_sodium.dart';
 void main() {
   init();
 
-  final password = randomBytesBuf(16);
-  final hash = pwHashStr(password, OpsLimit.interactive, MemLimit.interactive);
-  final decodedHash = ascii.decode(hash);
-  print(decodedHash);
+  final password = RandomBytes.buf(16);
+  final hash = pwHash.str(password, OpsLimit.interactive, MemLimit.interactive);
 
-  final isValid = pwHashStrVerify(hash, password);
-  print(isValid);
+  final isValid = pwHash.verify(hash, password);
 }
