@@ -55,7 +55,7 @@ final _MEMLIMIT_MAX =
     libsodium.lookupFunction<Uint64 Function(), int Function()>(
         "crypto_pwhash_memlimit_max")();
 
-class OpsLimit {
+abstract class OpsLimit {
   static final min = _OPSLIMIT_MIN;
   static final interactive = _OPSLIMIT_INTERACTIVE;
   static final moderate = _OPSLIMIT_MODERATE;
@@ -63,7 +63,7 @@ class OpsLimit {
   static final max = _OPSLIMIT_MAX;
 }
 
-class MemLimit {
+abstract class MemLimit {
   static final min = _MEMLIMIT_MIN;
   static final interactive = _MEMLIMIT_INTERACTIVE;
   static final moderate = _MEMLIMIT_MODERATE;
