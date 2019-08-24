@@ -66,7 +66,7 @@ abstract class SecretBox {
   /// Encrypts any kind of data with the XSalsa20 stream cipher.
   /// An authentication tag (Poly1305 MAC) is added to the ciphertext.
   /// The [nonce] must be [nonceBytes] long and can be generated
-  /// with any cryptographic random number generator like [randomBytesBuf].
+  /// with any cryptographic random number generator like [RandomBytes].
   /// The [key] has to be [keyBytes] long.
   ///
   /// ```
