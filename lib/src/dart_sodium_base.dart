@@ -6,7 +6,7 @@ var _isInitialized = false;
 final _init = libsodium
     .lookupFunction<ffi.Int8 Function(), int Function()>("sodium_init");
 
-/// Initialize sodium. This function should be called before any other function of sodium.
+/// Initializes sodium. This function should be called before any other function of sodium.
 /// Calling this function several times has no effect and can be safely done.
 /// Initialization is required for the random number generator to work correctly
 /// and sodium to be thread safe. Failing to initialize sodium could result in unsafe results.

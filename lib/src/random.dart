@@ -8,7 +8,7 @@ final _randomBytesBuf = libsodium.lookupFunction<
     Void Function(Pointer<Uint8> buf, Uint64 size),
     void Function(Pointer<Uint8> buf, int size)>("randombytes_buf");
 
-/// Produce a buffer which is [size] long and fill it with random values.
+/// Produces a buffer which is [size] long and fills it with random values.
 Uint8List randomBytesBuf(int size) {
   Pointer<Uint8> bufptr;
   try {

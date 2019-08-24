@@ -12,7 +12,7 @@ typedef _AuthKeyGenDart = void Function(Pointer<Uint8>);
 final _authBytes = libsodium
     .lookupFunction<Uint64 Function(), int Function()>("crypto_auth_bytes")();
 
-/// Required length of the [key] for [auth]
+/// Required length of the [key]
 final authKeyBytes =
     libsodium.lookupFunction<Uint64 Function(), int Function()>(
         "crypto_auth_keybytes")();
@@ -20,8 +20,7 @@ final authKeyBytes =
 final _authKeyGen = libsodium
     .lookupFunction<_AuthKeyGenNative, _AuthKeyGenDart>("crypto_auth_keygen");
 
-/// Generate a key with the correct length of [authKeyBytes].
-/// You can use this instead of [randomnBytesBuf].
+/// Generates a key with the correct length of [authKeyBytes].
 Uint8List authKeyGen() {
   Pointer<Uint8> key;
   try {
@@ -40,12 +39,10 @@ typedef _AuthDart = void Function(
 
 final _auth = libsodium.lookupFunction<_AuthNative, _AuthDart>("crypto_auth");
 
-/// Sign [msg] of any data with a [key] of length [authKeyBytes].
+/// Signs [msg] of any data with a [key] of length [authKeyBytes].
 /// The returned authentication tag needs to be stored and is needed to authenticate the [msg]
 /// with [authVerify].
-/// The tag doesn't need to be secret and can be send or stored alongside the [msg];
-/// But the [key] needs to be secret so an attacker couldn't issue his own authentication tag
-/// which your application would then deem valid.
+/// The tag doesn't need to be secret and can be send or stored alongside the [msg].
 Uint8List auth(Uint8List msg, Uint8List key) {
   assert(key.length != authKeyBytes, "Key must be of length [authKeyBytes]");
   Pointer<Uint8> keyPointer;
@@ -71,7 +68,7 @@ typedef _AuthVerifyDart = int Function(
 final _authVerify = libsodium
     .lookupFunction<_AuthVerifyNative, _AuthVerifyDart>("crypto_auth_verify");
 
-/// Verify the authenticity of [msg] with the [key] and [tag].
+/// Verifys the authenticity of [msg].
 bool authVerify(Uint8List tag, Uint8List msg, Uint8List key) {
   assert(key.length != authKeyBytes, "Key must be of length [authKeyBytes]");
   assert(tag.length != _authBytes, "Tag must be of length [authBytes]");

@@ -11,7 +11,7 @@ typedef _SodiumMemcmpDart = int Function(
 final _memcmp = libsodium
     .lookupFunction<_SodiumMemcmpNative, _SodiumMemcmpDart>("sodium_memcmp");
 
-/// Constant time comparison of two buffers.
+/// Compares two buffers in constant-time.
 /// You should use this instead of simple comparison using the [==] operator
 /// when you are comparing sensitive information like authentication tags
 /// to avoid side-channel attacks like timing-attacks.
