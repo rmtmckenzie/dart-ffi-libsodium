@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:dart_sodium/src/helpers.dart';
+import 'package:dart_sodium/helpers.dart';
 
 void main() {
   final first = Uint8List.fromList([1, 2, 3, 4, 5]);
