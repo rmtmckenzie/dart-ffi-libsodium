@@ -8,10 +8,8 @@ import '../ffi_helper.dart';
 
 import '../dart_sodium_base.dart';
 
-final secretBoxkeyGen = libsodium.lookupFunction<
-    Void Function(Pointer<Uint8> key),
-    void Function(
-        Pointer<Uint8> key)>("crypto_secretstream_xchacha20poly1305_keygen");
+final secretBoxkeyGen = libsodium.lookupFunction<Void Function(CString key),
+    void Function(CString key)>("crypto_secretstream_xchacha20poly1305_keygen");
 
 abstract class Tag {
   static final message =
@@ -29,27 +27,26 @@ abstract class Tag {
 }
 
 final initPush = libsodium.lookupFunction<
-    Int16 Function(
-        Pointer<State> state, Pointer<Uint8> header, Pointer<Uint8> key),
-    int Function(Pointer<State> state, Pointer<Uint8> header,
-        Pointer<Uint8> key)>("crypto_secretstream_xchacha20poly1305_init_push");
+    Int16 Function(Pointer<State> state, CString header, CString key),
+    int Function(Pointer<State> state, CString header,
+        CString key)>("crypto_secretstream_xchacha20poly1305_init_push");
 
 typedef _PushNative = Int16 Function(
     Pointer<State> state,
-    Pointer<Uint8> ciphertext,
+    CString ciphertext,
     Pointer<Uint64> clen,
-    Pointer<Uint8> msg,
+    CString msg,
     Uint64 mlen,
-    Pointer<Uint8> adData,
+    CString adData,
     Uint64 adlen,
     Uint8 tag);
 typedef _PushDart = int Function(
     Pointer<State> state,
-    Pointer<Uint8> ciphertext,
+    CString ciphertext,
     Pointer<Uint64> clen,
-    Pointer<Uint8> msg,
+    CString msg,
     int mlen,
-    Pointer<Uint8> adData,
+    CString adData,
     int adlen,
     int tag);
 
@@ -58,31 +55,30 @@ final push = libsodium.lookupFunction<_PushNative, _PushDart>(
 
 typedef _PullNative = Int16 Function(
     Pointer<State> state,
-    Pointer<Uint8> msg,
+    CString msg,
     Pointer<Uint64> msglen,
-    Pointer<Uint8> tag,
-    Pointer<Uint8> ctxt,
+    CString tag,
+    CString ctxt,
     Uint64 clen,
-    Pointer<Uint8> addData,
+    CString addData,
     Uint64 adlen);
 
 typedef _PullDart = int Function(
     Pointer<State> state,
-    Pointer<Uint8> msg,
+    CString msg,
     Pointer<Uint64> msglen,
-    Pointer<Uint8> tag,
-    Pointer<Uint8> ctxt,
+    CString tag,
+    CString ctxt,
     int clen,
-    Pointer<Uint8> addData,
+    CString addData,
     int adlen);
 final pull = libsodium.lookupFunction<_PullNative, _PullDart>(
     "crypto_secretstream_xchacha20poly1305_pull");
 
 final initPull = libsodium.lookupFunction<
-    Int16 Function(
-        Pointer<State> state, Pointer<Uint8> header, Pointer<Uint8> key),
-    int Function(Pointer<State> state, Pointer<Uint8> header,
-        Pointer<Uint8> key)>("crypto_secretstream_xchacha20poly1305_init_pull");
+    Int16 Function(Pointer<State> state, CString header, CString key),
+    int Function(Pointer<State> state, CString header,
+        CString key)>("crypto_secretstream_xchacha20poly1305_init_pull");
 
 class State extends Pointer<Void> {}
 
