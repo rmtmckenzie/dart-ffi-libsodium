@@ -15,3 +15,31 @@ typedef pwHashStrVerifyDart = int Function(
 final pwHashStrVerify =
     libsodium.lookupFunction<pwHashStrVerifyNative, pwHashStrVerifyDart>(
         "crypto_pwhash_str_verify");
+
+final opsLimitModerate =
+    libsodium.lookupFunction<Uint64 Function(), int Function()>(
+        "crypto_pwhash_opslimit_moderate")();
+final opsLimitMin = libsodium.lookupFunction<Uint64 Function(), int Function()>(
+    "crypto_pwhash_opslimit_min")();
+final opsLimitSensitive =
+    libsodium.lookupFunction<Uint64 Function(), int Function()>(
+        "crypto_pwhash_opslimit_sensitive")();
+final opsLimitInteractive =
+    libsodium.lookupFunction<Uint64 Function(), int Function()>(
+        "crypto_pwhash_opslimit_interactive")();
+final opsLimitMax = libsodium.lookupFunction<Uint64 Function(), int Function()>(
+    "crypto_pwhash_opslimit_max")();
+
+final memLimitModerate =
+    libsodium.lookupFunction<Uint64 Function(), int Function()>(
+        "crypto_pwhash_memlimit_moderate")();
+final memLimitMin = libsodium.lookupFunction<Uint64 Function(), int Function()>(
+    "crypto_pwhash_memlimit_min")();
+final memLimitSensitive =
+    libsodium.lookupFunction<Uint64 Function(), int Function()>(
+        "crypto_pwhash_memlimit_sensitive")();
+final memLimitInteractive =
+    libsodium.lookupFunction<Uint64 Function(), int Function()>(
+        "crypto_pwhash_memlimit_interactive")();
+final memLimitMax = libsodium.lookupFunction<Uint64 Function(), int Function()>(
+    "crypto_pwhash_memlimit_max")();
