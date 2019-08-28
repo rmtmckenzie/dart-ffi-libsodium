@@ -8,10 +8,10 @@ typedef pwhashStrDart = int Function(Pointer<Uint8> out, Pointer<Uint8> passwd,
 final pwHashStr = libsodium
     .lookupFunction<pwHashStrNative, pwhashStrDart>("crypto_pwhash_str");
 
-typedef pwhashStrVerifyNative = Int16 Function(
+typedef pwHashStrVerifyNative = Int16 Function(
     Pointer<Uint8> str, Pointer<Uint8> passwd, IntPtr passwdlen);
-typedef pwhashStrVerifyDart = int Function(
+typedef pwHashStrVerifyDart = int Function(
     Pointer<Uint8> str, Pointer<Uint8> passwd, int passwdlen);
-final pwhashStrVerify =
-    libsodium.lookupFunction<pwhashStrVerifyNative, pwhashStrVerifyDart>(
+final pwHashStrVerify =
+    libsodium.lookupFunction<pwHashStrVerifyNative, pwHashStrVerifyDart>(
         "crypto_pwhash_str_verify");
