@@ -2,7 +2,7 @@ import 'dart:ffi';
 import 'dart:typed_data';
 
 class CString extends Pointer<Uint8> {
-  static CString fromUint8List(Uint8List buf) => BufferToCString(buf);
+  factory CString.fromUint8List(Uint8List buf) => BufferToCString(buf);
   static Uint8List toUint8List(CString ptr, int length) =>
       CStringToBuffer(ptr, length);
 }
