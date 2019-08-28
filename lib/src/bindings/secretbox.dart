@@ -28,6 +28,6 @@ final keyBytes = libsodium.lookupFunction<Uint64 Function(), int Function()>(
 final nonceBytes = libsodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_secretbox_noncebytes")();
 
-final keygen =
+final keyGen =
     libsodium.lookupFunction<Void Function(CString), void Function(CString)>(
         "crypto_secretbox_keygen");
