@@ -1,15 +1,8 @@
 import 'dart:typed_data';
-
-import './src/dart_sodium_base.dart';
-import './src/ffi_helper.dart';
 import 'dart:ffi';
 
-typedef _SodiumMemcmpNative = Int16 Function(
-    Pointer<Uint8> b1, Pointer<Uint8> b2, Uint64 len);
-typedef _SodiumMemcmpDart = int Function(
-    Pointer<Uint8> b1, Pointer<Uint8> b2, int len);
-final _memcmp = libsodium
-    .lookupFunction<_SodiumMemcmpNative, _SodiumMemcmpDart>("sodium_memcmp");
+import 'package:dart_sodium/src/ffi_helper.dart';
+import 'src/bindings/helpers.dart' as bindings;
 
 /// Compares two buffers in constant-time.
 /// You should use this instead of simple comparison using the [==] operator
@@ -20,12 +13,12 @@ final _memcmp = libsodium
 /// is the value the [buffer] gets compared to. This is important because the
 /// comparison depends on the length of [buffer] to avoid leaking information
 /// about the length of [compareTo].
-bool memCmp(Uint8List buffer, Uint8List compareTo) {
+bool memoryCompare(Uint8List buffer, Uint8List compareTo) {
   Pointer<Uint8> firstPtr, secondPtr;
   try {
-    firstPtr = BufferToUnsignedChar(buffer);
-    secondPtr = BufferToUnsignedChar(compareTo);
-    final result = _memcmp(firstPtr, secondPtr, buffer.length);
+    firstPtr = CString.fromUint8List(buffer);
+    secondPtr = CString.fromUint8List(compareTo);
+    final result = bindings.memoryCompare(firstPtr, secondPtr, buffer.length);
     return result == 0;
   } finally {
     firstPtr?.free();
