@@ -1,20 +1,16 @@
-import 'package:dart_sodium/src/ffi_helper.dart';
-
-import './src/dart_sodium_base.dart' show libsodium;
 import 'dart:typed_data';
 import 'dart:ffi';
+import 'package:dart_sodium/src/ffi_helper.dart';
 
-final _randomBytesBuf = libsodium.lookupFunction<
-    Void Function(Pointer<Uint8> buf, Uint64 size),
-    void Function(Pointer<Uint8> buf, int size)>("randombytes_buf");
+import 'src/bindings/random.dart' as bindings;
 
 /// Produces a buffer which is [size] long and fills it with random values.
-Uint8List buf(int size) {
+Uint8List buffer(int size) {
   Pointer<Uint8> bufptr;
   try {
     bufptr = allocate(count: size);
-    _randomBytesBuf(bufptr, size);
-    return UnsignedCharToBuffer(bufptr, size);
+    bindings.buffer(bufptr, size);
+    return CString.toUint8List(bufptr, size);
   } finally {
     bufptr?.free();
   }
