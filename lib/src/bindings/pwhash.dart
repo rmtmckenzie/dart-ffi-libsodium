@@ -52,3 +52,6 @@ abstract class MemLimit {
       libsodium.lookupFunction<Uint64 Function(), int Function()>(
           "crypto_pwhash_memlimit_max")();
 }
+
+final strBytes = libsodium.lookupFunction<Uint64 Function(), int Function()>(
+    "crypto_pwhash_strbytes")();
