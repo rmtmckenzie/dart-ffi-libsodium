@@ -8,7 +8,7 @@ import '../ffi_helper.dart';
 
 import '../dart_sodium_base.dart';
 
-final secretBoxkeyGen = libsodium.lookupFunction<Void Function(CString key),
+final keyGen = libsodium.lookupFunction<Void Function(CString key),
     void Function(CString key)>("crypto_secretstream_xchacha20poly1305_keygen");
 
 abstract class Tag {
