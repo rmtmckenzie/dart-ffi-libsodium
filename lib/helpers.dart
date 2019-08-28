@@ -21,7 +21,7 @@ bool memoryCompare(Uint8List buffer, Uint8List compareTo) {
     final result = bindings.memoryCompare(firstPtr, secondPtr, buffer.length);
     return result == 0;
   } finally {
-    firstPtr?.free();
-    secondPtr?.free();
+    firstPtr.free();
+    secondPtr.free();
   }
 }
