@@ -12,14 +12,13 @@ final authKeyGen =
 final authBytes = libsodium
     .lookupFunction<Uint64 Function(), int Function()>("crypto_auth_bytes")();
 
-typedef _AuthNative = Void Function(
+typedef _AuthNative = Int16 Function(
     CString out, CString msg, Uint64 msglen, CString key);
-typedef _AuthDart = void Function(
+typedef _AuthDart = int Function(
     CString out, CString msg, int msglen, CString key);
-
 final auth = libsodium.lookupFunction<_AuthNative, _AuthDart>("crypto_auth");
 
-typedef _AuthVerifyNative = Int32 Function(
+typedef _AuthVerifyNative = Int16 Function(
     CString tag, CString msg, Uint64 msglen, CString key);
 typedef _AuthVerifyDart = int Function(
     CString tag, CString msg, int msglen, CString key);
