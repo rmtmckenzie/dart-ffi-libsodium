@@ -4,5 +4,5 @@ import 'dart:ffi';
 
 typedef _MemCmpNative = Int16 Function(CString b1, CString b2, Uint64 len);
 typedef _MemCmpDart = int Function(CString b1, CString b2, int len);
-final memCmp =
+final memoryCompare =
     libsodium.lookupFunction<_MemCmpNative, _MemCmpDart>("sodium_memcmp");
