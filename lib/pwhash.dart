@@ -21,8 +21,7 @@ Uint8List store(Uint8List passwd, int opslimit, int memlimit) {
     final hashResult =
         bindings.store(out, passwdCstr, passwd.length, opslimit, memlimit);
     if (hashResult < 0) {
-      throw Exception(
-          "Password hashing failed. Please make sure [opslimit] and [memlimit] receive valid values. For debugging enable asserts.");
+      throw Exception("Password hashing failed");
     }
     return CStringToBuffer(out, bindings.strBytes);
   } finally {
