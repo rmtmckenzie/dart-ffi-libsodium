@@ -12,19 +12,19 @@ import 'src/bindings/pwhash.dart' as bindings;
 /// final passwd = ascii.encode("my password");
 /// final pwhash = pwHashStr(paswd, OpsLimit.moderate, MemLimit.moderate);
 /// ```
-Uint8List storage(Uint8List passwd, int opslimit, int memlimit) {
+Uint8List store(Uint8List passwd, int opslimit, int memlimit) {
   Pointer<Uint8> out;
   Pointer<Uint8> passwdCstr;
   try {
     out = allocate(count: bindings.strBytes);
-    passwdCstr = CString.fromUint8List(passwd);
+    passwdCstr = BufferToCString(passwd);
     final hashResult =
         bindings.store(out, passwdCstr, passwd.length, opslimit, memlimit);
     if (hashResult < 0) {
       throw Exception(
           "Password hashing failed. Please make sure [opslimit] and [memlimit] receive valid values. For debugging enable asserts.");
     }
-    return CString.toUint8List(out, bindings.strBytes);
+    return CStringToBuffer(out, bindings.strBytes);
   } finally {
     out?.free();
     passwdCstr?.free();
@@ -36,8 +36,8 @@ bool storeVerify(Uint8List hash, Uint8List passwd) {
   Pointer<Uint8> hashPtr;
   Pointer<Uint8> passwdPtr;
   try {
-    hashPtr = CString.fromUint8List(hash);
-    passwdPtr = CString.fromUint8List(passwd);
+    hashPtr = BufferToCString(hash);
+    passwdPtr = BufferToCString(passwd);
     final verifyResult =
         bindings.storeVerify(hashPtr, passwdPtr, passwd.length);
     return verifyResult == 0;
