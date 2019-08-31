@@ -19,15 +19,15 @@ main() {
 
       decr = Decryptor(key, encr.header);
       final pull1 = decr.pull(chunk1);
-      expect(pull1.decryptedChunk, chunk1);
+      expect(pull1.decryptedChunk, msg1);
       expect(pull1.tag, Tag.message);
 
       final pull2 = decr.pull(chunk2);
-      expect(pull2.decryptedChunk, chunk2);
+      expect(pull2.decryptedChunk, msg2);
       expect(pull2.tag, Tag.finish);
     } finally {
-      encr.close();
-      decr.close();
+      encr?.close();
+      decr?.close();
     }
   });
 }
