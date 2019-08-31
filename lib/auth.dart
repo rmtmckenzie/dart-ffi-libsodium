@@ -11,14 +11,14 @@ class Authenticator {
     try {
       key = allocate(count: bindings.keyBytes);
       bindings.keyGen(key);
-      return CString.toUint8List(key, bindings.keyBytes);
+      return CStringToBuffer(key, bindings.keyBytes);
     } finally {
       key.free();
     }
   }
 
-  final CString _key;
-  Authenticator(Uint8List key) : _key = CString.fromUint8List(key) {
+  final Pointer<Uint8> _key;
+  Authenticator(Uint8List key) : _key = BufferToCString(key) {
     if (key.length != bindings.keyBytes) {
       _key.free();
       throw ArgumentError("Key hasn't expected length");
@@ -30,12 +30,12 @@ class Authenticator {
     Pointer<Uint8> msgPointer;
     try {
       out = allocate(count: bindings.authBytes);
-      msgPointer = CString.fromUint8List(msg);
+      msgPointer = BufferToCString(msg);
       final authResult = bindings.auth(out, msgPointer, msg.length, _key);
       if (authResult != 0) {
         throw Exception("Authentication failed");
       }
-      return CString.toUint8List(out, bindings.authBytes);
+      return CStringToBuffer(out, bindings.authBytes);
     } finally {
       out.free();
       msgPointer.free();
@@ -46,8 +46,8 @@ class Authenticator {
     Pointer<Uint8> tagPointer;
     Pointer<Uint8> msgPointer;
     try {
-      tagPointer = CString.fromUint8List(tag);
-      msgPointer = CString.fromUint8List(msg);
+      tagPointer = BufferToCString(tag);
+      msgPointer = BufferToCString(msg);
       final result = bindings.verify(tagPointer, msgPointer, msg.length, _key);
       return result == 0;
     } finally {

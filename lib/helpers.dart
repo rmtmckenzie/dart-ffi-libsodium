@@ -16,8 +16,8 @@ import 'src/bindings/helpers.dart' as bindings;
 bool memoryCompare(Uint8List buffer, Uint8List compareTo) {
   Pointer<Uint8> firstPtr, secondPtr;
   try {
-    firstPtr = CString.fromUint8List(buffer);
-    secondPtr = CString.fromUint8List(compareTo);
+    firstPtr = BufferToCString(buffer);
+    secondPtr = BufferToCString(compareTo);
     final result = bindings.memoryCompare(firstPtr, secondPtr, buffer.length);
     return result == 0;
   } finally {

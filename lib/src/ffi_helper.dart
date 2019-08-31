@@ -1,12 +1,6 @@
 import 'dart:ffi';
 import 'dart:typed_data';
 
-class CString extends Pointer<Uint8> {
-  factory CString.fromUint8List(Uint8List buf) => BufferToCString(buf);
-  static Uint8List toUint8List(CString ptr, int length) =>
-      CStringToBuffer(ptr, length);
-}
-
 /// Allocates heap memory with the length of [buf] and fills it with its content.
 /// A pointer to the first char gets returned.
 /// The resulting char-array is fixed length and not null terminated.

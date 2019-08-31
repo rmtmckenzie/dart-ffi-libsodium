@@ -11,14 +11,14 @@ class SecretBox {
     try {
       key = allocate(count: bindings.keyBytes);
       bindings.keyGen(key);
-      return CString.toUint8List(key, bindings.keyBytes);
+      return CStringToBuffer(key, bindings.keyBytes);
     } finally {
       key.free();
     }
   }
 
-  final CString _key;
-  SecretBox(Uint8List key) : _key = CString.fromUint8List(key) {
+  final Pointer<Uint8> _key;
+  SecretBox(Uint8List key) : _key = BufferToCString(key) {
     if (key.length != bindings.keyBytes) {
       _key.free();
       throw Exception("Key hasn't expected length");
@@ -46,14 +46,14 @@ class SecretBox {
     try {
       final cypherTextLen = bindings.macBytes + msg.length;
       cypherText = allocate(count: cypherTextLen);
-      msgPtr = CString.fromUint8List(msg);
-      noncePtr = CString.fromUint8List(nonce);
+      msgPtr = BufferToCString(msg);
+      noncePtr = BufferToCString(nonce);
       final secretBoxResult =
           bindings.easy(cypherText, msgPtr, msg.length, noncePtr, _key);
       if (secretBoxResult == -1) {
         throw Exception("Encrypting failed");
       }
-      return CString.toUint8List(cypherText, cypherTextLen);
+      return CStringToBuffer(cypherText, cypherTextLen);
     } finally {
       cypherText.free();
       msgPtr.free();
@@ -71,14 +71,14 @@ class SecretBox {
     try {
       final msgLen = cypherText.length - bindings.macBytes;
       msgPtr = allocate(count: msgLen);
-      cPtr = CString.fromUint8List(cypherText);
-      noncePtr = CString.fromUint8List(nonce);
+      cPtr = BufferToCString(cypherText);
+      noncePtr = BufferToCString(nonce);
       final result =
           bindings.openEasy(msgPtr, cPtr, cypherText.length, noncePtr, _key);
       if (result == -1) {
         throw Exception("Decrypting failed");
       }
-      return CString.toUint8List(msgPtr, msgLen);
+      return CStringToBuffer(msgPtr, msgLen);
     } finally {
       cPtr.free();
       noncePtr.free();

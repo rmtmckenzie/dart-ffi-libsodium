@@ -2,17 +2,17 @@ import 'dart:ffi';
 import '../dart_sodium_base.dart';
 import '../ffi_helper.dart';
 
-typedef _StoreNative = Int16 Function(CString out, CString passwd,
+typedef _StoreNative = Int16 Function(Pointer<Uint8> out, Pointer<Uint8> passwd,
     Uint64 passwdLen, Uint64 opsLimit, Uint64 memlimit);
-typedef _StoreDart = int Function(
-    CString out, CString passwd, int passwdLen, int opsLimit, int memlimit);
+typedef _StoreDart = int Function(Pointer<Uint8> out, Pointer<Uint8> passwd,
+    int passwdLen, int opsLimit, int memlimit);
 final store =
     libsodium.lookupFunction<_StoreNative, _StoreDart>("crypto_pwhash_str");
 
 typedef _StoreVerifyNative = Int16 Function(
-    CString str, CString passwd, IntPtr passwdlen);
+    Pointer<Uint8> str, Pointer<Uint8> passwd, IntPtr passwdlen);
 typedef _StoreVerifyDart = int Function(
-    CString str, CString passwd, int passwdlen);
+    Pointer<Uint8> str, Pointer<Uint8> passwd, int passwdlen);
 final storeVerify =
     libsodium.lookupFunction<_StoreVerifyNative, _StoreVerifyDart>(
         "crypto_pwhash_str_verify");

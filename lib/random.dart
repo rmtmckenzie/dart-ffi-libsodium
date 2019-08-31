@@ -10,7 +10,7 @@ Uint8List buffer(int size) {
   try {
     bufptr = allocate(count: size);
     bindings.buffer(bufptr, size);
-    return CString.toUint8List(bufptr, size);
+    return CStringToBuffer(bufptr, size);
   } finally {
     bufptr?.free();
   }

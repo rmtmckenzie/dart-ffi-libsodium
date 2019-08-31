@@ -4,16 +4,28 @@ import '../dart_sodium_base.dart';
 import 'dart:ffi';
 
 typedef _EasyNative = Int16 Function(
-    CString cyphertext, CString msg, Uint64 msglen, CString nonce, CString key);
-typedef _EasyDart = int Function(
-    CString cyphertext, CString msg, int msglen, CString nonce, CString key);
+    Pointer<Uint8> cyphertext,
+    Pointer<Uint8> msg,
+    Uint64 msglen,
+    Pointer<Uint8> nonce,
+    Pointer<Uint8> key);
+typedef _EasyDart = int Function(Pointer<Uint8> cyphertext, Pointer<Uint8> msg,
+    int msglen, Pointer<Uint8> nonce, Pointer<Uint8> key);
 final easy =
     libsodium.lookupFunction<_EasyNative, _EasyDart>("crypto_secretbox_easy");
 
-typedef _OpenEasyNative = Int16 Function(CString msg, CString cypherText,
-    Uint64 cypherTextLen, CString nonce, CString key);
-typedef _OpenEasyDart = int Function(CString msg, CString cypherText,
-    int cypherTextLen, CString nonce, CString key);
+typedef _OpenEasyNative = Int16 Function(
+    Pointer<Uint8> msg,
+    Pointer<Uint8> cypherText,
+    Uint64 cypherTextLen,
+    Pointer<Uint8> nonce,
+    Pointer<Uint8> key);
+typedef _OpenEasyDart = int Function(
+    Pointer<Uint8> msg,
+    Pointer<Uint8> cypherText,
+    int cypherTextLen,
+    Pointer<Uint8> nonce,
+    Pointer<Uint8> key);
 final openEasy = libsodium.lookupFunction<_OpenEasyNative, _OpenEasyDart>(
     "crypto_secretbox_open_easy");
 
@@ -28,6 +40,5 @@ final keyBytes = libsodium.lookupFunction<Uint64 Function(), int Function()>(
 final nonceBytes = libsodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_secretbox_noncebytes")();
 
-final keyGen =
-    libsodium.lookupFunction<Void Function(CString), void Function(CString)>(
-        "crypto_secretbox_keygen");
+final keyGen = libsodium.lookupFunction<Void Function(Pointer<Uint8>),
+    void Function(Pointer<Uint8>)>("crypto_secretbox_keygen");
