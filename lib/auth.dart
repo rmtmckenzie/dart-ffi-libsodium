@@ -5,7 +5,9 @@ import 'package:dart_sodium/src/ffi_helper.dart';
 
 import 'src/bindings/auth.dart' as bindings;
 
+/// Authenticates / Signs messages
 class Authenticator {
+  /// Produces random keys for an Authenticator
   static keyGen() {
     Pointer<Uint8> key;
     try {
@@ -25,6 +27,7 @@ class Authenticator {
     }
   }
 
+  /// Authenticates / signs a message
   Uint8List authenticate(Uint8List msg) {
     Pointer<Uint8> out;
     Pointer<Uint8> msgPointer;
@@ -42,6 +45,7 @@ class Authenticator {
     }
   }
 
+  /// verifies a message and its tag
   bool verify(Uint8List tag, Uint8List msg) {
     Pointer<Uint8> tagPointer;
     Pointer<Uint8> msgPointer;
@@ -56,6 +60,7 @@ class Authenticator {
     }
   }
 
+  /// Closes the Authenticator. Call this to avoid memory leaks.
   void close() {
     _key.free();
   }
