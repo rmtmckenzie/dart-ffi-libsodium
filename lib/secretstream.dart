@@ -113,15 +113,15 @@ class Decryptor {
   }
 
   /// Pulls data out of the stream
-  _PullData pull(Uint8List ciphertext, {int adLen}) {
+  _PullData pull(Uint8List ciphertext, {int adLen = 0}) {
     final dataLen = ciphertext.length - bindings.aBytes;
     final dataPtr = allocate<Uint8>(count: dataLen);
     final cPtr = BufferToCString(ciphertext);
     final tagPtr = allocate<Uint8>();
-    final adPtr = allocate<Uint8>();
+    final adPtr = allocate<Uint8>(count: adLen);
     try {
       int pushResult = bindings.pull(
-          _state, dataPtr, null, tagPtr, cPtr, ciphertext.length, adPtr, 0);
+          _state, dataPtr, null, tagPtr, cPtr, ciphertext.length, adPtr, adLen);
       if (pushResult != 0) {
         throw Exception("SecretBox pull failed");
       }
