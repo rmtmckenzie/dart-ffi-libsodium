@@ -10,7 +10,7 @@ main() {
     Encryptor encr;
     Decryptor decr;
     try {
-      final key = Encryptor.keyGen();
+      final key = keyGen();
       encr = Encryptor(key);
       final msg1 = utf8.encode("first message");
       final msg2 = utf8.encode("second message");
