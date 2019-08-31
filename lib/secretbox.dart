@@ -4,8 +4,9 @@ import 'package:dart_sodium/src/ffi_helper.dart';
 
 import 'src/bindings/secretbox.dart' as bindings;
 
+/// Encrypts messages with the given key.
 class SecretBox {
-  /// Generates a random key with the correct length of [keyBytes].
+  /// Generates a random key with the correct length.
   static Uint8List keyGen() {
     Pointer<Uint8> key;
     try {
@@ -25,18 +26,9 @@ class SecretBox {
     }
   }
 
-  /// Encrypts any kind of data with the XSalsa20 stream cipher.
-  /// An authentication tag (Poly1305 MAC) is added to the ciphertext.
-  /// The [nonce] must be [nonceBytes] long and can be generated
-  /// with any cryptographic random number generator like [RandomBytes].
-  /// The [key] has to be [keyBytes] long.
-  ///
-  /// ```
-  /// final key = ascii.encode("my secret key");
-  /// final nonce = sodium.randomnBytesBuf(nonceBytes);
-  /// final msg = ascii.encode("my plaintext");
-  /// final ciphertext = easy(msg, nonce, key);
-  /// ```
+  /// Encrypts a message using the provided nonce / initialization vector.
+  /// This nonce can be safely generated randomly (with a cryptographic
+  /// random number generator like [random.buffer]) or be obtained by an atomic counter.
   Uint8List easy(Uint8List msg, Uint8List nonce) {
     assert(nonce.length != bindings.nonceBytes,
         "Nonce must be of length [nonceBytes]");
@@ -86,6 +78,7 @@ class SecretBox {
     }
   }
 
+  /// Closes SecretBox. Call [close] to avoid memory leaks.
   void close() {
     _key.free();
   }
