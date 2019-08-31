@@ -4,7 +4,9 @@ import 'package:dart_sodium/src/ffi_helper.dart';
 
 import 'src/bindings/secretstream.dart' as bindings;
 
+/// Encrypts chunks of a stream
 class Encryptor {
+  /// generates a a key for [Encryptor]
   static Uint8List keyGen() {
     Pointer<Uint8> keyPtr;
     try {
@@ -19,6 +21,8 @@ class Encryptor {
   final Pointer<Uint8> _key;
   final Pointer<Uint8> _header;
   final Pointer<bindings.State> _state;
+
+  /// Header needed for [Decryptor]
   Uint8List get header => CStringToBuffer(_header, bindings.headerBytes);
 
   Encryptor(Uint8List key)
@@ -37,6 +41,9 @@ class Encryptor {
     }
   }
 
+  /// Pushe new [data] into the stream and get back the encrypted chunk
+  /// You can also add [additionalData] (metadata).
+  /// To end the stream set [tag] to [Tag.finish]
   Uint8List push(Uint8List data,
       {Uint8List additionalData, Tag tag = Tag.message}) {
     Pointer<Uint8> dataPtr, adPtr, cPtr;
@@ -62,6 +69,7 @@ class Encryptor {
     }
   }
 
+  /// Closes the Encryptor. Call this method to avoid memory leaks
   void close() {
     _key.free();
     _header.free();
@@ -69,6 +77,7 @@ class Encryptor {
   }
 }
 
+/// Possible tags for [push]
 enum Tag { message, push, rekey, finish }
 
 class _PullData {
@@ -77,6 +86,7 @@ class _PullData {
   const _PullData(this.decryptedChunk, this.additionalData, this.tag);
 }
 
+/// Decrypts chunks of a secretstream encrypted by [Encryptor]
 class Decryptor {
   final Pointer<Uint8> _key;
   final Pointer<Uint8> _header;
@@ -99,6 +109,7 @@ class Decryptor {
     }
   }
 
+  /// Pulls data out of the stream
   _PullData pull(Uint8List ciphertext) {
     Pointer<Uint8> dataPtr, adPtr, cPtr, tagPtr;
     try {
@@ -125,6 +136,7 @@ class Decryptor {
     }
   }
 
+  /// Closes the Decryptor. Call this method to avoid memory leaks.
   void close() {
     _key.free();
     _header.free();
