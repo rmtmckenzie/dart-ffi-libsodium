@@ -12,6 +12,6 @@ Uint8List buffer(int size) {
     bindings.buffer(bufptr, size);
     return CStringToBuffer(bufptr, size);
   } finally {
-    bufptr?.free();
+    bufptr.free();
   }
 }
