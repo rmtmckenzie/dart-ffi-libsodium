@@ -46,7 +46,7 @@ class Authenticator {
   }
 
   /// verifies a message and its tag
-  bool verify(Uint8List tag, Uint8List msg) {
+  bool verify(Uint8List msg, Uint8List tag) {
     Pointer<Uint8> tagPointer;
     Pointer<Uint8> msgPointer;
     try {
