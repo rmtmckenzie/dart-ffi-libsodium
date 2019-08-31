@@ -6,7 +6,7 @@ import 'package:dart_sodium/src/ffi_helper.dart';
 import 'dart_sodium.dart';
 import 'src/bindings/secretstream.dart' as bindings;
 
-class Encrypter {
+class Encryptor {
   static Uint8List keyGen() {
     Pointer<Uint8> keyPtr;
     try {
@@ -23,7 +23,7 @@ class Encrypter {
   Pointer<bindings.State> _state;
   Uint8List get header => CStringToBuffer(_header, bindings.headerBytes);
 
-  Encrypter(Uint8List key) : _key = BufferToCString(key) {
+  Encryptor(Uint8List key) : _key = BufferToCString(key) {
     if (key.length != bindings.keyBytes) {
       _key.free();
       throw Exception("Key hasn't expected length");
@@ -77,12 +77,12 @@ class _PullData {
   const _PullData(this.decryptedChunk, this.additionalData, this.tag);
 }
 
-class Decrypter {
+class Decryptor {
   final Pointer<Uint8> _key;
   Pointer<Uint8> _header;
   Pointer<bindings.State> _state;
 
-  Decrypter(Uint8List key, Uint8List header)
+  Decryptor(Uint8List key, Uint8List header)
       : _key = BufferToCString(key),
         _header = BufferToCString(header) {
     if (key.length != bindings.keyBytes) {
