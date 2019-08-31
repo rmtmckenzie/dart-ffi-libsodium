@@ -4,6 +4,8 @@ import 'package:dart_sodium/src/ffi_helper.dart';
 
 import 'src/bindings/pwhash.dart' as bindings;
 
+export 'src/bindings/pwhash.dart' show OpsLimit, MemLimit;
+
 /// Produces strong password hashes with the Argon2 function, ready for storage.
 /// It also handles salting.
 /// Sensible values for [opslimit] and [memlimit] can be found in the abstract classes
