@@ -17,7 +17,7 @@ main() {
       final nonce = rand.buffer(SecretBox.nonceBytes);
       final ciphertext = box.easy(msg, nonce);
       final cleartext = box.openEasy(ciphertext, nonce);
-      expect(memoryCompare(msg, cleartext), true);
+      expect(cleartext, msg);
     } finally {
       box.close();
     }
