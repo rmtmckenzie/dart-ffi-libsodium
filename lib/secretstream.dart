@@ -63,9 +63,9 @@ class Encryptor {
       }
       return CStringToBuffer(cPtr, cLen);
     } finally {
-      dataPtr?.free();
-      adPtr?.free();
-      cPtr?.free();
+      dataPtr.free();
+      adPtr.free();
+      cPtr.free();
     }
   }
 
