@@ -118,7 +118,8 @@ class Decryptor {
     final dataPtr = allocate<Uint8>(count: dataLen);
     final cPtr = BufferToCString(ciphertext);
     final tagPtr = allocate<Uint8>();
-    final adPtr = allocate<Uint8>(count: adLen);
+    final Pointer<Uint8> adPtr =
+        adLen == 0 ? fromAddress(0) : allocate(count: adLen);
     try {
       int pushResult = bindings.pull(
           _state, dataPtr, null, tagPtr, cPtr, ciphertext.length, adPtr, adLen);
