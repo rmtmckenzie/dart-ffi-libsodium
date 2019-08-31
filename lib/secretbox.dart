@@ -18,6 +18,9 @@ class SecretBox {
     }
   }
 
+  static final nonceBytes = bindings.nonceBytes;
+  static final keyBytes = bindings.keyBytes;
+
   final Pointer<Uint8> _key;
   SecretBox(Uint8List key) : _key = BufferToCString(key) {
     if (key.length != bindings.keyBytes) {
