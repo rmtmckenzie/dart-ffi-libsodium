@@ -66,7 +66,7 @@ class Encryptor {
       return CStringToBuffer(cPtr, cLen);
     } finally {
       dataPtr.free();
-      adPtr.free();
+      adPtr?.free();
       cPtr.free();
     }
   }
@@ -132,7 +132,7 @@ class Decryptor {
       return _PullData(chunk, adData, Tag.values[tag]);
     } finally {
       dataPtr.free();
-      adPtr.free();
+      adPtr?.free();
       tagPtr.free();
       cPtr.free();
     }
