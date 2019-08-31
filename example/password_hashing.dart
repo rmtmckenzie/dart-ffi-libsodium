@@ -7,9 +7,10 @@ import 'package:dart_sodium/pwhash.dart' as pwhash;
 void main() {
   init();
 
-  final password = rand.buf(16);
-  final hash = pwhash.str(
+  final password = rand.buffer(16);
+  final hash = pwhash.store(
       password, pwhash.OpsLimit.interactive, pwhash.MemLimit.interactive);
 
-  final isValid = pwhash.verify(hash, password);
+  final isValid = pwhash.storeVerify(hash, password);
+  assert(isValid == true);
 }

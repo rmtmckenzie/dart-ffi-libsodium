@@ -2,14 +2,20 @@ import 'dart:convert';
 
 import 'package:dart_sodium/dart_sodium.dart';
 import 'package:dart_sodium/random.dart' as rand;
-import 'package:dart_sodium/auth.dart' as auth;
+import 'package:dart_sodium/auth.dart';
 
 void main() {
   init();
 
-  final key = auth.keyGen();
-  final msg = rand.buf(16);
-  final tag = auth.auth(msg, key);
+  final key = Authenticator.keyGen();
+  final msg = utf8.encode("message");
+  final auth = Authenticator(key);
+  try {
+    final tag = auth.authenticate(msg);
 
-  final isValid = auth.verify(tag, msg, key);
+    final isValid = auth.verify(msg, tag);
+    assert(isValid == true);
+  } finally {
+    auth.close();
+  }
 }

@@ -2,15 +2,21 @@ import 'dart:convert';
 
 import 'package:dart_sodium/dart_sodium.dart';
 import 'package:dart_sodium/random.dart' as rand;
-import 'package:dart_sodium/secretbox.dart' as box;
+import 'package:dart_sodium/secretbox.dart';
 
 void main() {
   init();
 
-  final key = box.keyGen();
-  final plaintext = ascii.encode("my plaintext");
-  final nonce = rand.buf(box.nonceBytes);
-  final ciphertext = box.easy(plaintext, nonce, key);
+  final plaintext = utf8.encode("my plaintext");
+  final nonce = rand.buffer(SecretBox.nonceBytes);
+  final key = SecretBox.keyGen();
+  final box = SecretBox(key);
+  try {
+    final ciphertext = box.easy(plaintext, nonce);
 
-  final decrypted = box.openEasy(ciphertext, nonce, key);
+    final decrypted = box.openEasy(ciphertext, nonce);
+    assert(decrypted == plaintext);
+  } finally {
+    box.close();
+  }
 }
