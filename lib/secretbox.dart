@@ -8,9 +8,8 @@ import 'src/bindings/secretbox.dart' as bindings;
 class SecretBox {
   /// Generates a random key with the correct length.
   static Uint8List keyGen() {
-    Pointer<Uint8> key;
+    final Pointer<Uint8> key = allocate(count: bindings.keyBytes);
     try {
-      key = allocate(count: bindings.keyBytes);
       bindings.keyGen(key);
       return CStringToBuffer(key, bindings.keyBytes);
     } finally {
@@ -35,14 +34,11 @@ class SecretBox {
   Uint8List easy(Uint8List msg, Uint8List nonce) {
     assert(nonce.length == bindings.nonceBytes,
         "Nonce must be of length [nonceBytes]");
-    Pointer<Uint8> cypherText;
-    Pointer<Uint8> msgPtr;
-    Pointer<Uint8> noncePtr;
+    final cypherTextLen = bindings.macBytes + msg.length;
+    final cypherText = allocate<Uint8>(count: cypherTextLen);
+    final msgPtr = BufferToCString(msg);
+    final noncePtr = BufferToCString(nonce);
     try {
-      final cypherTextLen = bindings.macBytes + msg.length;
-      cypherText = allocate(count: cypherTextLen);
-      msgPtr = BufferToCString(msg);
-      noncePtr = BufferToCString(nonce);
       final secretBoxResult =
           bindings.easy(cypherText, msgPtr, msg.length, noncePtr, _key);
       if (secretBoxResult == -1) {
@@ -60,14 +56,11 @@ class SecretBox {
   Uint8List openEasy(Uint8List cypherText, Uint8List nonce) {
     assert(nonce.length == bindings.nonceBytes,
         "Nonce must be of length [nonceBytes]");
-    Pointer<Uint8> cPtr;
-    Pointer<Uint8> noncePtr;
-    Pointer<Uint8> msgPtr;
+    final msgLen = cypherText.length - bindings.macBytes;
+    final msgPtr = allocate<Uint8>(count: msgLen);
+    final cPtr = BufferToCString(cypherText);
+    final noncePtr = BufferToCString(nonce);
     try {
-      final msgLen = cypherText.length - bindings.macBytes;
-      msgPtr = allocate(count: msgLen);
-      cPtr = BufferToCString(cypherText);
-      noncePtr = BufferToCString(nonce);
       final result =
           bindings.openEasy(msgPtr, cPtr, cypherText.length, noncePtr, _key);
       if (result == -1) {

@@ -8,9 +8,8 @@ export 'src/bindings/secretstream.dart' show keyBytes;
 
 /// generates a a key for [Encryptor]
 Uint8List keyGen() {
-  Pointer<Uint8> keyPtr;
+  final Pointer<Uint8> keyPtr = allocate(count: bindings.keyBytes);
   try {
-    keyPtr = allocate(count: bindings.keyBytes);
     bindings.keyGen(keyPtr);
     return CStringToBuffer(keyPtr, bindings.keyBytes);
   } finally {
@@ -48,16 +47,18 @@ class Encryptor {
   /// To end the stream set [tag] to [Tag.finish]
   Uint8List push(Uint8List data,
       {Uint8List additionalData, Tag tag = Tag.message}) {
-    Pointer<Uint8> dataPtr, adPtr, cPtr;
+    Pointer<Uint8> adPtr;
+    var adLen = 0;
+    if (additionalData == null) {
+      adPtr = fromAddress(0);
+    } else {
+      adLen = additionalData.length;
+      adPtr = BufferToCString(additionalData);
+    }
+    final dataPtr = BufferToCString(data);
+    final cLen = data.length + bindings.aBytes;
+    final cPtr = allocate<Uint8>(count: cLen);
     try {
-      dataPtr = BufferToCString(data);
-      final cLen = data.length + bindings.aBytes;
-      cPtr = allocate(count: cLen);
-      var adLen = 0;
-      if (additionalData != null) {
-        adLen = additionalData.length;
-        adPtr = BufferToCString(additionalData);
-      }
       int pushResult = bindings.push(
           _state, cPtr, null, dataPtr, data.length, adPtr, adLen, tag.index);
       if (pushResult != 0) {
@@ -66,7 +67,7 @@ class Encryptor {
       return CStringToBuffer(cPtr, cLen);
     } finally {
       dataPtr.free();
-      adPtr?.free();
+      adPtr.free();
       cPtr.free();
     }
   }
@@ -112,15 +113,13 @@ class Decryptor {
   }
 
   /// Pulls data out of the stream
-  _PullData pull(Uint8List ciphertext) {
-    Pointer<Uint8> dataPtr, adPtr, cPtr, tagPtr;
+  _PullData pull(Uint8List ciphertext, {int adLen}) {
+    final dataLen = ciphertext.length - bindings.aBytes;
+    final dataPtr = allocate<Uint8>(count: dataLen);
+    final cPtr = BufferToCString(ciphertext);
+    final tagPtr = allocate<Uint8>();
+    final adPtr = allocate<Uint8>();
     try {
-      final dataLen = ciphertext.length - bindings.aBytes;
-      dataPtr = allocate(count: dataLen);
-      cPtr = BufferToCString(ciphertext);
-      tagPtr = allocate();
-      adPtr = allocate();
-
       int pushResult = bindings.pull(
           _state, dataPtr, null, tagPtr, cPtr, ciphertext.length, adPtr, 0);
       if (pushResult != 0) {
@@ -132,7 +131,7 @@ class Decryptor {
       return _PullData(chunk, adData, Tag.values[tag]);
     } finally {
       dataPtr.free();
-      adPtr?.free();
+      adPtr.free();
       tagPtr.free();
       cPtr.free();
     }

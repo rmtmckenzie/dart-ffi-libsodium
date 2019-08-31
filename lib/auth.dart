@@ -9,9 +9,8 @@ import 'src/bindings/auth.dart' as bindings;
 class Authenticator {
   /// Produces random keys for an Authenticator
   static keyGen() {
-    Pointer<Uint8> key;
+    final key = allocate<Uint8>(count: bindings.keyBytes);
     try {
-      key = allocate(count: bindings.keyBytes);
       bindings.keyGen(key);
       return CStringToBuffer(key, bindings.keyBytes);
     } finally {
@@ -29,11 +28,9 @@ class Authenticator {
 
   /// Authenticates / signs a message
   Uint8List authenticate(Uint8List msg) {
-    Pointer<Uint8> out;
-    Pointer<Uint8> msgPointer;
+    final out = allocate<Uint8>(count: bindings.authBytes);
+    final msgPointer = BufferToCString(msg);
     try {
-      out = allocate(count: bindings.authBytes);
-      msgPointer = BufferToCString(msg);
       final authResult = bindings.auth(out, msgPointer, msg.length, _key);
       if (authResult != 0) {
         throw Exception("Authentication failed");
@@ -47,11 +44,9 @@ class Authenticator {
 
   /// verifies a message and its tag
   bool verify(Uint8List msg, Uint8List tag) {
-    Pointer<Uint8> tagPointer;
-    Pointer<Uint8> msgPointer;
+    final tagPointer = BufferToCString(tag);
+    final msgPointer = BufferToCString(msg);
     try {
-      tagPointer = BufferToCString(tag);
-      msgPointer = BufferToCString(msg);
       final result = bindings.verify(tagPointer, msgPointer, msg.length, _key);
       return result == 0;
     } finally {
