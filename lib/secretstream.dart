@@ -4,20 +4,20 @@ import 'package:dart_sodium/src/ffi_helper.dart';
 
 import 'src/bindings/secretstream.dart' as bindings;
 
+/// generates a a key for [Encryptor]
+Uint8List keyGen() {
+  Pointer<Uint8> keyPtr;
+  try {
+    keyPtr = allocate(count: bindings.keyBytes);
+    bindings.keyGen(keyPtr);
+    return CStringToBuffer(keyPtr, bindings.keyBytes);
+  } finally {
+    keyPtr.free();
+  }
+}
+
 /// Encrypts chunks of a stream
 class Encryptor {
-  /// generates a a key for [Encryptor]
-  static Uint8List keyGen() {
-    Pointer<Uint8> keyPtr;
-    try {
-      keyPtr = allocate(count: bindings.keyBytes);
-      bindings.keyGen(keyPtr);
-      return CStringToBuffer(keyPtr, bindings.keyBytes);
-    } finally {
-      keyPtr.free();
-    }
-  }
-
   final Pointer<Uint8> _key;
   final Pointer<Uint8> _header;
   final Pointer<bindings.State> _state;
