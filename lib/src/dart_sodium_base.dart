@@ -1,6 +1,6 @@
 import 'dart:ffi' as ffi;
 
-final libsodium = ffi.DynamicLibrary.open("libsodium");
+ffi.DynamicLibrary libsodium;
 var _isInitialized = false;
 
 final _init = libsodium
@@ -12,10 +12,11 @@ final _init = libsodium
 /// and sodium to be thread safe. Failing to initialize sodium could result in unsafe results.
 /// Should sodium (for whatever reasons) fail to initialize, you should disregard any vaulues
 /// acquired from it.
-void init() {
+void init(String path) {
   if (_isInitialized) {
     return;
   }
+  libsodium = ffi.DynamicLibrary.open(path);
   final result = _init();
   if (result < 0) {
     throw Exception("""Initialization of dart_sodium failed: $result 
