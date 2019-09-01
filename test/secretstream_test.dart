@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:dart_sodium/src/dart_sodium_base.dart';
+import './init.dart';
 import 'package:test/test.dart';
 import 'package:dart_sodium/secretstream.dart';
 

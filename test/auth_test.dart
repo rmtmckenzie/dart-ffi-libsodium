@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:dart_sodium/dart_sodium.dart';
+import './init.dart';
 import 'package:test/test.dart';
 import 'package:dart_sodium/auth.dart';
 

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:dart_sodium/dart_sodium.dart';
+import './init.dart';
 import 'package:dart_sodium/secretbox.dart';
 import 'package:dart_sodium/random.dart' as rand;
 import 'package:dart_sodium/helpers.dart';

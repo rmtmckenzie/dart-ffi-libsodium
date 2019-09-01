@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:dart_sodium/dart_sodium.dart';
+import './init.dart';
 import 'package:dart_sodium/helpers.dart';
 import 'package:test/test.dart';
 
