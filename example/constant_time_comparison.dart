@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:dart_sodium/helpers.dart';
+import 'package:dart_sodium/dart_sodium.dart';
 
 void main() {
+  init("./libsodium");
   final first = Uint8List.fromList([1, 2, 3, 4, 5]);
   final second = Uint8List.fromList([]);
   final firstCopy = Uint8List.fromList(first);

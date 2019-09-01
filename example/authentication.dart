@@ -5,7 +5,7 @@ import 'package:dart_sodium/random.dart' as rand;
 import 'package:dart_sodium/auth.dart';
 
 void main() {
-  init();
+  init("./libsodium");
 
   final key = Authenticator.keyGen();
   final msg = utf8.encode("message");

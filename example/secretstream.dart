@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:dart_sodium/secretstream.dart' as secretstream;
+import 'package:dart_sodium/dart_sodium.dart';
 
 void main() {
+  init("./libsodium");
   final key = secretstream.keyGen();
   final encr = secretstream.Encryptor(key);
   final decr = secretstream.Decryptor(key, encr.header);

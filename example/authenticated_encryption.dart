@@ -5,7 +5,7 @@ import 'package:dart_sodium/random.dart' as rand;
 import 'package:dart_sodium/secretbox.dart';
 
 void main() {
-  init();
+  init("./libsodium");
 
   final plaintext = utf8.encode("my plaintext");
   final nonce = rand.buffer(SecretBox.nonceBytes);

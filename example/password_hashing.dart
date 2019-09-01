@@ -5,7 +5,7 @@ import 'package:dart_sodium/random.dart' as rand;
 import 'package:dart_sodium/pwhash.dart' as pwhash;
 
 void main() {
-  init();
+  init("./libsodium");
 
   final password = rand.buffer(16);
   final hash = pwhash.store(
