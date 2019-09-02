@@ -1,5 +1,3 @@
-import 'package:dart_sodium/src/ffi_helper.dart';
-
 import '../dart_sodium_base.dart';
 import 'dart:ffi';
 

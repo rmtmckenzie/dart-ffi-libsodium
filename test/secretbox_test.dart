@@ -3,7 +3,6 @@ import 'dart:convert';
 import './init.dart';
 import 'package:dart_sodium/secretbox.dart';
 import 'package:dart_sodium/random.dart' as rand;
-import 'package:dart_sodium/helpers.dart';
 import 'package:test/test.dart';
 
 main() {

@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:ffi';
 
 import 'package:dart_sodium/src/ffi_helper.dart';
 import 'src/bindings/helpers.dart' as bindings;

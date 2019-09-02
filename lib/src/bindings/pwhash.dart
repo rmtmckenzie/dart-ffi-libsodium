@@ -1,6 +1,5 @@
 import 'dart:ffi';
 import '../dart_sodium_base.dart';
-import '../ffi_helper.dart';
 
 typedef _StoreNative = Int16 Function(Pointer<Uint8> out, Pointer<Uint8> passwd,
     Uint64 passwdLen, Uint64 opsLimit, Uint64 memlimit);

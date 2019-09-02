@@ -1,5 +1,4 @@
 import '../dart_sodium_base.dart';
-import '../ffi_helper.dart';
 import 'dart:ffi';
 
 typedef _MemCmpNative = Int16 Function(
