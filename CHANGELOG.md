@@ -1,12 +1,5 @@
-## 0.1.0
-
-This is a pre-release with some of its later functionality still missing.
-The api however should be stable.
-
-## 0.1.1
-- make MemLimit and OpsLimit abstract
-- add examples to readme
-- some work on documentation
-
-## 0.2.0
-- pack belonging together functions into abstract classes
+## 1.0.0
+- Stable API for the most common functions
+- Different functionalities (like password hashing or authentication) are in their own mini-library
+- OO interface to hide pointers
+- Updated examples and tests
