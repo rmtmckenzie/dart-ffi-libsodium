@@ -4,9 +4,14 @@ import 'package:dart_sodium/src/ffi_helper.dart';
 
 import 'src/bindings/box.dart' as bindings;
 
-class _KeyPair {
+class KeyPair {
   final Uint8List publicKey, secretKey;
-  const _KeyPair(this.publicKey, this.secretKey);
+  const KeyPair(this.publicKey, this.secretKey);
+}
+
+class Detached {
+  final Uint8List ciphertext, authTag;
+  const Detached(this.ciphertext, this.authTag);
 }
 
 /// Encrypt and decrypt single messages
@@ -21,7 +26,7 @@ class Box {
   static final nonceBytes = bindings.nonceBytes;
 
   /// Generates a public and secret key pair
-  static _KeyPair keyPair() {
+  static KeyPair keyPair() {
     final Pointer<Uint8> secretKeyPtr =
         allocate(count: bindings.secretKeyBytes);
     final Pointer<Uint8> publicKeyPtr =
@@ -33,7 +38,7 @@ class Box {
       }
       final secretKey = CStringToBuffer(secretKeyPtr, bindings.secretKeyBytes);
       final publicKey = CStringToBuffer(secretKeyPtr, bindings.publicKeyBytes);
-      return _KeyPair(publicKey, secretKey);
+      return KeyPair(publicKey, secretKey);
     } finally {
       secretKeyPtr.free();
       publicKeyPtr.free();
@@ -47,7 +52,7 @@ class Box {
     }
   }
 
-  /// Encrypt a single message given a unique nonce and a public key
+  /// Encrypt a single message given a unique [nonce] and [publicKey]
   Uint8List easy(Uint8List msg, Uint8List nonce, Uint8List publicKey) {
     final pkPtr = BufferToCString(publicKey);
     final Pointer<Uint8> msgPtr = BufferToCString(msg);
@@ -69,7 +74,7 @@ class Box {
     }
   }
 
-  /// Opens messages encrypted with [easy] given the nonce and public key
+  /// Opens messages encrypted with [easy] given the [nonce]and [publicKey]
   Uint8List openEasy(
       Uint8List ciphertext, Uint8List nonce, Uint8List publicKey) {
     final pkPtr = BufferToCString(publicKey);
@@ -89,6 +94,57 @@ class Box {
       noncePtr.free();
       cPtr.free();
       pkPtr.free();
+    }
+  }
+
+  /// Encrypt a single message given a unique [nonce] and [publicKey]
+  Detached detached(Uint8List msg, Uint8List nonce, Uint8List publicKey) {
+    final pkPtr = BufferToCString(publicKey);
+    final Pointer<Uint8> msgPtr = BufferToCString(msg);
+    final Pointer<Uint8> noncePtr = BufferToCString(nonce);
+    final cLen = msg.length;
+    final Pointer<Uint8> cPtr = allocate(count: cLen);
+    final Pointer<Uint8> mac = allocate(count: bindings.macBytes);
+    try {
+      final result = bindings.detached(
+          cPtr, mac, msgPtr, msg.length, noncePtr, pkPtr, secretKey);
+      if (result != 0) {
+        throw Exception("Encrypting failed");
+      }
+      final c = CStringToBuffer(cPtr, cLen);
+      final authTag = CStringToBuffer(mac, bindings.macBytes);
+      return Detached(c, authTag);
+    } finally {
+      msgPtr.free();
+      noncePtr.free();
+      cPtr.free();
+      pkPtr.free();
+      mac.free();
+    }
+  }
+
+  /// Opens messages encrypted with [detached] given the [nonce], [authTag] and [publicKey]
+  Uint8List openDetached(Uint8List ciphertext, Uint8List nonce,
+      Uint8List authTag, Uint8List publicKey) {
+    final pkPtr = BufferToCString(publicKey);
+    final msgLen = ciphertext.length - bindings.macBytes;
+    final Pointer<Uint8> msgPtr = allocate(count: msgLen);
+    final Pointer<Uint8> noncePtr = BufferToCString(nonce);
+    final Pointer<Uint8> cPtr = BufferToCString(ciphertext);
+    final Pointer<Uint8> mac = BufferToCString(authTag);
+    try {
+      final result = bindings.openDetached(
+          msgPtr, cPtr, mac, ciphertext.length, noncePtr, pkPtr, secretKey);
+      if (result != 0) {
+        throw Exception("Decrypting failed");
+      }
+      return CStringToBuffer(msgPtr, msgLen);
+    } finally {
+      msgPtr.free();
+      noncePtr.free();
+      cPtr.free();
+      pkPtr.free();
+      mac.free();
     }
   }
 
