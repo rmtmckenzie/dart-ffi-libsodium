@@ -21,4 +21,19 @@ main() {
       box.close();
     }
   });
+
+  test("encrypt and decrypt with afternm", () {
+    init();
+    final keys = Box.keyPair();
+    final box = BoxNm(keys.publicKey, keys.secretKey);
+    final msg = utf8.encode("hello world");
+    final nonce = buffer(Box.nonceBytes);
+    try {
+      final ciphertext = box.easy(msg, nonce);
+      final decrypted = box.openEasy(ciphertext, nonce);
+      expect(msg, decrypted);
+    } finally {
+      box.close();
+    }
+  });
 }
