@@ -13,6 +13,9 @@ final macBytes = libsodium
     .lookupFunction<Int64 Function(), int Function()>("crypto_box_macbytes")();
 final nonceBytes = libsodium.lookupFunction<Int64 Function(), int Function()>(
     "crypto_box_noncebytes")();
+final beforeNmBytes =
+    libsodium.lookupFunction<Int64 Function(), int Function()>(
+        "crypto_box_beforenmbytes")();
 
 final keyPair = libsodium.lookupFunction<
     Int16 Function(Pointer<Uint8> pk, Pointer<Uint8> sk),
@@ -63,3 +66,34 @@ typedef _BoxOpenEasyDart = int Function(
 
 final openEasy = libsodium.lookupFunction<_BoxOpenEasyNative, _BoxOpenEasyDart>(
     "crypto_box_open_easy");
+
+typedef _BoxEasyAfterNmNative = Int16 Function(
+    Pointer<Uint8> ciphertext,
+    Pointer<Uint8> message,
+    Uint64 mlen,
+    Pointer<Uint8> nonce,
+    Pointer<Uint8> key);
+typedef _BoxEasyAfterNmyDart = int Function(Pointer<Uint8> ciphertext,
+    Pointer<Uint8> message, int mlen, Pointer<Uint8> nonce, Pointer<Uint8> key);
+
+final easyAfterNm =
+    libsodium.lookupFunction<_BoxEasyAfterNmNative, _BoxEasyAfterNmyDart>(
+        "crypto_box_easy_afternm");
+
+typedef _BoxOpenEasyAfterNmNative = Int16 Function(
+    Pointer<Uint8> message,
+    Pointer<Uint8> ciphertext,
+    Uint64 clen,
+    Pointer<Uint8> nonce,
+    Pointer<Uint8> pk,
+    Pointer<Uint8> sk);
+typedef _BoxOpenEasyAfterNmDart = int Function(
+    Pointer<Uint8> message,
+    Pointer<Uint8> ciphertext,
+    int clen,
+    Pointer<Uint8> nonce,
+    Pointer<Uint8> pk,
+    Pointer<Uint8> sk);
+
+final openEasyAfterNm = libsodium.lookupFunction<_BoxOpenEasyAfterNmNative,
+    _BoxOpenEasyAfterNmDart>("crypto_box_open_easy_afternm");
