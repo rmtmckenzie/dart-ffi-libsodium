@@ -4,8 +4,6 @@ import 'ffi_helper.dart';
 
 import 'bindings/secretstream.dart' as bindings;
 
-export 'bindings/secretstream.dart' show keyBytes;
-
 /// Encrypts chunks of a stream
 class StreamEncryptor {
   /// generates a a key for [StreamEncryptor]
@@ -18,6 +16,9 @@ class StreamEncryptor {
       keyPtr.free();
     }
   }
+
+  /// Required length of [key]
+  static final keyBytes = bindings.keyBytes;
 
   final Pointer<Uint8> _key;
   final Pointer<Uint8> _header;
