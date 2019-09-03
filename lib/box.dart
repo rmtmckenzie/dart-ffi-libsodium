@@ -102,8 +102,7 @@ class Box {
     final pkPtr = BufferToCString(publicKey);
     final Pointer<Uint8> msgPtr = BufferToCString(msg);
     final Pointer<Uint8> noncePtr = BufferToCString(nonce);
-    final cLen = msg.length;
-    final Pointer<Uint8> cPtr = allocate(count: cLen);
+    final Pointer<Uint8> cPtr = allocate(count: msg.length);
     final Pointer<Uint8> mac = allocate(count: bindings.macBytes);
     try {
       final result = bindings.detached(
@@ -111,7 +110,7 @@ class Box {
       if (result != 0) {
         throw Exception("Encrypting failed");
       }
-      final c = CStringToBuffer(cPtr, cLen);
+      final c = CStringToBuffer(cPtr, msg.length);
       final authTag = CStringToBuffer(mac, bindings.macBytes);
       return Detached(c, authTag);
     } finally {
@@ -127,8 +126,8 @@ class Box {
   Uint8List openDetached(Uint8List ciphertext, Uint8List nonce,
       Uint8List authTag, Uint8List publicKey) {
     final pkPtr = BufferToCString(publicKey);
-    final msgLen = ciphertext.length - bindings.macBytes;
-    final Pointer<Uint8> msgPtr = allocate(count: msgLen);
+    ;
+    final Pointer<Uint8> msgPtr = allocate(count: ciphertext.length);
     final Pointer<Uint8> noncePtr = BufferToCString(nonce);
     final Pointer<Uint8> cPtr = BufferToCString(ciphertext);
     final Pointer<Uint8> mac = BufferToCString(authTag);
@@ -138,7 +137,7 @@ class Box {
       if (result != 0) {
         throw Exception("Decrypting failed");
       }
-      return CStringToBuffer(msgPtr, msgLen);
+      return CStringToBuffer(msgPtr, ciphertext.length);
     } finally {
       msgPtr.free();
       noncePtr.free();
