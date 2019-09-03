@@ -29,6 +29,13 @@ main() {
       final decrypted = box.openEasy(ciphertext, nonce, keys.publicKey);
       expect(msg, decrypted);
     });
+
+    test("encrypt and decrypt a message in detached mode", () {
+      final detached = box.detached(msg, nonce, keys.publicKey);
+      final decrypted = box.openDetached(
+          detached.ciphertext, nonce, detached.authTag, keys.publicKey);
+      expect(decrypted, msg);
+    });
   });
 
   group("BoxNumerous", () {
