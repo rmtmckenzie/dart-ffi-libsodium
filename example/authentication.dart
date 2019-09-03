@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:dart_sodium/dart_sodium.dart';
-import 'package:dart_sodium/auth.dart';
+import 'package:dart_sodium/secret_key_crypto.dart';
 
 void main() {
   init("./libsodium");

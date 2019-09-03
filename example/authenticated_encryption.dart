@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dart_sodium/dart_sodium.dart';
 import 'package:dart_sodium/random.dart' as rand;
-import 'package:dart_sodium/secretbox.dart';
+import 'package:dart_sodium/secret_key_crypto.dart';
 
 void main() {
   init("./libsodium");

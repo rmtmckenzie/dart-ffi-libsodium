@@ -1,6 +1,6 @@
 import 'package:dart_sodium/dart_sodium.dart';
 import 'package:dart_sodium/random.dart' as rand;
-import 'package:dart_sodium/pwhash.dart' as pwhash;
+import 'package:dart_sodium/password_hasing.dart' as pwhash;
 
 void main() {
   init("./libsodium");
