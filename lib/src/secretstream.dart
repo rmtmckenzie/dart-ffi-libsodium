@@ -6,19 +6,19 @@ import 'bindings/secretstream.dart' as bindings;
 
 export 'bindings/secretstream.dart' show keyBytes;
 
-/// generates a a key for [StreamEncryptor]
-Uint8List keyGen() {
-  final Pointer<Uint8> keyPtr = allocate(count: bindings.keyBytes);
-  try {
-    bindings.keyGen(keyPtr);
-    return CStringToBuffer(keyPtr, bindings.keyBytes);
-  } finally {
-    keyPtr.free();
-  }
-}
-
 /// Encrypts chunks of a stream
 class StreamEncryptor {
+  /// generates a a key for [StreamEncryptor]
+  static Uint8List keyGen() {
+    final Pointer<Uint8> keyPtr = allocate(count: bindings.keyBytes);
+    try {
+      bindings.keyGen(keyPtr);
+      return CStringToBuffer(keyPtr, bindings.keyBytes);
+    } finally {
+      keyPtr.free();
+    }
+  }
+
   final Pointer<Uint8> _key;
   final Pointer<Uint8> _header;
   final Pointer<bindings.State> _state;
