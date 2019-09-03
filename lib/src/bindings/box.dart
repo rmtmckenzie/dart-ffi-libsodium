@@ -3,13 +3,13 @@ import '../dart_sodium_base.dart';
 
 final secretKeyBytes =
     libsodium.lookupFunction<Int64 Function(), int Function()>(
-        "crypto_box_secretkeybytes");
+        "crypto_box_secretkeybytes")();
 final seedBytes = libsodium
-    .lookupFunction<Int64 Function(), int Function()>("crypto_box_seedbytes");
+    .lookupFunction<Int64 Function(), int Function()>("crypto_box_seedbytes")();
 final macBytes = libsodium
-    .lookupFunction<Int64 Function(), int Function()>("crypto_box_macbytes");
-final nonceBytes = libsodium
-    .lookupFunction<Int64 Function(), int Function()>("crypto_box_noncebytes");
+    .lookupFunction<Int64 Function(), int Function()>("crypto_box_macbytes")();
+final nonceBytes = libsodium.lookupFunction<Int64 Function(), int Function()>(
+    "crypto_box_noncebytes")();
 
 final keyPair = libsodium.lookupFunction<
     Int16 Function(Pointer<Uint8> pk, Pointer<Uint8> sk),
