@@ -179,7 +179,7 @@ class BoxNumerous {
     }
   }
 
-  /// Encrypts a single message given a unique nonce
+  /// Encrypts a single message given a unique [nonce]
   Uint8List easy(Uint8List msg, Uint8List nonce) {
     final Pointer<Uint8> msgPtr = BufferToCString(msg);
     final Pointer<Uint8> noncePtr = BufferToCString(nonce);
@@ -216,6 +216,51 @@ class BoxNumerous {
       msgPtr.free();
       noncePtr.free();
       cPtr.free();
+    }
+  }
+
+  /// Encrypt a single message given a unique [nonce]
+  Detached detached(Uint8List msg, Uint8List nonce) {
+    final Pointer<Uint8> msgPtr = BufferToCString(msg);
+    final Pointer<Uint8> noncePtr = BufferToCString(nonce);
+    final Pointer<Uint8> cPtr = allocate(count: msg.length);
+    final Pointer<Uint8> mac = allocate(count: bindings.macBytes);
+    try {
+      final result = bindings.detachedAfterNm(
+          cPtr, mac, msgPtr, msg.length, noncePtr, key);
+      if (result != 0) {
+        throw Exception("Encrypting failed");
+      }
+      final c = CStringToBuffer(cPtr, msg.length);
+      final authTag = CStringToBuffer(mac, bindings.macBytes);
+      return Detached(c, authTag);
+    } finally {
+      msgPtr.free();
+      noncePtr.free();
+      cPtr.free();
+      mac.free();
+    }
+  }
+
+  /// Opens messages encrypted with [detached] given the [nonce], [authTag] and [publicKey]
+  Uint8List openDetached(
+      Uint8List ciphertext, Uint8List nonce, Uint8List authTag) {
+    final Pointer<Uint8> msgPtr = allocate(count: ciphertext.length);
+    final Pointer<Uint8> noncePtr = BufferToCString(nonce);
+    final Pointer<Uint8> cPtr = BufferToCString(ciphertext);
+    final Pointer<Uint8> mac = BufferToCString(authTag);
+    try {
+      final result = bindings.openDetachedAfterNm(
+          msgPtr, cPtr, mac, ciphertext.length, noncePtr, key);
+      if (result != 0) {
+        throw Exception("Decrypting failed");
+      }
+      return CStringToBuffer(msgPtr, ciphertext.length);
+    } finally {
+      msgPtr.free();
+      noncePtr.free();
+      cPtr.free();
+      mac.free();
     }
   }
 
