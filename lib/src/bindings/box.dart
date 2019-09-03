@@ -31,14 +31,14 @@ final scalarMultBase = libsodium.lookupFunction<
 typedef _BoxEasyNative = Int16 Function(
     Pointer<Uint8> ciphertext,
     Pointer<Uint8> message,
-    Pointer<Uint8> mlen,
+    Uint64 mlen,
     Pointer<Uint8> nonce,
     Pointer<Uint8> pk,
     Pointer<Uint8> sk);
 typedef _BoxEasyDart = int Function(
     Pointer<Uint8> ciphertext,
     Pointer<Uint8> message,
-    Pointer<Uint8> mlen,
+    int mlen,
     Pointer<Uint8> nonce,
     Pointer<Uint8> pk,
     Pointer<Uint8> sk);
@@ -49,14 +49,14 @@ final easy =
 typedef _BoxOpenEasyNative = Int16 Function(
     Pointer<Uint8> message,
     Pointer<Uint8> ciphertext,
-    Pointer<Uint8> clen,
+    Uint64 clen,
     Pointer<Uint8> nonce,
     Pointer<Uint8> pk,
     Pointer<Uint8> sk);
 typedef _BoxOpenEasyDart = int Function(
     Pointer<Uint8> message,
     Pointer<Uint8> ciphertext,
-    Pointer<Uint8> clen,
+    int clen,
     Pointer<Uint8> nonce,
     Pointer<Uint8> pk,
     Pointer<Uint8> sk);
