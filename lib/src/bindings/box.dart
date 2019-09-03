@@ -4,6 +4,9 @@ import '../dart_sodium_base.dart';
 final secretKeyBytes =
     libsodium.lookupFunction<Int64 Function(), int Function()>(
         "crypto_box_secretkeybytes")();
+final publicKeyBytes =
+    libsodium.lookupFunction<Int64 Function(), int Function()>(
+        "crypto_box_publickeybytes")();
 final seedBytes = libsodium
     .lookupFunction<Int64 Function(), int Function()>("crypto_box_seedbytes")();
 final macBytes = libsodium
