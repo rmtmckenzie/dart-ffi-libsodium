@@ -91,6 +91,7 @@ final detached =
 typedef _BoxOpenDetachedNative = Int16 Function(
     Pointer<Uint8> message,
     Pointer<Uint8> ciphertext,
+    Pointer<Uint8> mac,
     Uint64 clen,
     Pointer<Uint8> nonce,
     Pointer<Uint8> pk,
@@ -98,6 +99,7 @@ typedef _BoxOpenDetachedNative = Int16 Function(
 typedef _BoxOpenDetachedDart = int Function(
     Pointer<Uint8> message,
     Pointer<Uint8> ciphertext,
+    Pointer<Uint8> mac,
     int clen,
     Pointer<Uint8> nonce,
     Pointer<Uint8> pk,
