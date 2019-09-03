@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import './init.dart';
-import 'package:dart_sodium/pwhash.dart';
+import 'package:dart_sodium/password_hasing.dart';
 import 'package:test/test.dart';
 
 main() {

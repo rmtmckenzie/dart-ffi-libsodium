@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import './init.dart';
-import 'package:dart_sodium/secretbox.dart';
+import 'package:dart_sodium/secret_key_crypto.dart';
 import 'package:dart_sodium/random.dart' as rand;
 import 'package:test/test.dart';
 
