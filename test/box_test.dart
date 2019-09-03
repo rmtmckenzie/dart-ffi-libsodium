@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:dart_sodium/box.dart';
+import 'package:dart_sodium/public_key_crypto.dart';
 import 'package:dart_sodium/random.dart';
 import 'package:test/test.dart';
 

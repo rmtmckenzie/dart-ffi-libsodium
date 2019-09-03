@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import './init.dart';
 import 'package:test/test.dart';
-import 'package:dart_sodium/auth.dart';
+import 'package:dart_sodium/secret_key_crypto.dart';
 
 main() {
   test("authenticate message", () {
