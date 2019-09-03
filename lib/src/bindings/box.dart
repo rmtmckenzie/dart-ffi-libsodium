@@ -97,3 +97,8 @@ typedef _BoxOpenEasyAfterNmDart = int Function(
 
 final openEasyAfterNm = libsodium.lookupFunction<_BoxOpenEasyAfterNmNative,
     _BoxOpenEasyAfterNmDart>("crypto_box_open_easy_afternm");
+
+final beforeNm = libsodium.lookupFunction<
+    Int16 Function(Pointer<Uint8> k, Pointer<Uint8> pk, Pointer<Uint8> sk),
+    int Function(Pointer<Uint8> k, Pointer<Uint8> pk,
+        Pointer<Uint8> sk)>("crypto_box_beforenm");
