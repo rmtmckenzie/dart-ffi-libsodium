@@ -6,7 +6,7 @@ import 'bindings/secretstream.dart' as bindings;
 
 export 'bindings/secretstream.dart' show keyBytes;
 
-/// generates a a key for [Encryptor]
+/// generates a a key for [StreamEncryptor]
 Uint8List keyGen() {
   final Pointer<Uint8> keyPtr = allocate(count: bindings.keyBytes);
   try {
@@ -18,15 +18,15 @@ Uint8List keyGen() {
 }
 
 /// Encrypts chunks of a stream
-class Encryptor {
+class StreamEncryptor {
   final Pointer<Uint8> _key;
   final Pointer<Uint8> _header;
   final Pointer<bindings.State> _state;
 
-  /// Header needed for [Decryptor]
+  /// Header needed for [StreamDecryptor]
   Uint8List get header => CStringToBuffer(_header, bindings.headerBytes);
 
-  Encryptor(Uint8List key)
+  StreamEncryptor(Uint8List key)
       : _key = BufferToCString(key),
         _header = allocate(count: bindings.headerBytes),
         _state = allocate(count: bindings.stateBytes) {
@@ -89,13 +89,13 @@ class _PullData {
   const _PullData(this.decryptedChunk, this.additionalData, this.tag);
 }
 
-/// Decrypts chunks of a secretstream encrypted by [Encryptor]
-class Decryptor {
+/// Decrypts chunks of a secretstream encrypted by [StreamEncryptor]
+class StreamDecryptor {
   final Pointer<Uint8> _key;
   final Pointer<Uint8> _header;
   final Pointer<bindings.State> _state;
 
-  Decryptor(Uint8List key, Uint8List header)
+  StreamDecryptor(Uint8List key, Uint8List header)
       : _key = BufferToCString(key),
         _header = BufferToCString(header),
         _state = allocate(count: bindings.stateBytes) {
