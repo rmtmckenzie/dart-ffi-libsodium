@@ -9,11 +9,18 @@ class _KeyPair {
   const _KeyPair(this.publicKey, this.secretKey);
 }
 
+/// Encrypt and decrypt single messages
 class Box {
+  /// Required length of the [secretKey]
   static final secretKeyBytes = bindings.secretKeyBytes;
+
+  /// Required length of the [publicKey]
   static final publicKeyBytes = bindings.publicKeyBytes;
+
+  /// Required length of the [nonce]
   static final nonceBytes = bindings.nonceBytes;
 
+  /// Generates a public and secret key pair
   static _KeyPair keyPair() {
     final Pointer<Uint8> secretKeyPtr =
         allocate(count: bindings.secretKeyBytes);
@@ -40,6 +47,7 @@ class Box {
     }
   }
 
+  /// Encrypt a single message given a unique nonce and a public key
   Uint8List easy(Uint8List msg, Uint8List nonce, Uint8List publicKey) {
     final pkPtr = BufferToCString(publicKey);
     final Pointer<Uint8> msgPtr = BufferToCString(msg);
@@ -61,6 +69,7 @@ class Box {
     }
   }
 
+  /// Opens messages encrypted with [easy] given the nonce and public key
   Uint8List openEasy(
       Uint8List ciphertext, Uint8List nonce, Uint8List publicKey) {
     final pkPtr = BufferToCString(publicKey);
@@ -83,14 +92,17 @@ class Box {
     }
   }
 
+  /// Closes the box. Should be called to avoid memory leaks.
   void close() {
     secretKey.free();
   }
 }
 
-class BoxNm {
+/// Encrypt and decrypt several messages for the same receiver or rather from the same sender.
+/// It derives a shared key once and stores it to make it more efficient.
+class BoxNumerous {
   final Pointer<Uint8> key;
-  BoxNm(Uint8List publicKey, Uint8List secretKey)
+  BoxNumerous(Uint8List publicKey, Uint8List secretKey)
       : key = allocate(count: bindings.beforeNmBytes) {
     if (secretKey.length != bindings.secretKeyBytes) {
       throw Exception("Secret Key hasn't expected length");
@@ -112,6 +124,7 @@ class BoxNm {
     }
   }
 
+  /// Encrypts a single message given a unique nonce
   Uint8List easy(Uint8List msg, Uint8List nonce) {
     final Pointer<Uint8> msgPtr = BufferToCString(msg);
     final Pointer<Uint8> noncePtr = BufferToCString(nonce);
@@ -131,6 +144,7 @@ class BoxNm {
     }
   }
 
+  /// Decrypts a single message encrypted by [easy]
   Uint8List openEasy(Uint8List ciphertext, Uint8List nonce) {
     final msgLen = ciphertext.length - bindings.macBytes;
     final Pointer<Uint8> msgPtr = allocate(count: msgLen);
@@ -150,6 +164,7 @@ class BoxNm {
     }
   }
 
+  /// Closes the box. Should be called to avoid memory leaks.
   void close() {
     key.free();
   }
