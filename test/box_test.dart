@@ -59,5 +59,12 @@ main() {
       final decrypted = box.openEasy(ciphertext, nonce);
       expect(msg, decrypted);
     });
+
+    test("encrypt and decrypt a message in detached mode", () {
+      final detached = box.detached(msg, nonce);
+      final decrypted =
+          box.openDetached(detached.ciphertext, nonce, detached.authTag);
+      expect(decrypted, msg);
+    });
   });
 }
