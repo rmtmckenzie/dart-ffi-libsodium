@@ -1,10 +1,10 @@
 import 'dart:ffi';
 import 'dart:typed_data';
-import 'package:dart_sodium/src/ffi_helper.dart';
+import 'ffi_helper.dart';
 
-import 'src/bindings/pwhash.dart' as bindings;
+import 'bindings/pwhash.dart' as bindings;
 
-export 'src/bindings/pwhash.dart' show OpsLimit, MemLimit;
+export 'bindings/pwhash.dart' show OpsLimit, MemLimit;
 
 /// Produces strong password hashes with the Argon2 function, ready for storage.
 /// It also handles salting.

@@ -1,10 +1,10 @@
 import 'dart:ffi';
 import 'dart:typed_data';
-import 'package:dart_sodium/src/ffi_helper.dart';
+import 'ffi_helper.dart';
 
-import 'src/bindings/secretstream.dart' as bindings;
+import 'bindings/secretstream.dart' as bindings;
 
-export 'src/bindings/secretstream.dart' show keyBytes;
+export 'bindings/secretstream.dart' show keyBytes;
 
 /// generates a a key for [Encryptor]
 Uint8List keyGen() {

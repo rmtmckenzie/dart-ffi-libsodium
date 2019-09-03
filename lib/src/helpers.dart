@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:dart_sodium/src/ffi_helper.dart';
-import 'src/bindings/helpers.dart' as bindings;
+import 'ffi_helper.dart';
+import 'bindings/helpers.dart' as bindings;
 
 /// Compares two buffers in constant-time.
 /// You should use this instead of simple comparison using the [==] operator

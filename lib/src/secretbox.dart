@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 import 'dart:ffi';
-import 'package:dart_sodium/src/ffi_helper.dart';
+import 'ffi_helper.dart';
 
-import 'src/bindings/secretbox.dart' as bindings;
+import 'bindings/secretbox.dart' as bindings;
 
 /// Encrypts messages with the given key.
 class SecretBox {

@@ -1,8 +1,8 @@
 import 'dart:ffi';
 import 'dart:typed_data';
-import 'package:dart_sodium/src/ffi_helper.dart';
+import 'ffi_helper.dart';
 
-import 'src/bindings/box.dart' as bindings;
+import 'bindings/box.dart' as bindings;
 
 class KeyPair {
   final Uint8List publicKey, secretKey;

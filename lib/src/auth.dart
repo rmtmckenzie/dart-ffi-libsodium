@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
 import 'dart:ffi';
-import 'package:dart_sodium/src/ffi_helper.dart';
+import 'ffi_helper.dart';
 
-import 'src/bindings/auth.dart' as bindings;
+import 'bindings/auth.dart' as bindings;
 
 /// Authenticates / Signs messages
 class Authenticator {
