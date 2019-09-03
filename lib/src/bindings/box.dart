@@ -78,6 +78,7 @@ typedef _BoxDetachedNative = Int16 Function(
 
 typedef _BoxDetachedyDart = int Function(
     Pointer<Uint8> ciphertext,
+    Pointer<Uint8> mac,
     Pointer<Uint8> message,
     int mlen,
     Pointer<Uint8> nonce,
