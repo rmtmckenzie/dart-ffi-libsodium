@@ -10,6 +10,10 @@ class _KeyPair {
 }
 
 class Box {
+  static final secretKeyBytes = bindings.secretKeyBytes;
+  static final publicKeyBytes = bindings.publicKeyBytes;
+  static final nonceBytes = bindings.nonceBytes;
+
   static _KeyPair keyPair() {
     final Pointer<Uint8> secretKeyPtr =
         allocate(count: bindings.secretKeyBytes);
