@@ -10,12 +10,12 @@ main() {
   test("encrypt and decrypt a message", () {
     init();
     final keys = Box.keyPair();
-    final box = Box(keys.publicKey, keys.secretKey);
+    final box = Box(keys.secretKey);
     final msg = utf8.encode("hello world");
     final nonce = buffer(Box.nonceBytes);
     try {
-      final ciphertext = box.easy(msg, nonce);
-      final decrypted = box.openEasy(ciphertext, nonce);
+      final ciphertext = box.easy(msg, nonce, keys.publicKey);
+      final decrypted = box.openEasy(ciphertext, nonce, keys.publicKey);
       expect(msg, decrypted);
     } finally {
       box.close();
