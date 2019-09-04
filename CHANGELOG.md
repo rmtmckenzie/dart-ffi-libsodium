@@ -7,3 +7,8 @@
 ## 1.1.1
 - unite similar features into more compact libraries
 - implement public-key-cryptography for authenticated encryption and signing
+
+## 1.1.2
+- clear out some pontential memory leaks
+- add bindings for secure memory
+- use memory locks to secure secret keys
