@@ -136,10 +136,7 @@ class StreamSigner {
     final pkPtr = BufferToCString(publicKey);
     try {
       final result = bindings.signFinalVerify(_state, sigPtr, _secretKey);
-      if (result != 0) {
-        return false;
-      }
-      return true;
+      return result == 0;
     } finally {
       sigPtr.free();
       pkPtr.free();
