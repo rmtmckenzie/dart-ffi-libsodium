@@ -147,18 +147,18 @@ class Box {
     }
   }
 
-  /// Closes the box. Should be called to avoid memory leaks.
+  /// Closes the box
   void close() {
     _secretKey.free();
   }
 }
 
-/// Encrypt and decrypt several messages for the same receiver or rather from the same sender.
+/// Encrypt and decrypt several messages for the same receiver or sender.
 /// It derives a shared key once and stores it to make it more efficient.
 class BoxNumerous {
-  final Pointer<Uint8> key;
+  final Pointer<Uint8> _key;
   BoxNumerous(Uint8List publicKey, Uint8List secretKey)
-      : key = allocate(count: bindings.beforeNmBytes) {
+      : _key = allocate(count: bindings.beforeNmBytes) {
     if (secretKey.length != bindings.secretKeyBytes) {
       throw Exception("Secret Key hasn't expected length");
     }
@@ -168,9 +168,9 @@ class BoxNumerous {
     final skPtr = BufferToCString(secretKey);
     final pkPtr = BufferToCString(publicKey);
     try {
-      final result = bindings.beforeNm(key, pkPtr, skPtr);
+      final result = bindings.beforeNm(_key, pkPtr, skPtr);
       if (result != 0) {
-        key.free();
+        _key.free();
         throw Exception("Key generation failed");
       }
     } finally {
@@ -187,7 +187,7 @@ class BoxNumerous {
     final Pointer<Uint8> cPtr = allocate(count: cLen);
     try {
       final result =
-          bindings.easyAfterNm(cPtr, msgPtr, msg.length, noncePtr, key);
+          bindings.easyAfterNm(cPtr, msgPtr, msg.length, noncePtr, _key);
       if (result != 0) {
         throw Exception(r"Encrypting failed");
       }
@@ -207,7 +207,7 @@ class BoxNumerous {
     final Pointer<Uint8> cPtr = BufferToCString(ciphertext);
     try {
       final result = bindings.openEasyAfterNm(
-          msgPtr, cPtr, ciphertext.length, noncePtr, key);
+          msgPtr, cPtr, ciphertext.length, noncePtr, _key);
       if (result != 0) {
         throw Exception("Decrypting failed");
       }
@@ -227,7 +227,7 @@ class BoxNumerous {
     final Pointer<Uint8> mac = allocate(count: bindings.macBytes);
     try {
       final result = bindings.detachedAfterNm(
-          cPtr, mac, msgPtr, msg.length, noncePtr, key);
+          cPtr, mac, msgPtr, msg.length, noncePtr, _key);
       if (result != 0) {
         throw Exception("Encrypting failed");
       }
@@ -251,7 +251,7 @@ class BoxNumerous {
     final Pointer<Uint8> mac = BufferToCString(authTag);
     try {
       final result = bindings.openDetachedAfterNm(
-          msgPtr, cPtr, mac, ciphertext.length, noncePtr, key);
+          msgPtr, cPtr, mac, ciphertext.length, noncePtr, _key);
       if (result != 0) {
         throw Exception("Decrypting failed");
       }
@@ -266,6 +266,6 @@ class BoxNumerous {
 
   /// Closes the box. Should be called to avoid memory leaks.
   void close() {
-    key.free();
+    _key.free();
   }
 }
