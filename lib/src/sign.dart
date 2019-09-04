@@ -10,7 +10,7 @@ class Signer {
   static final secretKeyBytes = bindings.secretKeyBytes;
   static final publicKeyBytes = bindings.publicKeyBytes;
 
-  /// Generates a secret and public [keyPair]
+  /// Generates a secret and public [KeyPair]
   static KeyPair keyPair() {
     final Pointer<Uint8> secretKeyPtr =
         allocate(count: bindings.secretKeyBytes);
