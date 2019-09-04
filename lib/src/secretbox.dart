@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 import 'dart:ffi';
+import 'package:dart_sodium/src/bindings/secure_memory.dart';
+
 import 'ffi_helper.dart';
 
 import 'bindings/secretbox.dart' as bindings;
@@ -29,6 +31,7 @@ class SecretBox {
       _key.free();
       throw ArgumentError("Key hasn't expected length");
     }
+    memoryLock(_key.address, bindings.keyBytes);
   }
 
   /// Encrypts a message using the provided nonce.
@@ -81,6 +84,7 @@ class SecretBox {
 
   /// Closes the SecretBox
   void close() {
+    memoryUnlock(_key.address, bindings.keyBytes);
     _key.free();
   }
 }
