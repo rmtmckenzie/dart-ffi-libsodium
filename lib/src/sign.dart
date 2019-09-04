@@ -33,6 +33,9 @@ class Signer {
   /// Checks the authenticity of [signedMsg] (signed with [sign]) with the [publicKey]
   /// and returns only the message
   static Uint8List open(Uint8List signedMsg, Uint8List publicKey) {
+    if (publicKey.length != bindings.publicKeyBytes) {
+      throw Exception("Public Key hasn't expected length");
+    }
     final msgLen = signedMsg.length - bindings.signBytes;
     final Pointer<Uint8> msgPtr = allocate(count: msgLen);
     final Pointer<Uint8> signedMsgPtr = BufferToCString(signedMsg);
