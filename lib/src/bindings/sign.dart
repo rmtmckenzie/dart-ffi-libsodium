@@ -44,3 +44,21 @@ typedef _SignOpenDart = int Function(Pointer<Uint8> msg, Pointer<Uint64> msgLen,
 
 final signOpen = libsodium
     .lookupFunction<_SignOpenNative, _SignOpenDart>("crypto_sign_open");
+
+class State extends Pointer<Void> {}
+
+final signInit = libsodium.lookupFunction<Int16 Function(Pointer<State> state),
+    int Function(Pointer<State> state)>("crypto_sign_init");
+final signUpdated = libsodium.lookupFunction<
+    Int16 Function(Pointer<State> state, Pointer<Uint8> msg, Uint64 mLen),
+    int Function(Pointer<State> state, Pointer<Uint8> msg,
+        Uint64 mLen)>("crypto_sign_update");
+final signFinal = libsodium.lookupFunction<
+    Int16 Function(Pointer<State> state, Pointer<Uint8> sig, Uint64 sigLen,
+        Pointer<Uint8> sk),
+    int Function(Pointer<State> state, Pointer<Uint8> sig, Uint64 sigLen,
+        Pointer<Uint8> sk)>("crypto_sign_final_create");
+final signFinalVerify = libsodium.lookupFunction<
+    Int16 Function(Pointer<State> state, Pointer<Uint8> sig, Pointer<Uint8> pk),
+    int Function(Pointer<State> state, Pointer<Uint8> sig,
+        Pointer<Uint8> pk)>("crypto_sign_final_verify");
