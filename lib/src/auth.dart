@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
 import 'dart:ffi';
+import 'bindings/secure_memory.dart';
+
 import 'ffi_helper.dart';
 
 import 'bindings/auth.dart' as bindings;
@@ -24,6 +26,7 @@ class Authenticator {
       _key.free();
       throw ArgumentError("Key hasn't expected length");
     }
+    memoryLock(_key.address, bindings.keyBytes);
   }
 
   /// Generates an authentication tag for [msg]
@@ -57,6 +60,7 @@ class Authenticator {
 
   /// Closes the Authenticator.
   void close() {
+    memoryUnlock(_key.address, bindings.keyBytes);
     _key.free();
   }
 }
