@@ -29,8 +29,8 @@ class Signer {
     }
   }
 
-  final Pointer<Uint8> secretKey;
-  Signer(Uint8List secretKey) : this.secretKey = BufferToCString(secretKey) {
+  final Pointer<Uint8> _secretKey;
+  Signer(Uint8List secretKey) : this._secretKey = BufferToCString(secretKey) {
     if (secretKey.length != bindings.secretKeyBytes) {
       throw Exception("Secret Key hasn't expected length");
     }
@@ -42,7 +42,7 @@ class Signer {
     final Pointer<Uint8> signedMsgPtr = allocate(count: signedMsgLen);
     try {
       final result =
-          bindings.sign(signedMsgPtr, null, msgPtr, msg.length, secretKey);
+          bindings.sign(signedMsgPtr, null, msgPtr, msg.length, _secretKey);
       if (result != 0) {
         throw Exception("Signing message failed");
       }
