@@ -1,5 +1,7 @@
 import 'dart:ffi';
 import 'dart:typed_data';
+import 'package:dart_sodium/src/bindings/secure_memory.dart';
+
 import 'ffi_helper.dart';
 
 import 'bindings/pwhash.dart' as bindings;
@@ -35,6 +37,7 @@ Uint8List store(Uint8List passwd, int opslimit, int memlimit) {
   }
   final out = allocate<Uint8>(count: bindings.strBytes);
   final passwdCstr = BufferToCString(passwd);
+  memoryLock(passwdCstr.address, passwd.length);
   try {
     final hashResult =
         bindings.store(out, passwdCstr, passwd.length, opslimit, memlimit);
@@ -55,6 +58,7 @@ Uint8List store(Uint8List passwd, int opslimit, int memlimit) {
     }
     return outBuf;
   } finally {
+    memoryUnlock(passwdCstr.address, passwd.length);
     out.free();
     passwdCstr.free();
   }
@@ -76,11 +80,13 @@ bool verify(Uint8List hash, Uint8List passwd) {
   }
   final hashPtr = BufferToCString(hash);
   final passwdPtr = BufferToCString(passwd);
+  memoryLock(passwdPtr.address, passwd.length);
   try {
     final verifyResult =
         bindings.storeVerify(hashPtr, passwdPtr, passwd.length);
     return verifyResult == 0;
   } finally {
+    memoryUnlock(passwdPtr.address, passwd.length);
     hashPtr.free();
     passwdPtr.free();
   }
