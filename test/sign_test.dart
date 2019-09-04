@@ -33,4 +33,27 @@ main() {
       expect(isValid, true);
     });
   });
+
+  group('Signer', () {
+    KeyPair keys;
+    Signer signer;
+    Uint8List msg;
+
+    setUpAll(() {
+      init();
+      keys = Signer.keyPair();
+      signer = Signer(keys.secretKey);
+      msg = utf8.encode("hello world");
+    });
+
+    tearDownAll(() {
+      signer.close();
+    });
+
+    test("sign message and verify signature", () {
+      final sigMsg = signer.sign(msg);
+      final openedMsg = Signer.open(sigMsg, keys.publicKey);
+      expect(openedMsg, msg);
+    });
+  });
 }
