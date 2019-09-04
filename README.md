@@ -1,4 +1,4 @@
-This is an easy to use wrapper for libsodium (version 1.0.18). It resembles the original interface (while being in compliance with Dart's nameing conventions) and uses object-orientation where it makes sense.
+This is an easy to use wrapper for libsodium (version 1.0.18). It resembles the original interface (while being in compliance with Dart's naming conventions) and uses object-orientation where it makes sense.
 
 As for now dart_sodium offers the following features:
 - password hashing
