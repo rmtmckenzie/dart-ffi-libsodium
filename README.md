@@ -1,11 +1,12 @@
 This is an easy to use wrapper for libsodium (version 1.0.18). It resembles the original interface (while being in compliance with Dart's nameing conventions) and uses object-orientation where it makes sense.
 
 As for now dart_sodium offers the following features:
-- password hashing (Argon2)
-- message authentication / signing
-- secretbox and secretstream interface (symmetric authenticated encryption)
+- password hashing
+- message authentication and signing
+- symmetric authenticated encryption
+- asymmetric authenticated encryption
 
-Please notice that this work has been done to the best of my abilities. This has not been reviewed by external security professionals. If you are one please feel free to review and test this library in any way you see fit. I am new to open source and I see forward to any feedback.
+Please notice that this is work in progress and has been done to the best of my abilities. This has not been reviewed by external security professionals. If you are one please feel free to review and test this library in any way you see fit. I am new to open source and I see forward to any feedback.
 
 ## How to Use
 
