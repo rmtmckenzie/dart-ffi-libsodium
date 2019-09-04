@@ -50,6 +50,7 @@ class Box {
   final Pointer<Uint8> _secretKey;
   Box(Uint8List secretKey) : this._secretKey = BufferToCString(secretKey) {
     if (secretKey.length != bindings.secretKeyBytes) {
+      close();
       throw ArgumentError("Secret Key hasn't expected length");
     }
     memoryLock(_secretKey.address, bindings.secretKeyBytes);
@@ -192,9 +193,11 @@ class BoxNumerous {
   BoxNumerous(Uint8List publicKey, Uint8List secretKey)
       : _key = allocate(count: bindings.beforeNmBytes) {
     if (secretKey.length != bindings.secretKeyBytes) {
+      close();
       throw ArgumentError("Secret Key hasn't expected length");
     }
     if (publicKey.length != bindings.publicKeyBytes) {
+      close();
       throw ArgumentError("Public Key hasn't expected length");
     }
     final skPtr = BufferToCString(secretKey);
@@ -202,7 +205,7 @@ class BoxNumerous {
     try {
       final result = bindings.beforeNm(_key, pkPtr, skPtr);
       if (result != 0) {
-        _key.free();
+        close();
         throw Exception("Key generation failed");
       }
       memoryLock(_key.address, bindings.beforeNmBytes);
