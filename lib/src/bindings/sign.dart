@@ -52,7 +52,7 @@ final signInit = libsodium.lookupFunction<Int16 Function(Pointer<State> state),
 final signUpdate = libsodium.lookupFunction<
     Int16 Function(Pointer<State> state, Pointer<Uint8> msg, Uint64 mLen),
     int Function(Pointer<State> state, Pointer<Uint8> msg,
-        Uint64 mLen)>("crypto_sign_update");
+        int mLen)>("crypto_sign_update");
 final signFinal = libsodium.lookupFunction<
     Int16 Function(Pointer<State> state, Pointer<Uint8> sig, Uint64 sigLen,
         Pointer<Uint8> sk),
