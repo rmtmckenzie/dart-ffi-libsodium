@@ -9,7 +9,7 @@ main() {
     init();
     final pwd = utf8.encode("my password");
     final hash = store(pwd, OpsLimit.min, MemLimit.min);
-    final isValid = storeVerify(hash, pwd);
+    final isValid = verify(hash, pwd);
     expect(isValid, true);
   });
 }

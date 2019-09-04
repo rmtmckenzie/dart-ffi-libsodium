@@ -9,6 +9,6 @@ void main() {
   final hash = pwhash.store(
       password, pwhash.OpsLimit.interactive, pwhash.MemLimit.interactive);
 
-  final isValid = pwhash.storeVerify(hash, password);
+  final isValid = pwhash.verify(hash, password);
   assert(isValid == true);
 }
