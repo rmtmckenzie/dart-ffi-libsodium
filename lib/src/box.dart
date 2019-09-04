@@ -48,12 +48,18 @@ class Box {
   final Pointer<Uint8> _secretKey;
   Box(Uint8List secretKey) : this._secretKey = BufferToCString(secretKey) {
     if (secretKey.length != bindings.secretKeyBytes) {
-      throw Exception("Secret Key hasn't expected length");
+      throw ArgumentError("Secret Key hasn't expected length");
     }
   }
 
   /// Encrypts a single message given a unique [nonce] and [publicKey]
   Uint8List easy(Uint8List msg, Uint8List nonce, Uint8List publicKey) {
+    if (nonce.length != bindings.nonceBytes) {
+      throw ArgumentError("[nonce] hasn't expected length");
+    }
+    if (publicKey.length != bindings.publicKeyBytes) {
+      throw ArgumentError("[publicKey] hasn't expected length");
+    }
     final pkPtr = BufferToCString(publicKey);
     final Pointer<Uint8> msgPtr = BufferToCString(msg);
     final Pointer<Uint8> noncePtr = BufferToCString(nonce);
@@ -77,6 +83,12 @@ class Box {
   /// Opens messages encrypted with [easy] given the [nonce]and [publicKey]
   Uint8List openEasy(
       Uint8List ciphertext, Uint8List nonce, Uint8List publicKey) {
+    if (nonce.length != bindings.nonceBytes) {
+      throw ArgumentError("[nonce] hasn't expected length");
+    }
+    if (publicKey.length != bindings.publicKeyBytes) {
+      throw ArgumentError("[publicKey] hasn't expected length");
+    }
     final pkPtr = BufferToCString(publicKey);
     final msgLen = ciphertext.length - bindings.macBytes;
     final Pointer<Uint8> msgPtr = allocate(count: msgLen);
@@ -100,6 +112,12 @@ class Box {
   /// Encrypts a single message given a unique [nonce] and [publicKey] like [easy],
   /// but the authentication tag and ciphertext are detached from one another
   Detached detached(Uint8List msg, Uint8List nonce, Uint8List publicKey) {
+    if (nonce.length != bindings.nonceBytes) {
+      throw ArgumentError("[nonce] hasn't expected length");
+    }
+    if (publicKey.length != bindings.publicKeyBytes) {
+      throw ArgumentError("[publicKey] hasn't expected length");
+    }
     final pkPtr = BufferToCString(publicKey);
     final Pointer<Uint8> msgPtr = BufferToCString(msg);
     final Pointer<Uint8> noncePtr = BufferToCString(nonce);
@@ -126,6 +144,15 @@ class Box {
   /// Opens a message encrypted with [detached] given the [nonce], [authTag] and [publicKey]
   Uint8List openDetached(Uint8List ciphertext, Uint8List nonce,
       Uint8List authTag, Uint8List publicKey) {
+    if (nonce.length != bindings.nonceBytes) {
+      throw ArgumentError("[nonce] hasn't expected length");
+    }
+    if (publicKey.length != bindings.publicKeyBytes) {
+      throw ArgumentError("[publicKey] hasn't expected length");
+    }
+    if (authTag.length != bindings.macBytes) {
+      throw ArgumentError("[authTag] hasn't expected length");
+    }
     final pkPtr = BufferToCString(publicKey);
     ;
     final Pointer<Uint8> msgPtr = allocate(count: ciphertext.length);
@@ -161,10 +188,10 @@ class BoxNumerous {
   BoxNumerous(Uint8List publicKey, Uint8List secretKey)
       : _key = allocate(count: bindings.beforeNmBytes) {
     if (secretKey.length != bindings.secretKeyBytes) {
-      throw Exception("Secret Key hasn't expected length");
+      throw ArgumentError("Secret Key hasn't expected length");
     }
     if (publicKey.length != bindings.publicKeyBytes) {
-      throw Exception("Public Key hasn't expected length");
+      throw ArgumentError("Public Key hasn't expected length");
     }
     final skPtr = BufferToCString(secretKey);
     final pkPtr = BufferToCString(publicKey);
@@ -182,6 +209,9 @@ class BoxNumerous {
 
   /// Encrypts a single message given a unique [nonce]
   Uint8List easy(Uint8List msg, Uint8List nonce) {
+    if (nonce.length != bindings.nonceBytes) {
+      throw ArgumentError("[nonce] hasn't expected length");
+    }
     final Pointer<Uint8> msgPtr = BufferToCString(msg);
     final Pointer<Uint8> noncePtr = BufferToCString(nonce);
     final cLen = bindings.macBytes + msg.length;
@@ -190,7 +220,7 @@ class BoxNumerous {
       final result =
           bindings.easyAfterNm(cPtr, msgPtr, msg.length, noncePtr, _key);
       if (result != 0) {
-        throw Exception(r"Encrypting failed");
+        throw Exception("Encrypting failed");
       }
       return CStringToBuffer(cPtr, cLen);
     } finally {
@@ -202,6 +232,9 @@ class BoxNumerous {
 
   /// Decrypts a single message encrypted by [easy] given the [nonce]
   Uint8List openEasy(Uint8List ciphertext, Uint8List nonce) {
+    if (nonce.length != bindings.nonceBytes) {
+      throw ArgumentError("[nonce] hasn't expected length");
+    }
     final msgLen = ciphertext.length - bindings.macBytes;
     final Pointer<Uint8> msgPtr = allocate(count: msgLen);
     final Pointer<Uint8> noncePtr = BufferToCString(nonce);
@@ -223,6 +256,9 @@ class BoxNumerous {
   /// Encrypts a single message given a unique [nonce] like [easy],
   /// but the authentication tag and ciphertext are detached from one another
   Detached detached(Uint8List msg, Uint8List nonce) {
+    if (nonce.length != bindings.nonceBytes) {
+      throw ArgumentError("[nonce] hasn't expected length");
+    }
     final Pointer<Uint8> msgPtr = BufferToCString(msg);
     final Pointer<Uint8> noncePtr = BufferToCString(nonce);
     final Pointer<Uint8> cPtr = allocate(count: msg.length);
@@ -247,6 +283,12 @@ class BoxNumerous {
   /// Opens a message encrypted with [detached] given the [nonce], [authTag] and [publicKey]
   Uint8List openDetached(
       Uint8List ciphertext, Uint8List nonce, Uint8List authTag) {
+    if (nonce.length != bindings.nonceBytes) {
+      throw ArgumentError("[nonce] hasn't expected length");
+    }
+    if (authTag.length != bindings.macBytes) {
+      throw ArgumentError("[authTag] hasn't expected length");
+    }
     final Pointer<Uint8> msgPtr = allocate(count: ciphertext.length);
     final Pointer<Uint8> noncePtr = BufferToCString(nonce);
     final Pointer<Uint8> cPtr = BufferToCString(ciphertext);
