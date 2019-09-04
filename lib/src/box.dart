@@ -1,5 +1,7 @@
 import 'dart:ffi';
 import 'dart:typed_data';
+import 'bindings/secure_memory.dart';
+
 import 'ffi_helper.dart';
 
 import 'bindings/box.dart' as bindings;
@@ -50,6 +52,7 @@ class Box {
     if (secretKey.length != bindings.secretKeyBytes) {
       throw ArgumentError("Secret Key hasn't expected length");
     }
+    memoryLock(_secretKey.address, bindings.secretKeyBytes);
   }
 
   /// Encrypts a single message given a unique [nonce] and [publicKey]
@@ -177,6 +180,7 @@ class Box {
 
   /// Closes the box
   void close() {
+    memoryUnlock(_secretKey.address, bindings.secretKeyBytes);
     _secretKey.free();
   }
 }
@@ -201,6 +205,7 @@ class BoxNumerous {
         _key.free();
         throw Exception("Key generation failed");
       }
+      memoryLock(_key.address, bindings.beforeNmBytes);
     } finally {
       skPtr.free();
       pkPtr.free();
@@ -310,6 +315,7 @@ class BoxNumerous {
 
   /// Closes the box
   void close() {
+    memoryUnlock(_key.address, bindings.beforeNmBytes);
     _key.free();
   }
 }
