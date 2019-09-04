@@ -84,10 +84,12 @@ class Signer {
 
 /// Signs big messages that couldn't fit into memory
 /// or messages that are received chunked
-class StreamSigner {
+///
+/// UNSTABLE: Don't use it for the time being.
+class UnstableStreamSigner {
   final Pointer<bindings.State> _state;
   final Pointer<Uint8> _secretKey;
-  StreamSigner(Uint8List secretKey)
+  UnstableStreamSigner(Uint8List secretKey)
       : _secretKey = BufferToCString(secretKey),
         _state = allocate(count: bindings.stateBytes) {
     if (secretKey.length != bindings.secretKeyBytes) {
@@ -143,7 +145,7 @@ class StreamSigner {
     }
   }
 
-  /// Closes [StreamSigner]
+  /// Closes [UnstableStreamSigner]
   void close() {
     _state.free();
     _secretKey.free();
