@@ -15,6 +15,24 @@ export 'bindings/pwhash.dart' show OpsLimit, MemLimit;
 /// final pwhash = pwHashStr(paswd, OpsLimit.moderate, MemLimit.moderate);
 /// ```
 Uint8List store(Uint8List passwd, int opslimit, int memlimit) {
+  if (passwd.length > bindings.passwdMax) {
+    throw ArgumentError("[passwd] is too long");
+  }
+  if (passwd.length < bindings.passwdMin) {
+    throw ArgumentError("[passwd] is too short");
+  }
+  if (opslimit > bindings.OpsLimit.max) {
+    throw ArgumentError("[opslimit] is too big");
+  }
+  if (opslimit < bindings.OpsLimit.min) {
+    throw ArgumentError("[opslimit] is too small");
+  }
+  if (memlimit > bindings.MemLimit.max) {
+    throw ArgumentError("[memlimit] is too big");
+  }
+  if (memlimit < bindings.MemLimit.min) {
+    throw ArgumentError("[memlimit] is too small");
+  }
   final out = allocate<Uint8>(count: bindings.strBytes);
   final passwdCstr = BufferToCString(passwd);
   try {

@@ -54,3 +54,11 @@ abstract class MemLimit {
 
 final strBytes = libsodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_pwhash_strbytes")();
+final passwdMax = libsodium.lookupFunction<Uint64 Function(), int Function()>(
+    "crypto_pwhash_passwd_max")();
+final passwdMin = libsodium.lookupFunction<Uint64 Function(), int Function()>(
+    "crypto_pwhash_passwd_min")();
+final bytesMax = libsodium.lookupFunction<Uint64 Function(), int Function()>(
+    "crypto_pwhash_bytes_max")();
+final bytesMin = libsodium.lookupFunction<Uint64 Function(), int Function()>(
+    "crypto_pwhash_bytes_min")();
