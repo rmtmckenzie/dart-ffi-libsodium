@@ -67,7 +67,8 @@ class Signer {
       final result = bindings.signOpen(
           msgPtr, null, signedMsgPtr, signedMsg.length, pkPtr);
       if (result != 0) {
-        throw Exception("Signing message failed");
+        throw Exception(
+            "Open message failed. Signature doesn't seem to be valid");
       }
       return CStringToBuffer(msgPtr, msgLen);
     } finally {
