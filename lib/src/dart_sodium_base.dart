@@ -8,10 +8,6 @@ final _init = libsodium
 
 /// Initializes sodium. This function should be called before any other function of sodium.
 /// Calling this function several times has no effect and can be safely done.
-/// Initialization is required for the random number generator to work correctly
-/// and sodium to be thread safe. Failing to initialize sodium could result in unsafe results.
-/// Should sodium (for whatever reasons) fail to initialize, you should disregard any vaulues
-/// acquired from it.
 void init(String path) {
   if (_isInitialized) {
     return;
@@ -19,8 +15,7 @@ void init(String path) {
   libsodium = ffi.DynamicLibrary.open(path);
   final result = _init();
   if (result < 0) {
-    throw Exception("""Initialization of dart_sodium failed: $result 
-       Without initialization, dart_sodium isn't safe to use!""");
+    throw Exception("Initialization of dart_sodium failed");
   }
   _isInitialized = true;
 }

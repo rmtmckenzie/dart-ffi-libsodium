@@ -5,11 +5,12 @@ import 'bindings/sign.dart' as bindings;
 import 'box.dart';
 import 'ffi_helper.dart';
 
+/// Sign messages with a shared key
 class Signer {
   static final secretKeyBytes = bindings.secretKeyBytes;
   static final publicKeyBytes = bindings.publicKeyBytes;
 
-  /// Generates  a secret- and public key pair
+  /// Generates a secret and public [keyPair]
   static KeyPair keyPair() {
     final Pointer<Uint8> secretKeyPtr =
         allocate(count: bindings.secretKeyBytes);
@@ -36,6 +37,7 @@ class Signer {
     }
   }
 
+  /// Prepends a signature to a copy of [msg]
   Uint8List sign(Uint8List msg) {
     final Pointer<Uint8> msgPtr = BufferToCString(msg);
     final signedMsgLen = bindings.signBytes + msg.length;
@@ -53,6 +55,8 @@ class Signer {
     }
   }
 
+  /// Checks the authenticity of [signedMsg] (signed with [sign]) with the [publicKey]
+  /// and returns only the message
   Uint8List open(Uint8List signedMsg, Uint8List publicKey) {
     final msgLen = signedMsg.length - bindings.signBytes;
     final Pointer<Uint8> msgPtr = allocate(count: msgLen);

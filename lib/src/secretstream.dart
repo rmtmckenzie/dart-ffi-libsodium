@@ -6,7 +6,7 @@ import 'bindings/secretstream.dart' as bindings;
 
 /// Encrypts chunks of a stream
 class StreamEncryptor {
-  /// generates a a key for [StreamEncryptor]
+  /// Generates a a key for [StreamEncryptor]
   static Uint8List keyGen() {
     final Pointer<Uint8> keyPtr = allocate(count: bindings.keyBytes);
     try {
@@ -43,8 +43,9 @@ class StreamEncryptor {
     }
   }
 
-  /// Pushe new [data] into the stream and get back the encrypted chunk
-  /// You can also add [additionalData] (metadata).
+  /// Pushe new [data] into the stream and get back the encrypted chunk.
+  /// You can also add [additionalData] (for example metadata).
+  /// There are several [Tag]s to convey information about the status of the stream.
   /// To end the stream set [tag] to [Tag.finish]
   Uint8List push(Uint8List data,
       {Uint8List additionalData, Tag tag = Tag.message}) {
@@ -73,7 +74,7 @@ class StreamEncryptor {
     }
   }
 
-  /// Closes the Encryptor. Call this method to avoid memory leaks
+  /// Closes the StreamEncryptor
   void close() {
     _key.free();
     _header.free();
@@ -118,7 +119,8 @@ class StreamDecryptor {
     }
   }
 
-  /// Pulls data out of the stream
+  /// Pulls data out of the stream.
+  /// [adLen] is the length of [additionalData] provided to [StreamEncryptor.push].
   PullData pull(Uint8List ciphertext, {int adLen = 0}) {
     final dataLen = ciphertext.length - bindings.aBytes;
     final dataPtr = allocate<Uint8>(count: dataLen);
@@ -144,7 +146,7 @@ class StreamDecryptor {
     }
   }
 
-  /// Closes the Decryptor. Call this method to avoid memory leaks.
+  /// Closes the StreamDecryptor
   void close() {
     _key.free();
     _header.free();

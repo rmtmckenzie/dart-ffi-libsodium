@@ -25,7 +25,7 @@ class Box {
   /// Required length of the [nonce]
   static final nonceBytes = bindings.nonceBytes;
 
-  /// Generates a public and secret key pair
+  /// Generates a public and secret [KeyPair]
   static KeyPair keyPair() {
     final Pointer<Uint8> secretKeyPtr =
         allocate(count: bindings.secretKeyBytes);
@@ -52,7 +52,7 @@ class Box {
     }
   }
 
-  /// Encrypt a single message given a unique [nonce] and [publicKey]
+  /// Encrypts a single message given a unique [nonce] and [publicKey]
   Uint8List easy(Uint8List msg, Uint8List nonce, Uint8List publicKey) {
     final pkPtr = BufferToCString(publicKey);
     final Pointer<Uint8> msgPtr = BufferToCString(msg);
@@ -97,7 +97,8 @@ class Box {
     }
   }
 
-  /// Encrypt a single message given a unique [nonce] and [publicKey]
+  /// Encrypts a single message given a unique [nonce] and [publicKey] like [easy],
+  /// but the authentication tag and ciphertext are detached from one another
   Detached detached(Uint8List msg, Uint8List nonce, Uint8List publicKey) {
     final pkPtr = BufferToCString(publicKey);
     final Pointer<Uint8> msgPtr = BufferToCString(msg);
@@ -122,7 +123,7 @@ class Box {
     }
   }
 
-  /// Opens messages encrypted with [detached] given the [nonce], [authTag] and [publicKey]
+  /// Opens a message encrypted with [detached] given the [nonce], [authTag] and [publicKey]
   Uint8List openDetached(Uint8List ciphertext, Uint8List nonce,
       Uint8List authTag, Uint8List publicKey) {
     final pkPtr = BufferToCString(publicKey);
@@ -199,7 +200,7 @@ class BoxNumerous {
     }
   }
 
-  /// Decrypts a single message encrypted by [easy]
+  /// Decrypts a single message encrypted by [easy] given the [nonce]
   Uint8List openEasy(Uint8List ciphertext, Uint8List nonce) {
     final msgLen = ciphertext.length - bindings.macBytes;
     final Pointer<Uint8> msgPtr = allocate(count: msgLen);
@@ -219,7 +220,8 @@ class BoxNumerous {
     }
   }
 
-  /// Encrypt a single message given a unique [nonce]
+  /// Encrypts a single message given a unique [nonce] like [easy],
+  /// but the authentication tag and ciphertext are detached from one another
   Detached detached(Uint8List msg, Uint8List nonce) {
     final Pointer<Uint8> msgPtr = BufferToCString(msg);
     final Pointer<Uint8> noncePtr = BufferToCString(nonce);
@@ -242,7 +244,7 @@ class BoxNumerous {
     }
   }
 
-  /// Opens messages encrypted with [detached] given the [nonce], [authTag] and [publicKey]
+  /// Opens a message encrypted with [detached] given the [nonce], [authTag] and [publicKey]
   Uint8List openDetached(
       Uint8List ciphertext, Uint8List nonce, Uint8List authTag) {
     final Pointer<Uint8> msgPtr = allocate(count: ciphertext.length);
@@ -264,7 +266,7 @@ class BoxNumerous {
     }
   }
 
-  /// Closes the box. Should be called to avoid memory leaks.
+  /// Closes the box
   void close() {
     _key.free();
   }
