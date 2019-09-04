@@ -43,7 +43,7 @@ class StreamEncryptor {
     }
   }
 
-  /// Pushe new [data] into the stream and get back the encrypted chunk.
+  /// Push new [data] into the stream and get back the encrypted chunk.
   /// You can also add [additionalData] (for example metadata).
   /// There are several [Tag]s to convey information about the status of the stream.
   /// To end the stream set [tag] to [Tag.finish]
