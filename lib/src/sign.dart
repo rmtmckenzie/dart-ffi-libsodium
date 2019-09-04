@@ -33,6 +33,7 @@ class Signer {
   final Pointer<Uint8> _secretKey;
   Signer(Uint8List secretKey) : this._secretKey = BufferToCString(secretKey) {
     if (secretKey.length != bindings.secretKeyBytes) {
+      close();
       throw Exception("Secret Key hasn't expected length");
     }
   }
@@ -74,4 +75,10 @@ class Signer {
       signedMsgPtr.free();
     }
   }
+
+  void close() {
+    _secretKey.free();
+  }
+}
+
 }
