@@ -128,6 +128,9 @@ class StreamDecryptor {
   /// [adLen] is the length of [additionalData] provided to [StreamEncryptor.push].
   PullData pull(Uint8List ciphertext, {int adLen = 0}) {
     final dataLen = ciphertext.length - bindings.aBytes;
+    if (dataLen > bindings.msgBytesMax) {
+      throw ArgumentError("[ciphertext] is too long");
+    }
     final dataPtr = allocate<Uint8>(count: dataLen);
     final cPtr = BufferToCString(ciphertext);
     final tagPtr = allocate<Uint8>();
