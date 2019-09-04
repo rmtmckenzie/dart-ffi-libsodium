@@ -110,8 +110,10 @@ class StreamDecryptor {
       close();
       throw Exception("Key hasn't expected length");
     }
-    assert(
-        header.length == bindings.headerBytes, "Header hasn't expected length");
+    if (header.length != bindings.headerBytes) {
+      close();
+      throw Exception("Header hasn't expected length");
+    }
     int initResult = bindings.initPull(_state, _header, _key);
     if (initResult != 0) {
       close();
