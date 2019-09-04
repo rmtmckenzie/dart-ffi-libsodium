@@ -81,4 +81,55 @@ class Signer {
   }
 }
 
+/// Signs big messages that couldn't fit into memory
+/// or messages that are received chunked
+class StreamSigner {
+  final Pointer<bindings.State> _state;
+  final Pointer<Uint8> _secretKey;
+  StreamSigner(Uint8List secretKey)
+      : _secretKey = BufferToCString(secretKey),
+        _state = allocate(count: bindings.stateBytes) {
+    if (secretKey.length != bindings.secretKeyBytes) {
+      close();
+      throw Exception("Secret Key hasn't expected length");
+    }
+    final result = bindings.signInit(_state);
+    if (result != 0) {
+      close();
+      throw Exception("Initializing StreamSigner failed");
+    }
+  }
+
+  /// Push msg into stream
+  void update(Uint8List msg) {
+    final Pointer<Uint8> msgPtr = BufferToCString(msg);
+    try {
+      final result = bindings.signUpdate(_state, msgPtr, msg.length);
+      if (result != 0) {
+        throw Exception("Pushing message into stream failed");
+      }
+    } finally {
+      msgPtr.free();
+    }
+  }
+
+  /// End stream and generate signature
+  Uint8List finish() {
+    final Pointer<Uint8> sigPtr = allocate(count: bindings.signBytes);
+    try {
+      final result = bindings.signFinal(_state, sigPtr, null, _secretKey);
+      if (result != 0) {
+        throw Exception("Signing message failed");
+      }
+      return CStringToBuffer(sigPtr, bindings.signBytes);
+    } finally {
+      sigPtr.free();
+    }
+  }
+
+  /// Closes [StreamSigner]
+  void close() {
+    _state.free();
+    _secretKey.free();
+  }
 }
