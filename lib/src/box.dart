@@ -45,8 +45,8 @@ class Box {
     }
   }
 
-  final Pointer<Uint8> secretKey;
-  Box(Uint8List secretKey) : this.secretKey = BufferToCString(secretKey) {
+  final Pointer<Uint8> _secretKey;
+  Box(Uint8List secretKey) : this._secretKey = BufferToCString(secretKey) {
     if (secretKey.length != bindings.secretKeyBytes) {
       throw Exception("Secret Key hasn't expected length");
     }
@@ -61,7 +61,7 @@ class Box {
     final Pointer<Uint8> cPtr = allocate(count: cLen);
     try {
       final result =
-          bindings.easy(cPtr, msgPtr, msg.length, noncePtr, pkPtr, secretKey);
+          bindings.easy(cPtr, msgPtr, msg.length, noncePtr, pkPtr, _secretKey);
       if (result != 0) {
         throw Exception("Encrypting failed");
       }
@@ -84,7 +84,7 @@ class Box {
     final Pointer<Uint8> cPtr = BufferToCString(ciphertext);
     try {
       final result = bindings.openEasy(
-          msgPtr, cPtr, ciphertext.length, noncePtr, pkPtr, secretKey);
+          msgPtr, cPtr, ciphertext.length, noncePtr, pkPtr, _secretKey);
       if (result != 0) {
         throw Exception("Decrypting failed");
       }
@@ -106,7 +106,7 @@ class Box {
     final Pointer<Uint8> mac = allocate(count: bindings.macBytes);
     try {
       final result = bindings.detached(
-          cPtr, mac, msgPtr, msg.length, noncePtr, pkPtr, secretKey);
+          cPtr, mac, msgPtr, msg.length, noncePtr, pkPtr, _secretKey);
       if (result != 0) {
         throw Exception("Encrypting failed");
       }
@@ -133,7 +133,7 @@ class Box {
     final Pointer<Uint8> mac = BufferToCString(authTag);
     try {
       final result = bindings.openDetached(
-          msgPtr, cPtr, mac, ciphertext.length, noncePtr, pkPtr, secretKey);
+          msgPtr, cPtr, mac, ciphertext.length, noncePtr, pkPtr, _secretKey);
       if (result != 0) {
         throw Exception("Decrypting failed");
       }
@@ -149,7 +149,7 @@ class Box {
 
   /// Closes the box. Should be called to avoid memory leaks.
   void close() {
-    secretKey.free();
+    _secretKey.free();
   }
 }
 
