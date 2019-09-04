@@ -135,7 +135,7 @@ class StreamSigner {
     final sigPtr = BufferToCString(signature);
     final pkPtr = BufferToCString(publicKey);
     try {
-      final result = bindings.signFinalVerify(_state, sigPtr, _secretKey);
+      final result = bindings.signFinalVerify(_state, sigPtr, pkPtr);
       return result == 0;
     } finally {
       sigPtr.free();
