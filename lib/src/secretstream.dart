@@ -81,13 +81,18 @@ class StreamEncryptor {
   }
 }
 
-/// Possible tags for [push]
+/// Possible tags for [StreamEncryptor.push]
+/// - [message] is the default and simply means that more messages are coming after this one.
+/// - [push] indicates that this message marks the end of a set of messages (for ecample a JSON-stream),
+/// but not of the stream itself.
+/// - [rekey] means that a new secret key will be derived.
+/// - [finish] marks the end of the stream
 enum Tag { message, push, rekey, finish }
 
-class _PullData {
+class PullData {
   final Uint8List decryptedChunk, additionalData;
   final Tag tag;
-  const _PullData(this.decryptedChunk, this.additionalData, this.tag);
+  const PullData._(this.decryptedChunk, this.additionalData, this.tag);
 }
 
 /// Decrypts chunks of a secretstream encrypted by [StreamEncryptor]
@@ -114,7 +119,7 @@ class StreamDecryptor {
   }
 
   /// Pulls data out of the stream
-  _PullData pull(Uint8List ciphertext, {int adLen = 0}) {
+  PullData pull(Uint8List ciphertext, {int adLen = 0}) {
     final dataLen = ciphertext.length - bindings.aBytes;
     final dataPtr = allocate<Uint8>(count: dataLen);
     final cPtr = BufferToCString(ciphertext);
@@ -130,7 +135,7 @@ class StreamDecryptor {
       final chunk = CStringToBuffer(dataPtr, dataLen);
       final adData = CStringToBuffer(adPtr, 0);
       final tag = tagPtr.load<int>();
-      return _PullData(chunk, adData, Tag.values[tag]);
+      return PullData._(chunk, adData, Tag.values[tag]);
     } finally {
       dataPtr.free();
       adPtr.free();
