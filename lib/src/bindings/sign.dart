@@ -12,10 +12,9 @@ final secretKeyBytes = libsodium
 final keyPair = libsodium.lookupFunction<
     Int16 Function(Pointer<Uint8> pk, Pointer<Uint8> sk),
     int Function(Pointer<Uint8> pk, Pointer<Uint8> sk)>("crypto_sign_keypair");
-final stateBytes = libsodium.lookupFunction<
-    Int16 Function(Pointer<Uint8> pk, Pointer<Uint8> sk),
-    int Function(
-        Pointer<Uint8> pk, Pointer<Uint8> sk)>("crypto_sign_statebytes")();
+final stateBytes = libsodium.lookupFunction<Uint64 Function(), int Function()>(
+    "crypto_sign_statebytes")();
+
 final seedKeyPair = libsodium.lookupFunction<
     Int16 Function(Pointer<Uint8> pk, Pointer<Uint8> sk),
     int Function(Pointer<Uint8> pk, Pointer<Uint8> sk,
