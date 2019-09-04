@@ -107,7 +107,7 @@ class StreamDecryptor {
         _header = BufferToCString(header),
         _state = allocate(count: bindings.stateBytes) {
     if (key.length != bindings.keyBytes) {
-      _key.free();
+      close();
       throw Exception("Key hasn't expected length");
     }
     assert(
