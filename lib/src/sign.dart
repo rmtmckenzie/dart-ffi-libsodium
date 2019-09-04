@@ -22,7 +22,7 @@ class Signer {
         throw Exception("Generation of keypair failed");
       }
       final secretKey = CStringToBuffer(secretKeyPtr, bindings.secretKeyBytes);
-      final publicKey = CStringToBuffer(secretKeyPtr, bindings.publicKeyBytes);
+      final publicKey = CStringToBuffer(publicKeyPtr, bindings.publicKeyBytes);
       return KeyPair(publicKey, secretKey);
     } finally {
       secretKeyPtr.free();
