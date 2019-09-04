@@ -115,7 +115,7 @@ class StreamDecryptor {
     int initResult = bindings.initPull(_state, _header, _key);
     if (initResult != 0) {
       close();
-      throw Exception("SecretBox init failed");
+      throw Exception("SecretBox init failed. Header seems to be invalid");
     }
   }
 
