@@ -117,12 +117,14 @@ class StreamSigner {
   /// End stream and generate signature
   Uint8List finish() {
     final Pointer<Uint8> sigPtr = allocate(count: bindings.signBytes);
+    final Pointer<Uint64> sigLenPtr = allocate();
     try {
-      final result = bindings.signFinal(_state, sigPtr, null, _secretKey);
+      final result = bindings.signFinal(_state, sigPtr, sigLenPtr, _secretKey);
       if (result != 0) {
         throw Exception("Signing message failed");
       }
-      return CStringToBuffer(sigPtr, bindings.signBytes);
+      final sigLen = sigLenPtr.load<int>();
+      return CStringToBuffer(sigPtr, sigLen);
     } finally {
       sigPtr.free();
     }
