@@ -49,7 +49,7 @@ class State extends Pointer<Void> {}
 
 final signInit = libsodium.lookupFunction<Int16 Function(Pointer<State> state),
     int Function(Pointer<State> state)>("crypto_sign_init");
-final signUpdated = libsodium.lookupFunction<
+final signUpdate = libsodium.lookupFunction<
     Int16 Function(Pointer<State> state, Pointer<Uint8> msg, Uint64 mLen),
     int Function(Pointer<State> state, Pointer<Uint8> msg,
         Uint64 mLen)>("crypto_sign_update");
