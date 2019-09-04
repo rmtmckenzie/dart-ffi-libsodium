@@ -41,7 +41,19 @@ Uint8List store(Uint8List passwd, int opslimit, int memlimit) {
     if (hashResult < 0) {
       throw Exception("Password hashing failed");
     }
-    return CStringToBuffer(out, bindings.strBytes);
+    final outBuf = Uint8List(bindings.strBytes);
+    var i = 0;
+    for (; i < bindings.strBytes; i++) {
+      final elem = out.elementAt(i).load<int>();
+      outBuf[i] = elem;
+      if (elem == 0) {
+        break;
+      }
+    }
+    if (i + 1 < bindings.strBytes) {
+      return outBuf.sublist(0, i);
+    }
+    return outBuf;
   } finally {
     out.free();
     passwdCstr.free();
