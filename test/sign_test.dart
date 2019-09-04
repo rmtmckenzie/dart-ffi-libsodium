@@ -9,14 +9,14 @@ import 'init.dart';
 main() {
   group("StreamSigner", () {
     KeyPair keys;
-    StreamSigner signer;
+    UnstableStreamSigner signer;
     Uint8List msg1;
     Uint8List msg2;
 
     setUpAll(() {
       init();
       keys = Signer.keyPair();
-      signer = StreamSigner(keys.secretKey);
+      signer = UnstableStreamSigner(keys.secretKey);
       msg1 = utf8.encode("hello ");
       msg2 = utf8.encode("world");
     });
