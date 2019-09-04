@@ -34,7 +34,7 @@ class Signer {
   /// and returns only the message
   static Uint8List open(Uint8List signedMsg, Uint8List publicKey) {
     if (publicKey.length != bindings.publicKeyBytes) {
-      throw Exception("Public Key hasn't expected length");
+      throw ArgumentError("Public Key hasn't expected length");
     }
     final msgLen = signedMsg.length - bindings.signBytes;
     final Pointer<Uint8> msgPtr = allocate(count: msgLen);
@@ -58,7 +58,7 @@ class Signer {
   Signer(Uint8List secretKey) : this._secretKey = BufferToCString(secretKey) {
     if (secretKey.length != bindings.secretKeyBytes) {
       close();
-      throw Exception("Secret Key hasn't expected length");
+      throw ArgumentError("Secret Key hasn't expected length");
     }
   }
 
@@ -97,12 +97,12 @@ class UnstableStreamSigner {
         _state = allocate(count: bindings.stateBytes) {
     if (secretKey.length != bindings.secretKeyBytes) {
       close();
-      throw Exception("Secret Key hasn't expected length");
+      throw ArgumentError("Secret Key hasn't expected length");
     }
     final result = bindings.signInit(_state);
     if (result != 0) {
       close();
-      throw Exception("Initializing StreamSigner failed");
+      throw ArgumentError("Initializing StreamSigner failed");
     }
   }
 
@@ -137,6 +137,12 @@ class UnstableStreamSigner {
 
   /// Verifies the authenticity of a [signature] with the [publicKey]
   bool verify(Uint8List signature, Uint8List publicKey) {
+    if (publicKey.length != bindings.publicKeyBytes) {
+      throw ArgumentError("[publicKey] hasn't expected length");
+    }
+    if (signature.length != bindings.signBytes) {
+      throw ArgumentError("[signature] hasn't expected length");
+    }
     final sigPtr = BufferToCString(signature);
     final pkPtr = BufferToCString(publicKey);
     try {
