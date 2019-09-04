@@ -6,12 +6,12 @@ import 'bindings/box.dart' as bindings;
 
 class KeyPair {
   final Uint8List publicKey, secretKey;
-  const KeyPair._(this.publicKey, this.secretKey);
+  const KeyPair(this.publicKey, this.secretKey);
 }
 
 class Detached {
   final Uint8List ciphertext, authTag;
-  const Detached._(this.ciphertext, this.authTag);
+  const Detached(this.ciphertext, this.authTag);
 }
 
 /// Encrypt and decrypt single messages
@@ -38,7 +38,7 @@ class Box {
       }
       final secretKey = CStringToBuffer(secretKeyPtr, bindings.secretKeyBytes);
       final publicKey = CStringToBuffer(secretKeyPtr, bindings.publicKeyBytes);
-      return KeyPair._(publicKey, secretKey);
+      return KeyPair(publicKey, secretKey);
     } finally {
       secretKeyPtr.free();
       publicKeyPtr.free();
@@ -112,7 +112,7 @@ class Box {
       }
       final c = CStringToBuffer(cPtr, msg.length);
       final authTag = CStringToBuffer(mac, bindings.macBytes);
-      return Detached._(c, authTag);
+      return Detached(c, authTag);
     } finally {
       msgPtr.free();
       noncePtr.free();
@@ -233,7 +233,7 @@ class BoxNumerous {
       }
       final c = CStringToBuffer(cPtr, msg.length);
       final authTag = CStringToBuffer(mac, bindings.macBytes);
-      return Detached._(c, authTag);
+      return Detached(c, authTag);
     } finally {
       msgPtr.free();
       noncePtr.free();
