@@ -1,5 +1,7 @@
 import 'dart:ffi';
 import 'dart:typed_data';
+import 'package:dart_sodium/src/bindings/secure_memory.dart';
+
 import 'ffi_helper.dart';
 
 import 'bindings/secretstream.dart' as bindings;
@@ -20,7 +22,6 @@ class StreamEncryptor {
   /// Required length of [key]
   static final keyBytes = bindings.keyBytes;
 
-  final Pointer<Uint8> _key;
   final Pointer<Uint8> _header;
   final Pointer<bindings.State> _state;
 
@@ -28,18 +29,21 @@ class StreamEncryptor {
   Uint8List get header => CStringToBuffer(_header, bindings.headerBytes);
 
   StreamEncryptor(Uint8List key)
-      : _key = BufferToCString(key),
-        _header = allocate(count: bindings.headerBytes),
+      : _header = allocate(count: bindings.headerBytes),
         _state = allocate(count: bindings.stateBytes) {
     if (key.length != bindings.keyBytes) {
-      _key.free();
       throw ArgumentError("Key hasn't expected length");
     }
-
-    int initResult = bindings.initPush(_state, _header, _key);
-    if (initResult != 0) {
-      close();
-      throw Exception("SecretBox init failed");
+    final keyPtr = BufferToCString(key);
+    try {
+      int initResult = bindings.initPush(_state, _header, keyPtr);
+      if (initResult != 0) {
+        close();
+        throw Exception("SecretBox init failed");
+      }
+      memoryLock(_state.address, bindings.stateBytes);
+    } finally {
+      keyPtr.free();
     }
   }
 
@@ -79,7 +83,7 @@ class StreamEncryptor {
 
   /// Closes the StreamEncryptor
   void close() {
-    _key.free();
+    memoryUnlock(_state.address, bindings.stateBytes);
     _header.free();
     _state.free();
   }
@@ -101,13 +105,11 @@ class PullData {
 
 /// Decrypts chunks of a secretstream encrypted by [StreamEncryptor]
 class StreamDecryptor {
-  final Pointer<Uint8> _key;
   final Pointer<Uint8> _header;
   final Pointer<bindings.State> _state;
 
   StreamDecryptor(Uint8List key, Uint8List header)
-      : _key = BufferToCString(key),
-        _header = BufferToCString(header),
+      : _header = BufferToCString(header),
         _state = allocate(count: bindings.stateBytes) {
     if (key.length != bindings.keyBytes) {
       close();
@@ -117,10 +119,16 @@ class StreamDecryptor {
       close();
       throw ArgumentError("Header hasn't expected length");
     }
-    int initResult = bindings.initPull(_state, _header, _key);
-    if (initResult != 0) {
-      close();
-      throw Exception("SecretBox init failed. Header seems to be invalid");
+    final keyPtr = BufferToCString(key);
+    try {
+      int initResult = bindings.initPull(_state, _header, keyPtr);
+      if (initResult != 0) {
+        close();
+        throw Exception("SecretBox init failed. Header seems to be invalid");
+      }
+      memoryLock(_state.address, bindings.stateBytes);
+    } finally {
+      keyPtr.free();
     }
   }
 
@@ -156,7 +164,7 @@ class StreamDecryptor {
 
   /// Closes the StreamDecryptor
   void close() {
-    _key.free();
+    memoryUnlock(_state.address, bindings.stateBytes);
     _header.free();
     _state.free();
   }
