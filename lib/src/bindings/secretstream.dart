@@ -90,3 +90,5 @@ final stateBytes = libsodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_secretstream_xchacha20poly1305_statebytes")();
 final headerBytes = libsodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_secretstream_xchacha20poly1305_headerbytes")();
+final msgBytesMax = libsodium.lookupFunction<Uint64 Function(), int Function()>(
+    "crypto_secretstream_xchacha20poly1305_messagebytes_max")();
