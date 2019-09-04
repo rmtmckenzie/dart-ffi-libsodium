@@ -33,7 +33,7 @@ class StreamEncryptor {
         _state = allocate(count: bindings.stateBytes) {
     if (key.length != bindings.keyBytes) {
       _key.free();
-      throw Exception("Key hasn't expected length");
+      throw ArgumentError("Key hasn't expected length");
     }
 
     int initResult = bindings.initPush(_state, _header, _key);
@@ -111,11 +111,11 @@ class StreamDecryptor {
         _state = allocate(count: bindings.stateBytes) {
     if (key.length != bindings.keyBytes) {
       close();
-      throw Exception("Key hasn't expected length");
+      throw ArgumentError("Key hasn't expected length");
     }
     if (header.length != bindings.headerBytes) {
       close();
-      throw Exception("Header hasn't expected length");
+      throw ArgumentError("Header hasn't expected length");
     }
     int initResult = bindings.initPull(_state, _header, _key);
     if (initResult != 0) {
