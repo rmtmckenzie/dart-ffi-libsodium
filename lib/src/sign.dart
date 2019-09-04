@@ -127,6 +127,22 @@ class StreamSigner {
     }
   }
 
+  /// Verifies the authenticity of a [signature] with the [publicKey]
+  bool verify(Uint8List signature, Uint8List publicKey) {
+    final sigPtr = BufferToCString(signature);
+    final pkPtr = BufferToCString(publicKey);
+    try {
+      final result = bindings.signFinalVerify(_state, sigPtr, _secretKey);
+      if (result != 0) {
+        return false;
+      }
+      return true;
+    } finally {
+      sigPtr.free();
+      pkPtr.free();
+    }
+  }
+
   /// Closes [StreamSigner]
   void close() {
     _state.free();
