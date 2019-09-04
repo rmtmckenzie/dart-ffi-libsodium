@@ -1,6 +1,8 @@
 import 'dart:ffi';
 import 'dart:typed_data';
 
+import 'package:dart_sodium/src/bindings/secure_memory.dart';
+
 import 'bindings/sign.dart' as bindings;
 import 'box.dart';
 import 'ffi_helper.dart';
@@ -60,6 +62,7 @@ class Signer {
       close();
       throw ArgumentError("Secret Key hasn't expected length");
     }
+    memoryLock(_secretKey.address, bindings.secretKeyBytes);
   }
 
   /// Prepends a signature to a copy of [msg]
@@ -81,6 +84,7 @@ class Signer {
   }
 
   void close() {
+    memoryUnlock(_secretKey.address, bindings.secretKeyBytes);
     _secretKey.free();
   }
 }
@@ -104,6 +108,8 @@ class UnstableStreamSigner {
       close();
       throw ArgumentError("Initializing StreamSigner failed");
     }
+    memoryLock(_secretKey.address, bindings.secretKeyBytes);
+    memoryLock(_state.address, bindings.stateBytes);
   }
 
   /// Push msg into stream
@@ -156,6 +162,8 @@ class UnstableStreamSigner {
 
   /// Closes [UnstableStreamSigner]
   void close() {
+    memoryUnlock(_secretKey.address, bindings.secretKeyBytes);
+    memoryUnlock(_state.address, bindings.stateBytes);
     _state.free();
     _secretKey.free();
   }
