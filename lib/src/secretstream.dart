@@ -49,6 +49,9 @@ class StreamEncryptor {
   /// To end the stream set [tag] to [Tag.finish]
   Uint8List push(Uint8List data,
       {Uint8List additionalData, Tag tag = Tag.message}) {
+    if (data.length > bindings.msgBytesMax) {
+      throw ArgumentError("[data] is longer than the max data size");
+    }
     Pointer<Uint8> adPtr;
     var adLen = 0;
     if (additionalData == null) {
