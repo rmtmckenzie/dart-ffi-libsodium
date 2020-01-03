@@ -12,3 +12,5 @@ doc/api/
 
 # vscode
 .vscode
+
+libsodium.dll
