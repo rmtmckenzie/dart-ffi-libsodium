@@ -38,8 +38,7 @@ class SignInitException implements Exception {
 
 /// Signs [message] with [secretKey]. [secretKey] must be [secretKeyBytes] long.
 Uint8List sign(Uint8List message, Uint8List secretKey) {
-  final skPtr = Uint8Array.allocate(count: bindings.secretKeyBytes)
-    ..view.setAll(0, secretKey);
+  final skPtr = Uint8Array.fromTypedList(secretKey);
   final messagePtr = Uint8Array.fromTypedList(message);
   final signedMessagePtr =
       Uint8Array.allocate(count: message.length + bindings.signBytes);
@@ -62,8 +61,7 @@ Uint8List sign(Uint8List message, Uint8List secretKey) {
 /// no Exception will be thrown and null will be returned.
 Uint8List open(Uint8List signedMessage, Uint8List publicKey,
     {Function() onError}) {
-  final pkPtr = Uint8Array.allocate(count: bindings.secretKeyBytes)
-    ..view.setAll(0, publicKey);
+  final pkPtr = Uint8Array.fromTypedList(publicKey);
   final signedMessagePtr = Uint8Array.fromTypedList(signedMessage);
   final messagePtr =
       Uint8Array.allocate(count: signedMessage.length - bindings.signBytes);
