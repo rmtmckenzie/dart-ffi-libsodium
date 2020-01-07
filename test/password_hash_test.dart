@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:dart_sodium/pwhash.dart' as pwhash;
+import 'package:dart_sodium/password_hash.dart' as pwhash;
 import 'package:dart_sodium/sodium.dart' as sodium;
 import 'package:test/test.dart';
 
