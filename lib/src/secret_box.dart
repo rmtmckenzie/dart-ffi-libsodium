@@ -19,11 +19,12 @@ class DecryptionError extends Error {
 
 /// Generates a key for a secret box.
 UnmodifiableUint8ListView keyGen() {
-  final key = Uint8Array.allocate(count: bindings.keyBytes);
-  bindings.keyGen(key.rawPtr);
-  key.view.fillZero();
-  key.free();
-  return UnmodifiableUint8ListView(Uint8List.fromList(key.view));
+  final keyPtr = Uint8Array.allocate(count: bindings.keyBytes);
+  final key = Uint8List.fromList(keyPtr.view);
+  bindings.keyGen(keyPtr.rawPtr);
+  keyPtr.view.fillZero();
+  keyPtr.free();
+  return UnmodifiableUint8ListView(key);
 }
 
 /// Encrypts [message] with [key]. [key] must be [keyBytes] long.
