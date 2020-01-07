@@ -32,10 +32,8 @@ UnmodifiableUint8ListView keyGen() {
 /// Throws [EncryptionError] when encryption fails.
 Uint8List easy(Uint8List message, Uint8List nonce, Uint8List key) {
   final messagePtr = Uint8Array.fromTypedList(message);
-  final noncePtr = Uint8Array.allocate(count: bindings.nonceBytes)
-    ..view.setAll(0, nonce);
-  final keyPtr = Uint8Array.allocate(count: bindings.keyBytes)
-    ..view.setAll(0, key);
+  final noncePtr = Uint8Array.fromTypedList(nonce);
+  final keyPtr = Uint8Array.fromTypedList(key);
   final ciphertextPtr =
       Uint8Array.allocate(count: message.length + bindings.macBytes);
   final result = bindings.easy(ciphertextPtr.rawPtr, messagePtr.rawPtr,
@@ -55,10 +53,8 @@ Uint8List easy(Uint8List message, Uint8List nonce, Uint8List key) {
 /// Throws [DecryptionError] when decryption fails.
 Uint8List openEasy(Uint8List ciphertext, Uint8List nonce, Uint8List key) {
   final cPtr = Uint8Array.fromTypedList(ciphertext);
-  final noncePtr = Uint8Array.allocate(count: bindings.nonceBytes)
-    ..view.setAll(0, nonce);
-  final keyPtr = Uint8Array.allocate(count: bindings.keyBytes)
-    ..view.setAll(0, key);
+  final noncePtr = Uint8Array.fromTypedList(nonce);
+  final keyPtr = Uint8Array.fromTypedList(key);
   final messagePtr =
       Uint8Array.allocate(count: ciphertext.length - bindings.macBytes);
   final result = bindings.openEasy(messagePtr.rawPtr, cPtr.rawPtr,
