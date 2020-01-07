@@ -23,12 +23,22 @@ void main() {
     expect(message2, decChunk2.msg);
   });
 
+  test('encrypt and decrypt message with additional data', () {
+    sodium.init();
+    final key = secret_stream.keyGen();
+    final message = utf8.encode('hello world');
+    final metaData = DateTime.now().millisecondsSinceEpoch.toRadixString(8);
+    final encodedMetaData = utf8.encode(metaData);
+
     final initPush = secret_stream.initPush(key);
-    final encChunk = secret_stream.push(initPush.state, message);
+    final encChunk = secret_stream.push(initPush.state, message,
+        additionalData: encodedMetaData);
 
     final pullState = secret_stream.initPull(initPush.header, key);
-    final decChunk = secret_stream.pull(pullState, encChunk);
+    final decChunk = secret_stream.pull(pullState, encChunk,
+        additionalDataLength: encodedMetaData.length);
 
     expect(message, decChunk.msg);
+    expect(encodedMetaData, decChunk.additionalData);
   });
 }
