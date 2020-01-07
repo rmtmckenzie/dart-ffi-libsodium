@@ -6,8 +6,6 @@ import 'internal_helpers.dart';
 
 import 'bindings/sign.dart' as bindings;
 
-export 'box.dart' show KeyPair;
-
 class SignError extends Error {
   @override
   String toString() {
