@@ -15,4 +15,18 @@ void main() {
 
     expect(openedMessage, message);
   });
+
+  test('sign and verify a multi-part message', () {
+    final keyPair = sign.KeyPair.generate();
+    final message = utf8.encode('hello world');
+    final message2 = utf8.encode('hello to the world');
+
+    final state = sign.init();
+    sign.update(state, message);
+    sign.update(state, message2);
+    final signature = sign.create(state, keyPair.secretKey);
+
+    final isValid = sign.verify(state, signature, keyPair.publicKey);
+    expect(isValid, true);
+  });
 }
