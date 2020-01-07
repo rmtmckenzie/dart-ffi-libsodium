@@ -125,7 +125,7 @@ Uint8List open(Uint8List signedMessage, Uint8List publicKey,
 
 /// Initializes state for signing a multi-part message.
 /// Throws [SignInitException] when initialization fails.
-Uint8List signInit() {
+Uint8List init() {
   final statePtr = Uint8Array.allocate(count: bindings.stateBytes);
   final result = bindings.signInit(statePtr.rawPtr);
 
