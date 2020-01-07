@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:ffi_helper/ffi_helper.dart';
 import 'internal_helpers.dart';
+import 'box.dart' show KeyPairException;
 
 import 'bindings/sign.dart' as bindings;
 
@@ -31,6 +32,47 @@ class SignInitException implements Exception {
   @override
   String toString() {
     return 'Failed to initialize MultiPartSigner';
+  }
+}
+
+/// Pair of public and secret key.
+class KeyPair {
+  final UnmodifiableUint8ListView publicKey, secretKey;
+  const KeyPair._(this.publicKey, this.secretKey);
+
+  /// Generates a pair of public and secret key.
+  /// Throws [KeyPairException] when generating keys fails.
+  factory KeyPair.generate() {
+    final pkPtr = Uint8Array.allocate(count: bindings.publicKeyBytes);
+    final skPtr = Uint8Array.allocate(count: bindings.secretKeyBytes);
+    final result = bindings.keyPair(pkPtr.rawPtr, skPtr.rawPtr);
+    final publicKey = UnmodifiableUint8ListView(Uint8List.fromList(pkPtr.view));
+    final secretKey = UnmodifiableUint8ListView(Uint8List.fromList(skPtr.view));
+    pkPtr.freeZero();
+    skPtr.freeZero();
+    if (result != 0) {
+      throw KeyPairException();
+    }
+    return KeyPair._(publicKey, secretKey);
+  }
+
+  /// Derives [publicKey] and [secretKey] from [seed].
+  /// Throws [KeyPairException] when generating keys fails.
+  factory KeyPair.fromSeed(Uint8List seed) {
+    final pkPtr = Uint8Array.allocate(count: bindings.publicKeyBytes);
+    final skPtr = Uint8Array.allocate(count: bindings.secretKeyBytes);
+    final seedPtr = Uint8Array.fromTypedList(seed);
+    final result =
+        bindings.seedKeyPair(pkPtr.rawPtr, skPtr.rawPtr, seedPtr.rawPtr);
+    final publicKey = UnmodifiableUint8ListView(Uint8List.fromList(pkPtr.view));
+    final secretKey = UnmodifiableUint8ListView(Uint8List.fromList(skPtr.view));
+
+    pkPtr.freeZero();
+    skPtr.freeZero();
+    if (result != 0) {
+      throw KeyPairException();
+    }
+    return KeyPair._(publicKey, secretKey);
   }
 }
 
