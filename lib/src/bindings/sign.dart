@@ -15,9 +15,9 @@ final stateBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_sign_statebytes")();
 
 final seedKeyPair = sodium.lookupFunction<
-    Int16 Function(Pointer<Uint8> pk, Pointer<Uint8> sk),
-    int Function(
-        Pointer<Uint8> pk, Pointer<Uint8> sk)>("crypto_sign_seed_keypair");
+    Int16 Function(Pointer<Uint8> pk, Pointer<Uint8> sk, Pointer<Uint8> seed),
+    int Function(Pointer<Uint8> pk, Pointer<Uint8> sk,
+        Pointer<Uint8> seed)>("crypto_sign_seed_keypair");
 
 typedef _SignNative = Int16 Function(
     Pointer<Uint8> signMsg,
