@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/random.dart' as bindings;
-import 'helper.dart';
+import 'internal_helpers.dart';
 
 /// Generates a sequence of [size] random numbers
 UnmodifiableUint8ListView buffer(int size) {

@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/box.dart' as bindings;
-import 'helper.dart';
+import 'internal_helpers.dart';
 import 'secret_box.dart' show EncryptionError, DecryptionError;
 
 class KeyPairException implements Exception {

@@ -2,7 +2,7 @@ import 'package:ffi_helper/ffi_helper.dart';
 import 'package:ffi/ffi.dart';
 import 'dart:ffi';
 import 'dart:typed_data';
-import 'helper.dart';
+import 'internal_helpers.dart';
 
 import 'bindings/secretstream.dart' as bindings;
 

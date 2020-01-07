@@ -1,7 +1,7 @@
 import 'bindings/secretbox.dart' as bindings;
 import 'package:ffi_helper/ffi_helper.dart';
 import 'dart:typed_data';
-import 'helper.dart';
+import 'internal_helpers.dart';
 
 class EncryptionError extends Error {
   @override
