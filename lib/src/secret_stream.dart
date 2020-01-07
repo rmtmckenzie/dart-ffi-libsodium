@@ -8,8 +8,8 @@ import 'bindings/secretstream.dart' as bindings;
 
 class PullData {
   final Tag tag;
-  final Uint8List msg, additionalData;
-  const PullData._(this.msg, this.tag, this.additionalData);
+  final Uint8List msg;
+  const PullData._(this.msg, this.tag);
 }
 
 class InitPushData {
@@ -144,14 +144,18 @@ Uint8List initPull(Uint8List header, Uint8List key) {
 /// Pulls a message out of the stream. [additionalDataLength] is the length
 /// of the provided additional data.
 /// Throws [PullError] when pulling message out of stream fails.
-PullData pull(Uint8List state, Uint8List chunk,
-    {int additionalDataLength = 0}) {
+PullData pull(Uint8List state, Uint8List chunk, {Uint8List additionalData}) {
+  var adDataLen = 0;
+  Pointer<Uint8> adDataPtr;
+  if (additionalData == null) {
+    adDataPtr = nullptr.cast();
+  } else {
+    adDataLen = additionalData.length;
+    adDataPtr = Uint8Array.fromTypedList(additionalData).rawPtr;
+  }
   final messagePtr = Uint8Array.allocate(count: chunk.length - bindings.aBytes);
   final cPtr = Uint8Array.fromTypedList(chunk);
   final statePtr = Uint8Array.fromTypedList(state);
-  final Pointer<Uint8> adDataPtr = additionalDataLength == 0
-      ? nullptr.cast()
-      : allocate(count: additionalDataLength);
 
   final tagPtr = allocate<Uint8>();
   final result = bindings.pull(
@@ -162,7 +166,7 @@ PullData pull(Uint8List state, Uint8List chunk,
       cPtr.rawPtr,
       chunk.length,
       adDataPtr,
-      additionalDataLength);
+      adDataLen);
   messagePtr.free();
   cPtr.free();
 
@@ -170,15 +174,11 @@ PullData pull(Uint8List state, Uint8List chunk,
   statePtr.view.fillZero();
   statePtr.free();
 
-  final adData = additionalDataLength == 0
-      ? Uint8List(0)
-      : Uint8List.fromList(adDataPtr.asTypedList(additionalDataLength));
   free(adDataPtr);
   final tag = tagPtr.value;
   free(tagPtr);
   if (result != 0) {
     throw PullError();
   }
-  return PullData._(
-      Uint8List.fromList(messagePtr.view), Tag.values[tag], adData);
+  return PullData._(Uint8List.fromList(messagePtr.view), Tag.values[tag]);
 }

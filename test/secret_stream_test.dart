@@ -27,8 +27,8 @@ void main() {
     sodium.init();
     final key = secret_stream.keyGen();
     final message = utf8.encode('hello world');
-    final metaData = DateTime.now().millisecondsSinceEpoch.toRadixString(8);
-    final encodedMetaData = utf8.encode(metaData);
+    final metaData = DateTime.now().millisecondsSinceEpoch;
+    final encodedMetaData = utf8.encode(metaData.toString());
 
     final initPush = secret_stream.initPush(key);
     final encChunk = secret_stream.push(initPush.state, message,
@@ -36,9 +36,8 @@ void main() {
 
     final pullState = secret_stream.initPull(initPush.header, key);
     final decChunk = secret_stream.pull(pullState, encChunk,
-        additionalDataLength: encodedMetaData.length);
+        additionalData: encodedMetaData);
 
     expect(message, decChunk.msg);
-    expect(encodedMetaData, decChunk.additionalData);
   });
 }
