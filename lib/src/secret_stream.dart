@@ -85,8 +85,8 @@ InitPushData initPush(Uint8List key) {
 }
 
 /// Pushes [message] into the stream. [message] cannot be longer than [msgBytesMax] (~256 GB).
-/// [additionalData] could be meta data, but most of the time
-/// it will be left empty.
+/// [additionalData] will not be encrypted but it will be included in the computation
+/// of the authentication tag.
 /// The [tag] marks the status of the stream (see libsodium documentation).
 /// Throws a [PushStreamException] when pushing [message] into the stream fails.
 Uint8List push(Uint8List state, Uint8List message,
@@ -141,8 +141,7 @@ Uint8List initPull(Uint8List header, Uint8List key) {
   return state;
 }
 
-/// Pulls a message out of the stream. [additionalDataLength] is the length
-/// of the provided additional data.
+/// Pulls a message out of the stream. [additionalData] must be the same given to [push].
 /// Throws [PullError] when pulling message out of stream fails.
 PullData pull(Uint8List state, Uint8List chunk, {Uint8List additionalData}) {
   var adDataLen = 0;
