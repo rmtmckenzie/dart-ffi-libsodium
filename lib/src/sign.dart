@@ -2,7 +2,7 @@ import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:ffi_helper/ffi_helper.dart';
-import 'helper.dart';
+import 'internal_helpers.dart';
 
 import 'bindings/sign.dart' as bindings;
 

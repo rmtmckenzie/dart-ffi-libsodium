@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:ffi_helper/ffi_helper.dart';
 import 'bindings/auth.dart' as bindings;
-import 'helper.dart';
+import 'internal_helpers.dart';
 
 class AuthException implements Exception {
   @override
