@@ -6,8 +6,8 @@ import 'package:dart_sodium/sodium.dart' as sodium;
 import 'package:test/test.dart';
 
 void main() {
+  sodium.init();
   test('encrypt and decrypt individual message', () {
-    sodium.init();
     final key = secret_box.keyGen();
     final message = utf8.encode('hello world');
     final nonce = rand_bytes.buffer(secret_box.nonceBytes);

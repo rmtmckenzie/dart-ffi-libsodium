@@ -5,8 +5,8 @@ import 'package:dart_sodium/sodium.dart' as sodium;
 import 'package:test/test.dart';
 
 void main() {
+  sodium.init();
   test('encrypt and decrypt message as stream', () {
-    sodium.init();
     final key = secret_stream.keyGen();
     final message = utf8.encode('hello world');
     final message2 = utf8.encode('hello to the world');
@@ -24,7 +24,6 @@ void main() {
   });
 
   test('encrypt and decrypt message with additional data', () {
-    sodium.init();
     final key = secret_stream.keyGen();
     final message = utf8.encode('hello world');
     final metaData = DateTime.now().millisecondsSinceEpoch;
