@@ -154,7 +154,7 @@ void update(Uint8List state, Uint8List message) {
   }
 }
 
-/// Generates a signature which takes every part of the message into account.
+/// Generates a signature for multi-part message.
 /// [secretKey] must be [secretKeyBytes] long.
 /// Throws [SignError] when generating signature fails.
 Uint8List create(Uint8List state, Uint8List secretKey) {
