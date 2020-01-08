@@ -1,5 +1,7 @@
 import 'dart:typed_data';
+import 'dart:ffi';
 
+import 'package:ffi/ffi.dart';
 import 'package:ffi_helper/ffi_helper.dart';
 import 'internal_helpers.dart';
 
@@ -33,17 +35,23 @@ class FinishStreamError extends Error {
   }
 }
 
-Uint8List genericHash(Uint8List input, Uint8List key, {int outLength}) {
-  outLength = outLength ?? bindings.genericHashBytes;
+Uint8List genericHash(Uint8List input, [Uint8List key, int outLength]) {
+  outLength ??= bindings.genericHashBytes;
   final outPtr = Uint8Array.allocate(count: outLength);
   final inPtr = Uint8Array.fromTypedList(input);
-  final keyPtr = Uint8Array.fromTypedList(key);
 
-  final result = bindings.genericHash(outPtr.rawPtr, outLength, inPtr.rawPtr,
-      input.length, keyPtr.rawPtr, key.length);
+  var result = 0;
+  if (key == null) {
+    result = bindings.genericHash(outPtr.rawPtr, outLength, inPtr.rawPtr,
+        input.length, nullptr.cast(), 0);
+  } else {
+    final keyPtr = Uint8Array.fromTypedList(key);
+    result = bindings.genericHash(outPtr.rawPtr, outLength, inPtr.rawPtr,
+        input.length, keyPtr.rawPtr, key.length);
+    keyPtr.freeZero();
+  }
   outPtr.free();
   inPtr.free();
-  keyPtr.freeZero();
 
   if (result != 0) {
     throw GenericHashError();
