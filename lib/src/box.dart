@@ -162,7 +162,8 @@ Uint8List openEasyAfterNumerous(
   final noncePtr = Uint8Array.fromTypedList(nonce);
   final keyPtr = Uint8Array.fromTypedList(key);
   final cPtr = Uint8Array.fromTypedList(ciphertext);
-  final msgPtr = Uint8Array.allocate(count: ciphertext.length);
+  final msgPtr =
+      Uint8Array.allocate(count: ciphertext.length - bindings.macBytes);
 
   final result = bindings.openEasyAfterNumerous(msgPtr.rawPtr, cPtr.rawPtr,
       ciphertext.length, noncePtr.rawPtr, keyPtr.rawPtr);
