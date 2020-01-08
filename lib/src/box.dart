@@ -142,7 +142,7 @@ Uint8List easyAfterNumerous(Uint8List message, Uint8List nonce, Uint8List key) {
   final msgPtr = Uint8Array.fromTypedList(message);
   final cPtr = Uint8Array.allocate(count: message.length + bindings.macBytes);
 
-  final result = bindings.easyAfterNm(cPtr.rawPtr, msgPtr.rawPtr,
+  final result = bindings.easyAfterNumerous(cPtr.rawPtr, msgPtr.rawPtr,
       message.length, noncePtr.rawPtr, keyPtr.rawPtr);
 
   noncePtr.free();
@@ -162,10 +162,9 @@ Uint8List openEasyAfterNumerous(
   final noncePtr = Uint8Array.fromTypedList(nonce);
   final keyPtr = Uint8Array.fromTypedList(key);
   final cPtr = Uint8Array.fromTypedList(ciphertext);
-  final msgPtr =
-      Uint8Array.allocate(count: ciphertext.length - bindings.macBytes);
+  final msgPtr = Uint8Array.allocate(count: ciphertext.length);
 
-  final result = bindings.easyAfterNm(msgPtr.rawPtr, cPtr.rawPtr,
+  final result = bindings.openEasyAfterNumerous(msgPtr.rawPtr, cPtr.rawPtr,
       ciphertext.length, noncePtr.rawPtr, keyPtr.rawPtr);
   noncePtr.free();
   cPtr.free();
