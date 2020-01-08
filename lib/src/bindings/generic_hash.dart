@@ -49,4 +49,4 @@ final finish = sodium.lookupFunction<
         int outlen)>('crypto_generichash_final');
 
 final keyGen = sodium.lookupFunction<Void Function(Pointer<Uint8> key),
-    void Function(Pointer<Uint8> key)>('crypto_generichash_final');
+    void Function(Pointer<Uint8> key)>('crypto_generichash_keygen');
