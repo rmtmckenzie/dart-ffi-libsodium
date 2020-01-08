@@ -10,7 +10,7 @@ void main() {
     final key = hash.keyGen();
     expect(key.length, hash.genericHashBytes);
     final message = utf8.encode('hello world');
-    final hashed = hash.genericHash(message, key);
+    final hashed = hash.genericHash(message, key: key);
     expect(hashed.length, hash.genericHashBytes);
   });
 

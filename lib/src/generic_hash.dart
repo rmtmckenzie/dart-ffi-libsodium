@@ -35,7 +35,7 @@ class FinishStreamError extends Error {
   }
 }
 
-Uint8List genericHash(Uint8List input, [Uint8List key, int outLength]) {
+Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
   outLength ??= bindings.genericHashBytes;
   final outPtr = Uint8Array.allocate(count: outLength);
   final inPtr = Uint8Array.fromTypedList(input);
