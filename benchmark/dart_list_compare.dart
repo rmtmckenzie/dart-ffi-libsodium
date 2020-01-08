@@ -18,8 +18,10 @@ class ConstantTimeListCompareBenchmark extends BenchmarkBase {
 
   @override
   void run() {
-    for (var i = 0; i < a.length; i++) {
-      if (a[i] == b[i]) {}
+    final ax4 = a.buffer.asInt32x4List();
+    final bx4 = b.buffer.asInt32x4List();
+    for (var i = 0; i < ax4.length; i++) {
+      ax4[i] == bx4[i];
     }
   }
 }
