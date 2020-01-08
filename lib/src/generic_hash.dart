@@ -59,16 +59,21 @@ Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
   return Uint8List.fromList(outPtr.view);
 }
 
-Uint8List init(Uint8List key, {int outLength}) {
+Uint8List init({Uint8List key, int outLength}) {
   outLength = outLength ?? bindings.genericHashBytes;
   final statePtr = Uint8Array.allocate(count: bindings.stateBytes);
-  final keyPtr = Uint8Array.fromTypedList(key);
 
-  final result =
-      bindings.init(statePtr.rawPtr, keyPtr.rawPtr, key.length, outLength);
+  var result = 0;
+  if (key == null) {
+    result = bindings.init(statePtr.rawPtr, nullptr.cast(), 0, outLength);
+  } else {
+    final keyPtr = Uint8Array.fromTypedList(key);
+    result =
+        bindings.init(statePtr.rawPtr, keyPtr.rawPtr, key.length, outLength);
+    keyPtr.freeZero();
+  }
   final state = Uint8List.fromList(statePtr.view);
   statePtr.freeZero();
-  keyPtr.freeZero();
 
   if (result != 0) {
     throw InitStreamError();
