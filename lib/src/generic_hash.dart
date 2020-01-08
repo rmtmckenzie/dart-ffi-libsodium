@@ -102,7 +102,7 @@ Uint8List finish(Uint8List state, {int outLength}) {
   final outPtr = Uint8Array.allocate(count: outLength);
 
   final result = bindings.finish(statePtr.rawPtr, outPtr.rawPtr, outLength);
-  state.setAll(0, statePtr.view);
+  state.fillZero();
   statePtr.freeZero();
   outPtr.free();
 
