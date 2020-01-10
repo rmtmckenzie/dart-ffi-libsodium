@@ -6,7 +6,7 @@ import 'internal_helpers.dart';
 class PasswordHashException extends Error {
   @override
   String toString() {
-    return "Failed to generate password hash";
+    return 'Failed to generate password hash';
   }
 }
 
