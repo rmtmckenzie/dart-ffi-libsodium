@@ -14,10 +14,10 @@ class SignError extends Error {
   }
 }
 
-class UpdateException implements Exception {
+class UpdateStreamException implements Exception {
   @override
   String toString() {
-    return 'Failed to update state of MultiPartSigner';
+    return 'Failed to update sign stream';
   }
 }
 
@@ -28,10 +28,10 @@ class InvalidSignatureError extends ArgumentError {
   }
 }
 
-class SignInitException implements Exception {
+class InitStreamException implements Exception {
   @override
   String toString() {
-    return 'Failed to initialize MultiPartSigner';
+    return 'Failed to initialize sign stream';
   }
 }
 
@@ -130,7 +130,7 @@ Uint8List _initStream() {
   final state = Uint8List.fromList(statePtr.view);
   statePtr.freeZero();
   if (result != 0) {
-    throw SignInitException();
+    throw InitStreamException();
   }
   return state;
 }
@@ -151,7 +151,7 @@ mixin Update {
     statePtr.freeZero();
     messagePtr.free();
     if (result != 0) {
-      throw UpdateException;
+      throw UpdateStreamException;
     }
   }
 }
