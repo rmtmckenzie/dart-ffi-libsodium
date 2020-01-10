@@ -38,7 +38,7 @@ class PushError extends Error {
   }
 }
 
-enum Tag { message, finish, push, rekey }
+enum Tag { message, finalize, push, rekey }
 
 /// Generates a key for a secret stream.
 UnmodifiableUint8ListView keyGen() {
