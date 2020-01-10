@@ -26,15 +26,15 @@ void main() {
     final key = hash.keyGen();
     final message = utf8.encode('hello world');
     final message2 = utf8.encode('hello to the world');
-    final state = hash.init(key: key);
-    hash.update(state, message);
-    hash.update(state, message2);
-    final hashed = hash.finish(state);
+    final hashStream = hash.GenericHashStream(key: key);
+    hashStream.update(message);
+    hashStream.update(message2);
+    final hashed = hashStream.finalize();
 
-    final state2 = hash.init(key: key);
-    hash.update(state2, message);
-    hash.update(state2, message2);
-    final hashed2 = hash.finish(state2);
+    final hashStream2 = hash.GenericHashStream(key: key);
+    hashStream2.update(message);
+    hashStream2.update(message2);
+    final hashed2 = hashStream.finalize();
 
     expect(hashed, hashed2);
   });
@@ -42,15 +42,15 @@ void main() {
   test('Hash multi part message without key', () {
     final message = utf8.encode('hello world');
     final message2 = utf8.encode('hello to the world');
-    final state = hash.init();
-    hash.update(state, message);
-    hash.update(state, message2);
-    final hashed = hash.finish(state);
+    final hashStream = hash.GenericHashStream();
+    hashStream.update(message);
+    hashStream.update(message2);
+    final hashed = hashStream.finalize();
 
-    final state2 = hash.init();
-    hash.update(state2, message);
-    hash.update(state2, message2);
-    final hashed2 = hash.finish(state2);
+    final hashStream2 = hash.GenericHashStream();
+    hashStream2.update(message);
+    hashStream2.update(message2);
+    final hashed2 = hashStream.finalize();
     expect(hashed, hashed2);
   });
 }
