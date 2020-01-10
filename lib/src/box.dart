@@ -107,8 +107,7 @@ Uint8List openEasy(Uint8List ciphertext, Uint8List nonce, Uint8List publicKey,
   if (result != 0) {
     throw DecryptionError();
   }
-  return Uint8List.fromList(
-      cPtr.view.sublist(0, ciphertext.length - bindings.macBytes));
+  return cPtr.view.sublist(0, ciphertext.length - bindings.macBytes);
 }
 
 /// Generates a shared key to improve performance.
