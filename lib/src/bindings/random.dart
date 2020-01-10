@@ -1,8 +1,8 @@
 import 'sodium.dart';
 import 'dart:ffi';
 
-final seedBytes = sodium
-    .lookupFunction<Uint64 Function(), int Function()>('randombytes_seedbytes');
+final seedBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
+    'randombytes_seedbytes')();
 
 final buffer = sodium.lookupFunction<
     Void Function(Pointer<Void> buf, IntPtr size),
