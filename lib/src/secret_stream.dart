@@ -6,12 +6,6 @@ import 'internal_helpers.dart';
 
 import 'bindings/secretstream.dart' as bindings;
 
-class PullData {
-  final Tag tag;
-  final Uint8List message;
-  const PullData._(this.message, this.tag);
-}
-
 class PullError extends Error {
   @override
   String toString() {
@@ -124,6 +118,8 @@ class PullStream with Rekey {
   @override
   final Uint8List _state;
   UnmodifiableUint8ListView get state => _state;
+  Tag _tag;
+  Tag get tag => _tag;
 
   PullStream.resume(this._state);
   factory PullStream(Uint8List key, Uint8List header) {
@@ -147,7 +143,8 @@ class PullStream with Rekey {
 
   /// Pulls a message out of the stream. [additionalData] must be the same given to [push].
   /// Throws [PullError] when pulling message out of stream fails.
-  PullData pull(Uint8List chunk, {Uint8List additionalData}) {
+  Uint8List pull(Uint8List chunk,
+      {Uint8List additionalData, bool readTag = false}) {
     var adDataLen = 0;
     Pointer<Uint8> adDataPtr;
     if (additionalData == null) {
@@ -161,7 +158,7 @@ class PullStream with Rekey {
     final cPtr = Uint8Array.fromTypedList(chunk);
     final statePtr = Uint8Array.fromTypedList(_state);
 
-    final tagPtr = allocate<Uint8>();
+    final tagPtr = readTag ? allocate<Uint8>() : nullptr.cast<Uint8>();
     final result = bindings.pull(
         statePtr.rawPtr,
         messagePtr.rawPtr,
@@ -179,11 +176,12 @@ class PullStream with Rekey {
     statePtr.free();
 
     free(adDataPtr);
-    final tag = tagPtr.value;
+    _tag = readTag ? null : Tag.values[tagPtr.value];
     free(tagPtr);
     if (result != 0) {
       throw PullError();
     }
-    return PullData._(Uint8List.fromList(messagePtr.view), Tag.values[tag]);
+
+    return Uint8List.fromList(messagePtr.view);
   }
 }
