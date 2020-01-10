@@ -174,7 +174,7 @@ class PullStream with Rekey {
     statePtr.freeZero();
 
     free(adDataPtr);
-    _tag = readTag ? null : Tag.values[tagPtr.value];
+    _tag = readTag ? Tag.values[tagPtr.value] : null;
     free(tagPtr);
     if (result != 0) {
       throw PullError();
