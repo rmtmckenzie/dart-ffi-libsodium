@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ffi';
 
-import 'package:ffi/ffi.dart';
 import 'package:ffi_helper/ffi_helper.dart';
 import 'internal_helpers.dart';
 

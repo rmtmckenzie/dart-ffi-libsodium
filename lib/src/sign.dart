@@ -192,6 +192,7 @@ class SignStream with Update {
 
 /// Stream to verify the signature of a multi-part message
 class VerifyStream with Update {
+  @override
   final Uint8List _state;
   UnmodifiableUint8ListView get state => _state;
 
