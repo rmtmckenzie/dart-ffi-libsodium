@@ -8,8 +8,8 @@ import 'bindings/secretstream.dart' as bindings;
 
 class PullData {
   final Tag tag;
-  final Uint8List msg;
-  const PullData._(this.msg, this.tag);
+  final Uint8List message;
+  const PullData._(this.message, this.tag);
 }
 
 class PullError extends Error {
