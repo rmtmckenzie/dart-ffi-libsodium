@@ -9,21 +9,21 @@ import 'bindings/secretstream.dart' as bindings;
 class PullError extends Error {
   @override
   String toString() {
-    return "Pulling from secret stream failed";
+    return 'Pulling from secret stream failed';
   }
 }
 
 class InitStreamError extends Error {
   @override
   String toString() {
-    return "Initializing secret stream failed";
+    return 'Initializing secret stream failed';
   }
 }
 
 class PushError extends Error {
   @override
   String toString() {
-    return "Pushing into secret stream failed";
+    return 'Pushing into secret stream failed';
   }
 }
 
