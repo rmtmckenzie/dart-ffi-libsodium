@@ -59,57 +59,60 @@ Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
   return Uint8List.fromList(outPtr.view);
 }
 
-Uint8List init({Uint8List key, int outLength}) {
-  outLength = outLength ?? bindings.genericHashBytes;
-  final statePtr = Uint8Array.allocate(count: bindings.stateBytes);
+class GenericHashStream {
+  final Uint8List _state;
+  UnmodifiableUint8ListView get stet => UnmodifiableUint8ListView(_state);
+  final int outLength;
 
-  var result = 0;
-  if (key == null) {
-    result = bindings.init(statePtr.rawPtr, nullptr.cast(), 0, outLength);
-  } else {
-    final keyPtr = Uint8Array.fromTypedList(key);
-    result =
-        bindings.init(statePtr.rawPtr, keyPtr.rawPtr, key.length, outLength);
-    keyPtr.freeZero();
+  GenericHashStream.resume(this._state, this.outLength);
+  factory GenericHashStream({Uint8List key, int outLength}) {
+    outLength ??= bindings.genericHashBytes;
+    final statePtr = Uint8Array.allocate(count: bindings.stateBytes);
+
+    var result = 0;
+    if (key == null) {
+      result = bindings.init(statePtr.rawPtr, nullptr.cast(), 0, outLength);
+    } else {
+      final keyPtr = Uint8Array.fromTypedList(key);
+      result =
+          bindings.init(statePtr.rawPtr, keyPtr.rawPtr, key.length, outLength);
+      keyPtr.freeZero();
+    }
+    final state = Uint8List.fromList(statePtr.view);
+    statePtr.freeZero();
+
+    if (result != 0) {
+      throw InitStreamError();
+    }
+    return GenericHashStream.resume(state, outLength);
   }
-  final state = Uint8List.fromList(statePtr.view);
-  statePtr.freeZero();
+  void update(Uint8List input) {
+    final statePtr = Uint8Array.fromTypedList(_state);
+    final inPtr = Uint8Array.fromTypedList(input);
 
-  if (result != 0) {
-    throw InitStreamError();
+    final result = bindings.update(statePtr.rawPtr, inPtr.rawPtr, input.length);
+    _state.setAll(0, statePtr.view);
+    statePtr.freeZero();
+    inPtr.free();
+
+    if (result != 0) {
+      throw UpdateStreamError();
+    }
   }
 
-  return state;
-}
+  Uint8List finalize() {
+    final statePtr = Uint8Array.fromTypedList(_state);
+    final outPtr = Uint8Array.allocate(count: outLength);
 
-void update(Uint8List state, Uint8List input) {
-  final statePtr = Uint8Array.fromTypedList(state);
-  final inPtr = Uint8Array.fromTypedList(input);
+    final result = bindings.finish(statePtr.rawPtr, outPtr.rawPtr, outLength);
+    statePtr.freeZero();
+    outPtr.free();
 
-  final result = bindings.update(statePtr.rawPtr, inPtr.rawPtr, input.length);
-  state.setAll(0, statePtr.view);
-  statePtr.freeZero();
-  inPtr.free();
-
-  if (result != 0) {
-    throw UpdateStreamError();
+    if (result != 0) {
+      throw FinishStreamError();
+    }
+    return Uint8List.fromList(outPtr.view);
   }
-}
-
-Uint8List finish(Uint8List state, {int outLength}) {
-  outLength = outLength ?? bindings.genericHashBytes;
-  final statePtr = Uint8Array.fromTypedList(state);
-  final outPtr = Uint8Array.allocate(count: outLength);
-
-  final result = bindings.finish(statePtr.rawPtr, outPtr.rawPtr, outLength);
-  state.fillZero();
-  statePtr.freeZero();
-  outPtr.free();
-
-  if (result != 0) {
-    throw FinishStreamError();
-  }
-  return Uint8List.fromList(outPtr.view);
 }
 
 UnmodifiableUint8ListView keyGen() {
