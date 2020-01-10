@@ -27,10 +27,10 @@ class UpdateStreamError extends Error {
   }
 }
 
-class FinishStreamError extends Error {
+class FinalizeStreamError extends Error {
   @override
   String toString() {
-    return 'Finish generic hash stream failed';
+    return 'Finalize generic hash stream failed';
   }
 }
 
@@ -120,7 +120,7 @@ class GenericHashStream {
     outPtr.free();
 
     if (result != 0) {
-      throw FinishStreamError();
+      throw FinalizeStreamError();
     }
     return Uint8List.fromList(outPtr.view);
   }
