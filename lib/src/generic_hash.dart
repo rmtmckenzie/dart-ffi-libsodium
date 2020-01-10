@@ -34,6 +34,14 @@ class FinalizeStreamError extends Error {
   }
 }
 
+/// Generate a fingerprint for [input]. A different [key] (optional) produces
+/// a different fingerprint for the same [input]. [key] (when provided) must be between
+/// [keyBytesMin] and [keyBytesMax] long (recommended [keyBytes]). [outLength] (optional) controls
+/// the length of the generated hash and must be between [genericHashBytesMin] and [genericHashBytesMax] long (standart [genericHashBytes]).
+/// Throws [GenericHashError] when generating fingerprint fails.
+///
+/// Please remember to use constant-time comparison when comparing two fingerprints
+/// when no information must be leaked.
 Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
   outLength ??= bindings.genericHashBytes;
   final outPtr = Uint8Array.allocate(count: outLength);
@@ -72,6 +80,7 @@ class GenericHashStream {
   /// fingerprint. When [key] is provided it must be between [keyBytesMin] and [keyBytesMax]
   /// long (recommended is [keyBytes]). [outhLength] controls the length of the resulting hash
   /// and must be between [genericHashBytesMin] and [genericHashBytesMax] (standard is [genericHashBytes]).
+  /// Throws [InitStreamError] when initializing stream fails.
   factory GenericHashStream({Uint8List key, int outLength}) {
     outLength ??= bindings.genericHashBytes;
     final statePtr = Uint8Array.allocate(count: bindings.stateBytes);
@@ -110,7 +119,9 @@ class GenericHashStream {
     }
   }
 
-  /// Generates the hash / fingerprint. The stream shouldn't be used any more after calling [finalize].
+  /// Generates the fingerprint of the multi-part message.
+  /// The stream mustn't be used after calling [finalize].
+  /// Throws [FinalizeStreamError] when finalizing fails.
   Uint8List finalize() {
     final statePtr = Uint8Array.fromTypedList(_state);
     final outPtr = Uint8Array.allocate(count: outLength);
