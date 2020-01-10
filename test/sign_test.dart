@@ -21,12 +21,15 @@ void main() {
     final message = utf8.encode('hello world');
     final message2 = utf8.encode('hello to the world');
 
-    final state = sign.init();
-    sign.update(state, message);
-    sign.update(state, message2);
-    final signature = sign.create(state, keyPair.secretKey);
+    final signStream = sign.SignStream();
+    signStream.update(message);
+    signStream.update(message2);
+    final signature = signStream.finalize(keyPair.secretKey);
 
-    final isValid = sign.verify(state, signature, keyPair.publicKey);
+    final verifyStream = sign.VerifyStream();
+    verifyStream.update(message);
+    verifyStream.update(message2);
+    final isValid = verifyStream.verify(signature, keyPair.publicKey);
     expect(isValid, true);
   });
 }
