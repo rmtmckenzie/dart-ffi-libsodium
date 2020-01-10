@@ -48,6 +48,7 @@ mixin Rekey {
 }
 
 class PushStream with Rekey {
+  @override
   final Uint8List _state;
   Uint8List _header;
 
@@ -92,7 +93,7 @@ class PushStream with Rekey {
     }
     final msgPtr = Uint8Array.fromTypedList(message);
     final cPtr = Uint8Array.allocate(count: message.length + bindings.aBytes);
-    final statePtr = Uint8Array.fromTypedList(state);
+    final statePtr = Uint8Array.fromTypedList(_state);
 
     final result = bindings.push(statePtr.rawPtr, cPtr.rawPtr, nullptr.cast(),
         msgPtr.rawPtr, message.length, adDataPtr, adDataLen, tag.index);
@@ -119,66 +120,70 @@ UnmodifiableUint8ListView keyGen() {
   return UnmodifiableUint8ListView(key);
 }
 
-/// Decrypts all messeges encrypted with [push] with [key].
-/// The decryption stream must be initialized with the [header]
-/// Throws a [InitStreamException] when initializing the secret stream fails.
-Uint8List initPull(Uint8List header, Uint8List key) {
-  final keyPtr = Uint8Array.fromTypedList(key);
-  final headerPtr = Uint8Array.fromTypedList(header);
-  final statePtr = Uint8Array.allocate(count: bindings.stateBytes);
+class PullStream with Rekey {
+  @override
+  final Uint8List _state;
+  UnmodifiableUint8ListView get state => _state;
 
-  final result =
-      bindings.initPull(statePtr.rawPtr, headerPtr.rawPtr, keyPtr.rawPtr);
-  keyPtr.view.fillZero();
-  keyPtr.free();
-  headerPtr.free();
+  PullStream.resume(this._state);
+  factory PullStream(Uint8List key, Uint8List header) {
+    final keyPtr = Uint8Array.fromTypedList(key);
+    final headerPtr = Uint8Array.fromTypedList(header);
+    final statePtr = Uint8Array.allocate(count: bindings.stateBytes);
 
-  final state = Uint8List.fromList(statePtr.view);
-  statePtr.view.fillZero();
-  statePtr.free();
-  if (result != 0) {
-    throw InitStreamError();
+    final result =
+        bindings.initPull(statePtr.rawPtr, headerPtr.rawPtr, keyPtr.rawPtr);
+    keyPtr.freeZero();
+    headerPtr.free();
+
+    final state = Uint8List.fromList(statePtr.view);
+    statePtr.view.fillZero();
+    statePtr.free();
+    if (result != 0) {
+      throw InitStreamError();
+    }
+    return PullStream.resume(state);
   }
-  return state;
-}
 
-/// Pulls a message out of the stream. [additionalData] must be the same given to [push].
-/// Throws [PullError] when pulling message out of stream fails.
-PullData pull(Uint8List state, Uint8List chunk, {Uint8List additionalData}) {
-  var adDataLen = 0;
-  Pointer<Uint8> adDataPtr;
-  if (additionalData == null) {
-    adDataPtr = nullptr.cast();
-  } else {
-    adDataLen = additionalData.length;
-    adDataPtr = Uint8Array.fromTypedList(additionalData).rawPtr;
+  /// Pulls a message out of the stream. [additionalData] must be the same given to [push].
+  /// Throws [PullError] when pulling message out of stream fails.
+  PullData pull(Uint8List chunk, {Uint8List additionalData}) {
+    var adDataLen = 0;
+    Pointer<Uint8> adDataPtr;
+    if (additionalData == null) {
+      adDataPtr = nullptr.cast();
+    } else {
+      adDataLen = additionalData.length;
+      adDataPtr = Uint8Array.fromTypedList(additionalData).rawPtr;
+    }
+    final messagePtr =
+        Uint8Array.allocate(count: chunk.length - bindings.aBytes);
+    final cPtr = Uint8Array.fromTypedList(chunk);
+    final statePtr = Uint8Array.fromTypedList(_state);
+
+    final tagPtr = allocate<Uint8>();
+    final result = bindings.pull(
+        statePtr.rawPtr,
+        messagePtr.rawPtr,
+        nullptr.cast<Uint64>(),
+        tagPtr,
+        cPtr.rawPtr,
+        chunk.length,
+        adDataPtr,
+        adDataLen);
+    messagePtr.free();
+    cPtr.free();
+
+    _state.setAll(0, statePtr.view);
+    statePtr.view.fillZero();
+    statePtr.free();
+
+    free(adDataPtr);
+    final tag = tagPtr.value;
+    free(tagPtr);
+    if (result != 0) {
+      throw PullError();
+    }
+    return PullData._(Uint8List.fromList(messagePtr.view), Tag.values[tag]);
   }
-  final messagePtr = Uint8Array.allocate(count: chunk.length - bindings.aBytes);
-  final cPtr = Uint8Array.fromTypedList(chunk);
-  final statePtr = Uint8Array.fromTypedList(state);
-
-  final tagPtr = allocate<Uint8>();
-  final result = bindings.pull(
-      statePtr.rawPtr,
-      messagePtr.rawPtr,
-      nullptr.cast<Uint64>(),
-      tagPtr,
-      cPtr.rawPtr,
-      chunk.length,
-      adDataPtr,
-      adDataLen);
-  messagePtr.free();
-  cPtr.free();
-
-  state.setAll(0, statePtr.view);
-  statePtr.view.fillZero();
-  statePtr.free();
-
-  free(adDataPtr);
-  final tag = tagPtr.value;
-  free(tagPtr);
-  if (result != 0) {
-    throw PullError();
-  }
-  return PullData._(Uint8List.fromList(messagePtr.view), Tag.values[tag]);
 }
