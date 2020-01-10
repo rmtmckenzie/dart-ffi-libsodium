@@ -133,8 +133,7 @@ class PullStream with Rekey {
     headerPtr.free();
 
     final state = Uint8List.fromList(statePtr.view);
-    statePtr.view.fillZero();
-    statePtr.free();
+    statePtr.freeZero();
     if (result != 0) {
       throw InitStreamError();
     }
