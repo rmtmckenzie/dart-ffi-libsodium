@@ -59,12 +59,20 @@ Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
   return Uint8List.fromList(outPtr.view);
 }
 
+/// Generates hash for a multi-part message
 class GenericHashStream {
   final Uint8List _state;
   UnmodifiableUint8ListView get stet => UnmodifiableUint8ListView(_state);
   final int outLength;
 
+  /// Resume stream with a saved [state] and [outhLength];
   GenericHashStream.resume(this._state, this.outLength);
+
+  /// The same [key] results in the same fingerprint just as calling [GenericHashStream]
+  /// without any [key] at all. But a different [key] will also result in a different
+  /// fingerprint. When [key] is provided it must be between [keyBytesMin] and [keyBytesMax]
+  /// long (recommended is [keyBytes]). [outhLength] controls the length of the resulting hash
+  /// and must be between [genericHashBytesMin] and [genericHashBytesMax] (standard is [genericHashBytes]).
   factory GenericHashStream({Uint8List key, int outLength}) {
     outLength ??= bindings.genericHashBytes;
     final statePtr = Uint8Array.allocate(count: bindings.stateBytes);
@@ -86,6 +94,9 @@ class GenericHashStream {
     }
     return GenericHashStream.resume(state, outLength);
   }
+
+  /// Updates the stream with [input]. Call [update] of every part of the message.
+  /// Throws [UpdateStreamError] when updating stream fails.
   void update(Uint8List input) {
     final statePtr = Uint8Array.fromTypedList(_state);
     final inPtr = Uint8Array.fromTypedList(input);
@@ -100,6 +111,7 @@ class GenericHashStream {
     }
   }
 
+  /// Generates the hash / fingerprint. The stream shouldn't be used any more after calling [finalize].
   Uint8List finalize() {
     final statePtr = Uint8Array.fromTypedList(_state);
     final outPtr = Uint8Array.allocate(count: outLength);
@@ -115,6 +127,7 @@ class GenericHashStream {
   }
 }
 
+/// Generates a key for generic hash.
 UnmodifiableUint8ListView keyGen() {
   final keyPtr = Uint8Array.allocate(count: bindings.keyBytes);
   bindings.keyGen(keyPtr.rawPtr);
