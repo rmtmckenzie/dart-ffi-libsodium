@@ -50,14 +50,35 @@ You have to install libsodium on your machine. If you use Linux or MacOS you can
 ### Secret box
 ````Dart
 final key = secret_box.keyGen();
-  final msg = utf8.encode('hello world');
+final msg = utf8.encode('hello world');
 
-  final nonce = random_bytes.buffer(secret_box.nonceBytes);
-  final c = secret_box.easy(msg, nonce, key);
+final nonce = random_bytes.buffer(secret_box.nonceBytes);
+final c = secret_box.easy(msg, nonce, key);
 
-  final decrypted = secret_box.openEasy(c, nonce, key);
+final decrypted = secret_box.openEasy(c, nonce, key);
+````
+### Secret stream
+````Dart
+final key = secret_stream.keyGen();
+final message = utf8.encode('hello world');
+final message2 = utf8.encode('hello to the world');
+
+final pushStream = secret_stream.PushStream(key);
+final encChunk = pushStream.push(message);
+final encChunk2 = pushStream.push(message2, tag: secret_stream.Tag.finalize);
+
+final pullStream = secret_stream.PullStream(key, pushStream.header);
+final decChunk = pullStream.pull(encChunk);
+final decChunk2 = pullStream.pull(encChunk2);
 ````
 
+### Password hash
+````Dart
+final password = utf8.encode('my password');
+final hash = pwhash.store(
+    password, pwhash.OpsLimit.interactive, pwhash.MemLimit.interactive);
+final isValid = pwhash.verify(hash, password);
+````
 # Security
 
 Please keep in mind that when snapshotted, `random_bytes` might produce the same output (https://libsodium.gitbook.io/doc/generating_random_data#note).
