@@ -46,6 +46,18 @@ to initialize a suitable random number generator. You just need to do this once 
 
 You have to install libsodium on your machine. If you use Linux or MacOS you can use the corresponding package manager to do that; in the case of Windows you have to manually copy the .dll into the System32 directory. Alternatively you could copy the shared library into the root directory of your application.
 
+## Examples
+### Secret box
+````Dart
+final key = secret_box.keyGen();
+  final msg = utf8.encode('hello world');
+
+  final nonce = random_bytes.buffer(secret_box.nonceBytes);
+  final c = secret_box.easy(msg, nonce, key);
+
+  final decrypted = secret_box.openEasy(c, nonce, key);
+````
+
 # Security
 
 Please keep in mind that when snapshotted, `random_bytes` might produce the same output (https://libsodium.gitbook.io/doc/generating_random_data#note).
