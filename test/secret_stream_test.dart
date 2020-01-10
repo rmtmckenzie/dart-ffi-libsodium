@@ -17,15 +17,15 @@ void main() {
         pushStream.push(message2, tag: secret_stream.Tag.finalize);
 
     final pullStream = secret_stream.PullStream(key, pushStream.header);
-    final decChunk = pullStream.pull(encChunk);
+    final decChunk = pullStream.pull(encChunk, readTag: true);
 
     expect(message, decChunk);
-    expect(pullStream, secret_stream.Tag.message);
+    expect(pullStream.tag, secret_stream.Tag.message);
 
     final decChunk2 = pullStream.pull(encChunk2);
 
     expect(message2, decChunk2);
-    expect(pullStream, secret_stream.Tag.finalize);
+    expect(pullStream.tag, null);
   });
 
   test('encrypt and decrypt message with additional data', () {
@@ -46,10 +46,10 @@ void main() {
     final decChunk = pullStream.pull(encChunk, additionalData: encodedMetaData);
 
     expect(message, decChunk);
-    expect(pullStream.tag, secret_stream.Tag.message);
+    expect(pullStream.tag, null);
 
-    final decChunk2 =
-        pullStream.pull(encChunk2, additionalData: encodedMetaData2);
+    final decChunk2 = pullStream.pull(encChunk2,
+        additionalData: encodedMetaData2, readTag: true);
     expect(message2, decChunk2);
     expect(pullStream.tag, secret_stream.Tag.finalize);
   });
