@@ -27,6 +27,7 @@ class PushError extends Error {
   }
 }
 
+/// Marks the state of the stream (see libsodium documentation)
 enum Tag { message, finalize, push, rekey }
 
 mixin Rekey {
@@ -41,15 +42,22 @@ mixin Rekey {
   }
 }
 
+/// Encryption stream
 class PushStream with Rekey {
   @override
   final Uint8List _state;
   Uint8List _header;
 
+  /// State of the stream. You can save [state] to [resume] at a later point
+  /// or send it to another machine / thread to split up the workload.
   UnmodifiableUint8ListView get state => UnmodifiableUint8ListView(_state);
+
+  /// Header of the stream. Required to initialize a [PullStream].
   UnmodifiableUint8ListView get header => UnmodifiableUint8ListView(_header);
 
+  /// Resume the [PushStream] from a saved [state].
   PushStream.resume(this._state, [this._header]);
+
   factory PushStream(Uint8List key) {
     final keyPtr = Uint8Array.fromTypedList(key);
     final headerPtr = Uint8Array.allocate(count: bindings.headerBytes);
@@ -71,10 +79,10 @@ class PushStream with Rekey {
   }
 
   /// Pushes [message] into the stream. [message] cannot be longer than [msgBytesMax] (~256 GB).
-  /// [additionalData] will not be encrypted but it will be included in the computation
-  /// of the authentication tag.
-  /// The [tag] marks the status of the stream (see libsodium documentation).
-  /// Throws a [PushStreamException] when pushing [message] into the stream fails.
+  /// [additionalData] will not be encrypted but will be included in the computation
+  /// of the authentication tag (see libsodium documentation).
+  /// [tag] marks the status of the stream (see libsodium documentation).
+  /// Throws [PushError] when pushing [message] into the stream fails.
   Uint8List push(Uint8List message,
       {Uint8List additionalData, Tag tag = Tag.message}) {
     var adDataLen = 0;
@@ -114,13 +122,21 @@ UnmodifiableUint8ListView keyGen() {
   return UnmodifiableUint8ListView(key);
 }
 
+/// Decryption stream
 class PullStream with Rekey {
   @override
   final Uint8List _state;
+
+  /// State of the stream. You can save [state] to [resume] at a later point
+  /// or send it to another machine / thread to split up the workload.
   UnmodifiableUint8ListView get state => _state;
   Tag _tag;
+
+  /// Status of the stream (see libsodium documentation).
+  /// Will be updated with every [pull].
   Tag get tag => _tag;
 
+  /// Resume [PushStream] from a saved [state].
   PullStream.resume(this._state);
   factory PullStream(Uint8List key, Uint8List header) {
     final keyPtr = Uint8Array.fromTypedList(key);
@@ -141,6 +157,8 @@ class PullStream with Rekey {
   }
 
   /// Pulls a message out of the stream. [additionalData] must be the same given to [push].
+  /// If [readTag] is true [tag] will be updated with the tag of this message; otherwise
+  /// [tag] stays null
   /// Throws [PullError] when pulling message out of stream fails.
   Uint8List pull(Uint8List chunk,
       {Uint8List additionalData, bool readTag = false}) {
