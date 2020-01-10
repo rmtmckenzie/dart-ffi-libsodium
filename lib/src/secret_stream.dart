@@ -91,7 +91,7 @@ class PushStream with Rekey {
 
     final result = bindings.push(statePtr.rawPtr, cPtr.rawPtr, nullptr.cast(),
         msgPtr.rawPtr, message.length, adDataPtr, adDataLen, tag.index);
-    adDataPtr ?? free(adDataPtr);
+    free(adDataPtr);
     msgPtr.free();
     cPtr.free();
 
