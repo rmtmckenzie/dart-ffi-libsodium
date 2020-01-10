@@ -11,16 +11,16 @@ void main() {
     final message = utf8.encode('hello world');
     final message2 = utf8.encode('hello to the world');
 
-    final initPush = secret_stream.initPush(key);
-    final encChunk = secret_stream.push(initPush.state, message);
-    final encChunk2 = secret_stream.push(initPush.state, message2);
+    final pushStream = secret_stream.PushStream(key);
+    final encChunk = pushStream.push(message);
+    final encChunk2 = pushStream.push(message2);
 
-    final pullState = secret_stream.initPull(initPush.header, key);
-    final decChunk = secret_stream.pull(pullState, encChunk);
-    final decChunk2 = secret_stream.pull(pullState, encChunk2);
+    final pullStream = secret_stream.PullStream(key, pushStream.header);
+    final decChunk = pullStream.pull(encChunk);
+    final decChunk2 = pullStream.pull(encChunk2);
 
-    expect(message, decChunk.msg);
-    expect(message2, decChunk2.msg);
+    expect(message, decChunk.message);
+    expect(message2, decChunk2.message);
   });
 
   test('encrypt and decrypt message with additional data', () {
@@ -29,14 +29,12 @@ void main() {
     final metaData = DateTime.now().millisecondsSinceEpoch;
     final encodedMetaData = utf8.encode(metaData.toString());
 
-    final initPush = secret_stream.initPush(key);
-    final encChunk = secret_stream.push(initPush.state, message,
-        additionalData: encodedMetaData);
+    final pushStream = secret_stream.PushStream(key);
+    final encChunk = pushStream.push(message, additionalData: encodedMetaData);
 
-    final pullState = secret_stream.initPull(initPush.header, key);
-    final decChunk = secret_stream.pull(pullState, encChunk,
-        additionalData: encodedMetaData);
+    final pullStream = secret_stream.PullStream(key, pushStream.header);
+    final decChunk = pullStream.pull(encChunk, additionalData: encodedMetaData);
 
-    expect(message, decChunk.msg);
+    expect(message, decChunk.message);
   });
 }
