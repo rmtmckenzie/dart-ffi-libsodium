@@ -43,6 +43,14 @@ class FinalizeStreamError extends Error {
 /// Please remember to use constant-time comparison when comparing two fingerprints
 /// when no information must be leaked.
 Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
+  assert(key == null
+      ? true
+      : key.length >= bindings.keyBytesMin &&
+          key.length <= bindings.keyBytesMax);
+  assert(outLength == null
+      ? true
+      : outLength >= bindings.genericHashBytesMin &&
+          outLength <= bindings.genericHashBytesMax);
   outLength ??= bindings.genericHashBytes;
   final outPtr = Uint8Array.allocate(count: outLength);
   final inPtr = Uint8Array.fromTypedList(input);
@@ -82,6 +90,14 @@ class GenericHashStream {
   /// and must be between [genericHashBytesMin] and [genericHashBytesMax] (standard is [genericHashBytes]).
   /// Throws [InitStreamError] when initializing stream fails.
   factory GenericHashStream({Uint8List key, int outLength}) {
+    assert(key == null
+        ? true
+        : key.length >= bindings.keyBytesMin &&
+            key.length <= bindings.keyBytesMax);
+    assert(outLength == null
+        ? true
+        : outLength >= bindings.genericHashBytesMin &&
+            outLength <= bindings.genericHashBytesMax);
     outLength ??= bindings.genericHashBytes;
     final statePtr = Uint8Array.allocate(count: bindings.stateBytes);
 

@@ -56,7 +56,9 @@ class PushStream with Rekey {
   UnmodifiableUint8ListView get header => UnmodifiableUint8ListView(_header);
 
   /// Resume the [PushStream] from a saved [state].
-  PushStream.resume(this._state, [this._header]);
+  PushStream.resume(this._state, [this._header])
+      : assert(_state.length == bindings.stateBytes),
+        assert(_header == null ? true : _header.length == bindings.headerBytes);
 
   factory PushStream(Uint8List key) {
     final keyPtr = Uint8Array.fromTypedList(key);
@@ -137,7 +139,7 @@ class PullStream with Rekey {
   Tag get tag => _tag;
 
   /// Resume [PushStream] from a saved [state].
-  PullStream.resume(this._state);
+  PullStream.resume(this._state) : assert(_state.length == bindings.stateBytes);
   factory PullStream(Uint8List key, Uint8List header) {
     final keyPtr = Uint8Array.fromTypedList(key);
     final headerPtr = Uint8Array.fromTypedList(header);

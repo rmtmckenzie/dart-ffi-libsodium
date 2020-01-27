@@ -67,6 +67,9 @@ class KeyPair {
 /// Throws [EncryptionError] when encrypting message fails.
 Uint8List easy(Uint8List message, Uint8List nonce, Uint8List publicKey,
     Uint8List secretKey) {
+  assert(nonce.length == bindings.nonceBytes);
+  assert(publicKey.length == bindings.publicKeyBytes);
+  assert(secretKey.length == bindings.secretKeyBytes);
   final noncePtr = Uint8Array.fromTypedList(nonce);
   final pkPtr = Uint8Array.fromTypedList(publicKey);
   final skPtr = Uint8Array.fromTypedList(secretKey);
@@ -91,6 +94,9 @@ Uint8List easy(Uint8List message, Uint8List nonce, Uint8List publicKey,
 /// Throws [DecryptionError] when decrypting message fails.
 Uint8List openEasy(Uint8List ciphertext, Uint8List nonce, Uint8List publicKey,
     Uint8List secretKey) {
+  assert(nonce.length == bindings.nonceBytes);
+  assert(publicKey.length == bindings.publicKeyBytes);
+  assert(secretKey.length == bindings.secretKeyBytes);
   final noncePtr = Uint8Array.fromTypedList(nonce);
   final pkPtr = Uint8Array.fromTypedList(publicKey);
   final skPtr = Uint8Array.fromTypedList(secretKey);
@@ -114,6 +120,8 @@ Uint8List openEasy(Uint8List ciphertext, Uint8List nonce, Uint8List publicKey,
 /// [publicKey] must be [publicKeyBytes] long; [secretKey] must be [secretKeyBytes] long.
 /// Throws [BeforeNumerousError] when computing shared key fails.
 Uint8List beforeNumerous(Uint8List publicKey, Uint8List secretKey) {
+  assert(publicKey.length == bindings.publicKeyBytes);
+  assert(secretKey.length == bindings.secretKeyBytes);
   final pkPtr = Uint8Array.fromTypedList(publicKey);
   final skPtr = Uint8Array.fromTypedList(secretKey);
   final sharedKeyPtr = Uint8Array.allocate(count: bindings.beforeNumerousBytes);
@@ -137,6 +145,8 @@ Uint8List beforeNumerous(Uint8List publicKey, Uint8List secretKey) {
 /// [nonce] must be [nonceBytes] long and must bea unique value.
 /// Throws [EncryptionError] when encrypting [message] fails.
 Uint8List easyAfterNumerous(Uint8List message, Uint8List nonce, Uint8List key) {
+  assert(nonce.length == bindings.nonceBytes);
+  assert(key.length == bindings.beforeNumerousBytes);
   final noncePtr = Uint8Array.fromTypedList(nonce);
   final keyPtr = Uint8Array.fromTypedList(key);
   final cPtr = Uint8Array.allocate(count: message.length + bindings.macBytes)
@@ -159,6 +169,8 @@ Uint8List easyAfterNumerous(Uint8List message, Uint8List nonce, Uint8List key) {
 /// Throws [DecryptionError] when decrypting message fails.
 Uint8List openEasyAfterNumerous(
     Uint8List ciphertext, Uint8List nonce, Uint8List key) {
+  assert(nonce.length == bindings.nonceBytes);
+  assert(key.length == bindings.beforeNumerousBytes);
   final noncePtr = Uint8Array.fromTypedList(nonce);
   final keyPtr = Uint8Array.fromTypedList(key);
   final cPtr = Uint8Array.fromTypedList(ciphertext);

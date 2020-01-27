@@ -31,6 +31,8 @@ UnmodifiableUint8ListView keyGen() {
 /// [nonce] must a unique value and must be [nonceBytes] long.
 /// Throws [EncryptionError] when encryption fails.
 Uint8List easy(Uint8List message, Uint8List nonce, Uint8List key) {
+  assert(nonce.length == bindings.nonceBytes);
+  assert(key.length == bindings.keyBytes);
   final messagePtr = Uint8Array.fromTypedList(message);
   final noncePtr = Uint8Array.fromTypedList(nonce);
   final keyPtr = Uint8Array.fromTypedList(key);
@@ -52,6 +54,8 @@ Uint8List easy(Uint8List message, Uint8List nonce, Uint8List key) {
 /// Opens a message encrypted with [easy].
 /// Throws [DecryptionError] when decryption fails.
 Uint8List openEasy(Uint8List ciphertext, Uint8List nonce, Uint8List key) {
+  assert(nonce.length == bindings.nonceBytes);
+  assert(key.length == bindings.keyBytes);
   final cPtr = Uint8Array.fromTypedList(ciphertext);
   final noncePtr = Uint8Array.fromTypedList(nonce);
   final keyPtr = Uint8Array.fromTypedList(key);
