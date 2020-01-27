@@ -21,7 +21,7 @@ class UpdateStreamException implements Exception {
   }
 }
 
-class InvalidSignatureError extends ArgumentError {
+class InvalidSignatureError extends Error {
   @override
   String toString() {
     return 'The signature appears to be invalid';
