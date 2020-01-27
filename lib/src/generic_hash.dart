@@ -69,7 +69,7 @@ Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
 /// Generates hash for a multi-part message
 class GenericHashStream {
   final Uint8List _state;
-  UnmodifiableUint8ListView get stet => UnmodifiableUint8ListView(_state);
+  UnmodifiableUint8ListView get state => UnmodifiableUint8ListView(_state);
   final int outLength;
 
   /// Resume stream with a saved [state] and [outhLength];
