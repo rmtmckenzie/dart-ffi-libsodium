@@ -17,7 +17,7 @@ final keyBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
 final keyBytesMax = sodium.lookupFunction<Uint64 Function(), int Function()>(
     'crypto_generichash_keybytes_max')();
 final keyBytesMin = sodium.lookupFunction<Uint64 Function(), int Function()>(
-    'crypto_generichash_keybytesMin')();
+    'crypto_generichash_keybytes_min')();
 
 final stateBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
     'crypto_generichash_statebytes')();
