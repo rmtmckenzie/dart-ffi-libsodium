@@ -25,9 +25,11 @@ UnmodifiableUint8ListView keyGen() {
 }
 
 /// Derives subkey from [key]. [subkeyLength] must be between [subkeyBytesMin] and [subkeyBytesMax] long.
-/// [key] must be 32 bits long.
-/// [context] could be anything tied to the subkey,
-/// like a user name. [context] must be 8 bytes long. Up to 2^64 subkeys per [key] and [context] can be safely generated.
+/// [key] must be [keyBytes] long.
+/// [context] must be 8 bytes long and describes what the subkey is used for.
+/// This way generated subkeys for two different domains will likely be different,
+/// even when using the same [key].
+/// Up to 2^64 subkeys per [key] and [context] can be safely generated.
 /// [subkeyId] is the n-th generated subkey.
 UnmodifiableUint8ListView deriveFromKey(
     int subkeyLength, int subkeyId, Uint8List context, Uint8List key) {
