@@ -1,6 +1,19 @@
 import 'sodium.dart';
 import 'dart:ffi';
 
+final publicKeyBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
+    'crypto_kx_publickeybytes')();
+
+final secretKeyBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
+    'crypto_kx_secretkeybytes')();
+
+final seedBytes = sodium
+    .lookupFunction<Uint64 Function(), int Function()>('crypto_kx_seedbytes')();
+
+final sessionKeyBytes =
+    sodium.lookupFunction<Uint64 Function(), int Function()>(
+        'crypto_kx_sessionkeybytes')();
+
 final keyPair = sodium.lookupFunction<
     Int16 Function(Pointer<Uint8> publicKey, Pointer<Uint8> secretKey),
     int Function(Pointer<Uint8> publicKey,
