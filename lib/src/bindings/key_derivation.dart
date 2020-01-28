@@ -26,3 +26,9 @@ typedef _DeriveFromKeyDart = int Function(Pointer<Uint8> subkey,
 final deriveFromKey =
     sodium.lookupFunction<_DeriveFromKeyNative, _DeriveFromKeyDart>(
         'crypto_kdf_derive_from_key');
+
+final hchacha20 = sodium.lookupFunction<
+    Int16 Function(Pointer<Uint8> out, Pointer<Uint8> input, Pointer<Uint8> key,
+        Pointer<Uint8> constant),
+    int Function(Pointer<Uint8> out, Pointer<Uint8> input, Pointer<Uint8> key,
+        Pointer<Uint8> constant)>('crypto_core_hchacha20');
