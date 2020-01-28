@@ -69,9 +69,9 @@ UnmodifiableUint8ListView hchacha20(Uint8List nonce, Uint8List key,
   final outPtr = Uint8Array.allocate(count: 32);
   final keyPtr = Uint8Array.fromTypedList(key);
 
-  final Pointer<Uint8> constPtr =
-      constant == null ? nullptr.cast() : allocate(count: constant.length);
-  constPtr.asTypedList(constant.length).setAll(0, constant);
+  final Pointer<Uint8> constPtr = constant == null
+      ? nullptr.cast()
+      : Uint8Array.fromTypedList(constant).rawPtr;
 
   final result = bindings.hchacha20(
       outPtr.rawPtr, inputPtr.rawPtr, keyPtr.rawPtr, constPtr);
