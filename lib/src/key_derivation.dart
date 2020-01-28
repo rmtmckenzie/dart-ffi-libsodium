@@ -14,6 +14,7 @@ class KeyDerivationError extends Error {
   }
 }
 
+/// Generates a master key from which subkeys can be derived
 UnmodifiableUint8ListView keyGen() {
   final keyPtr = Uint8Array.allocate(count: bindings.keyBytes);
   bindings.keyGen(keyPtr.rawPtr);
@@ -23,6 +24,11 @@ UnmodifiableUint8ListView keyGen() {
   return key;
 }
 
+/// Derives subkey from [key]. [subkeyLength] must be between [subkeyBytesMin] and [subkeyBytesMax] long.
+/// [key] must be 32 bits long.
+/// [context] could be anything tied to the subkey,
+/// like a user name. [context] must be 8 bytes long. Up to 2^64 subkeys per [key] and [context] can be safely generated.
+/// [subkeyId] is the n-th generated subkey.
 UnmodifiableUint8ListView deriveFromKey(
     int subkeyLength, int subkeyId, Uint8List context, Uint8List key) {
   assert(key.length == bindings.keyBytes);
@@ -46,12 +52,18 @@ UnmodifiableUint8ListView deriveFromKey(
   return subkey;
 }
 
-UnmodifiableUint8ListView hchacha20(Uint8List input, Uint8List key,
+/// Nonce extension for ciphers with a nonce shorter than 192 bits.
+/// It derives a subkey of [key] with a long 192 bits long [nonce]. [key] must be 32 bytes long.
+/// Now you can use the subkey for encryption and shorten the [nonce] to the required length.
+/// This way the [nonce] can be safely randomly generated for ciphers with short nonces.
+/// Optionally a 16 bytes [constant] can be provided to make the function unique
+/// for one machine or process.
+UnmodifiableUint8ListView hchacha20(Uint8List nonce, Uint8List key,
     [Uint8List constant]) {
-  assert(input.length == 16);
+  assert(nonce.length == 16);
   assert(key.length == 32);
   assert(constant == null ? true : constant.length == 16);
-  final inputPtr = Uint8Array.fromTypedList(input);
+  final inputPtr = Uint8Array.fromTypedList(nonce);
   final outPtr = Uint8Array.allocate(count: 32);
   final keyPtr = Uint8Array.fromTypedList(key);
 
