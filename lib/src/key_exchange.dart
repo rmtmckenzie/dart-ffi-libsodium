@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:ffi_helper/ffi_helper.dart';
@@ -9,6 +10,13 @@ class KeyPairException implements Exception {
   @override
   String toString() {
     return 'Failed to generate key pair';
+  }
+}
+
+class SessionKeyError extends Error {
+  @override
+  String toString() {
+    return 'Failed to generate session key';
   }
 }
 
@@ -55,6 +63,30 @@ abstract class SessionKeys {
 }
 
 class ClientSessionKeys extends SessionKeys {
+  static UnmodifiableUint8ListView generateSessionKey(Uint8List clientPublicKey,
+      Uint8List clientSecretKey, Uint8List serverPublicKey) {
+    assert(clientPublicKey.length == bindings.publicKeyBytes);
+    assert(serverPublicKey.length == bindings.publicKeyBytes);
+    assert(clientSecretKey.length == bindings.secretKeyBytes);
+    final cskPtr = Uint8Array.fromTypedList(clientSecretKey);
+    final cpkPtr = Uint8Array.fromTypedList(clientPublicKey);
+    final spkPtr = Uint8Array.fromTypedList(serverPublicKey);
+    final keyPtr = Uint8Array.allocate(count: bindings.sessionKeyBytes);
+    final result = bindings.clientSessionKeys(keyPtr.rawPtr, nullptr.cast(),
+        cpkPtr.rawPtr, cskPtr.rawPtr, spkPtr.rawPtr);
+
+    final key = UnmodifiableUint8ListView(Uint8List.fromList(keyPtr.view));
+    keyPtr.freeZero();
+    cskPtr.freeZero();
+    cpkPtr.free();
+    spkPtr.free();
+
+    if (result != 0) {
+      throw SessionKeyError();
+    }
+    return key;
+  }
+
   ClientSessionKeys._(Uint8List receiverKey, Uint8List toReceiverKey)
       : super._(receiverKey, toReceiverKey);
 
