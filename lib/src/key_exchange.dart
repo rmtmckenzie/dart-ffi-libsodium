@@ -85,3 +85,35 @@ class ClientSessionKeys extends SessionKeys {
     return ClientSessionKeys._(rk, tk);
   }
 }
+
+class ServerSessionKeys extends SessionKeys {
+  ServerSessionKeys._(Uint8List receiverKey, Uint8List toReceiverKey)
+      : super._(receiverKey, toReceiverKey);
+
+  factory ServerSessionKeys.generate(Uint8List serverPublicKey,
+      Uint8List serverSecretKey, Uint8List clientPublicKey) {
+    assert(clientPublicKey.length == bindings.publicKeyBytes);
+    assert(serverPublicKey.length == bindings.publicKeyBytes);
+    assert(serverSecretKey.length == bindings.secretKeyBytes);
+    final sskPtr = Uint8Array.fromTypedList(serverSecretKey);
+    final spkPtr = Uint8Array.fromTypedList(serverPublicKey);
+    final cpkPtr = Uint8Array.fromTypedList(clientPublicKey);
+    final rkPtr = Uint8Array.allocate(count: bindings.sessionKeyBytes);
+    final tkPtr = Uint8Array.allocate(count: bindings.sessionKeyBytes);
+    final result = bindings.serverSessionKeys(rkPtr.rawPtr, tkPtr.rawPtr,
+        spkPtr.rawPtr, sskPtr.rawPtr, cpkPtr.rawPtr);
+
+    final rk = UnmodifiableUint8ListView(Uint8List.fromList(rkPtr.view));
+    rkPtr.freeZero();
+    final tk = UnmodifiableUint8ListView(Uint8List.fromList(tkPtr.view));
+    tkPtr.freeZero();
+    sskPtr.freeZero();
+    cpkPtr.free();
+    spkPtr.free();
+
+    if (result != 0) {
+      throw KeyPairException();
+    }
+    return ServerSessionKeys._(rk, tk);
+  }
+}
