@@ -6,7 +6,7 @@ import 'package:ffi_helper/ffi_helper.dart';
 import 'bindings/key_exchange.dart' as bindings;
 import 'internal_helpers.dart';
 
-class KeyPairException implements Exception {
+class KeyPairError extends Error {
   @override
   String toString() {
     return 'Failed to generate key pair';
@@ -33,7 +33,7 @@ class KeyPair {
     skPtr.freeZero();
     pkPtr.free();
     if (result != 0) {
-      throw KeyPairException();
+      throw KeyPairError();
     }
     return KeyPair._(pk, sk);
   }
@@ -50,7 +50,7 @@ class KeyPair {
     skPtr.freeZero();
     pkPtr.free();
     if (result != 0) {
-      throw KeyPairException();
+      throw KeyPairError();
     }
     return KeyPair._(pk, sk);
   }
@@ -112,7 +112,7 @@ class ClientSessionKeys extends SessionKeys {
     spkPtr.free();
 
     if (result != 0) {
-      throw KeyPairException();
+      throw KeyPairError();
     }
     return ClientSessionKeys._(rk, tk);
   }
@@ -144,7 +144,7 @@ class ServerSessionKeys extends SessionKeys {
     spkPtr.free();
 
     if (result != 0) {
-      throw KeyPairException();
+      throw KeyPairError();
     }
     return ServerSessionKeys._(rk, tk);
   }
