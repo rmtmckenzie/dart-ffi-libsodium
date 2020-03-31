@@ -1,4 +1,5 @@
 import 'bindings/sodium.dart' as bindings;
+import 'package:ffi/ffi.dart' as ffi;
 
 class InitException implements Exception {
   @override
@@ -27,3 +28,8 @@ bool Function() _initWrapper() {
 /// The return value indicates if dart_sodium was already initialized.
 /// Throws [InitException] when initialization fails.
 bool init() => _initWrapper()();
+
+/// The version of the installed dynamic library
+final version = () {
+  return ffi.Utf8.fromUtf8(bindings.version.cast());
+}();
