@@ -1,4 +1,4 @@
 /// Initialize dart_sodium.
 library sodium;
 
-export 'src/init.dart';
+export 'src/sodium_base.dart';
