@@ -9,6 +9,10 @@ class InitException implements Exception {
 }
 
 bool Function() _initWrapper() {
+  if (version.substring(0, 2) != '1.') {
+    throw StateError(
+        'The installed version of libsodium must be > 1.0.18 and < 2: $version');
+  }
   var isInit = false;
   return () {
     if (isInit) {
