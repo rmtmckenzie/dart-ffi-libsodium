@@ -27,8 +27,12 @@ bool Function() _initWrapper() {
   };
 }
 
-/// Initializes a random number generator for dart_sodium. Must be called before
-/// any other function of dart_sodium. Calling it multiple times has no effect.
+/// Initializes a random number generator for libsodium. Must be called before
+/// any other function of dart_sodium. Not doing so is a programming error, which
+/// can result in security risks.
+///
+/// It only needs to be called once per application.
+/// Calling it multiple times, even from different isolates, has no effect.
 /// The return value indicates if dart_sodium was already initialized.
 /// Throws [InitException] when initialization fails.
 final init = _initWrapper();
