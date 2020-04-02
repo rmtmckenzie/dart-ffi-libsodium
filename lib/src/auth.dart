@@ -21,9 +21,7 @@ UnmodifiableUint8ListView keyGen() {
 
 /// Generates an authentication tag for [message].
 /// [key] must be [keyBytes] long.
-/// Throws [AuthException] when generating authentication tag fails.
 Uint8List auth(Uint8List message, Uint8List key) {
-  assert(key.length == bindings.keyBytes);
   final messagePtr = Uint8Array.fromTypedList(message);
   final keyPtr = Uint8Array.fromTypedList(key);
   final tagPtr = Uint8Array.allocate(count: bindings.authBytes);
@@ -35,7 +33,8 @@ Uint8List auth(Uint8List message, Uint8List key) {
   keyPtr.free();
   tagPtr.free();
   if (result != 0) {
-    throw AuthException();
+    checkExpectedArgument(key.length, bindings.keyBytes, 'key.length');
+    throw Error();
   }
   return Uint8List.fromList(tagPtr.view);
 }
