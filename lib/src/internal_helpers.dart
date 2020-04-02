@@ -16,8 +16,11 @@ extension FilledZeroArray on MemoryArray {
   }
 }
 
-void assertArgument<T>(T value, T expected, [String name, String message]) {
-  if (value != expected) {
-    throw ArgumentError.value(value, name, message);
+/// Throws [ArgumentError] if simple equality check [==] between
+/// [value] and [expected] fails.
+void checkExpectedArgument(Object argument, Object expected,
+    [String name, String message]) {
+  if (argument != expected) {
+    throw ArgumentError.value(argument, name, message);
   }
 }
