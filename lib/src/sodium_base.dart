@@ -37,7 +37,7 @@ bool Function() _initWrapper() {
 /// Throws [InitException] when initialization fails.
 final init = _initWrapper();
 
-/// The version of the installed dynamic library
+/// Version string of the installed dynamic library of libsodium
 final version = () {
   return ffi.Utf8.fromUtf8(bindings.version.cast());
 }();
