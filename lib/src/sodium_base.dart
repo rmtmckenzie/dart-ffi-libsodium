@@ -31,7 +31,7 @@ bool Function() _initWrapper() {
 /// any other function of dart_sodium. Calling it multiple times has no effect.
 /// The return value indicates if dart_sodium was already initialized.
 /// Throws [InitException] when initialization fails.
-bool init() => _initWrapper()();
+final init = _initWrapper();
 
 /// The version of the installed dynamic library
 final version = () {
