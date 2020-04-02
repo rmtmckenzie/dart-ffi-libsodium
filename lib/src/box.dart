@@ -61,15 +61,23 @@ class KeyPair {
   }
 }
 
-/// Throws [ArgumentError] when arguments for the crypto_box_easy interface
-/// are false.
-void _checkEasyArguments(
-    Uint8List nonce, Uint8List publicKey, Uint8List secretKey) {
-  checkExpectedArgument(nonce.length, bindings.nonceBytes, 'nonce.length');
+void _checkKeyPair(Uint8List publicKey, Uint8List secretKey) {
   checkExpectedArgument(
       publicKey.length, bindings.publicKeyBytes, 'publicKey.length');
   checkExpectedArgument(
       secretKey.length, bindings.secretKeyBytes, 'secretKey.length');
+}
+
+void _checkNonce(Uint8List nonce) {
+  checkExpectedArgument(nonce.length, bindings.nonceBytes, 'nonce.length');
+}
+
+/// Throws [ArgumentError] when arguments for the crypto_box_easy interface
+/// are false.
+void _checkEasyArguments(
+    Uint8List nonce, Uint8List publicKey, Uint8List secretKey) {
+  _checkNonce(nonce);
+  _checkKeyPair(publicKey, secretKey);
 }
 
 /// Encrypts [message] with the recipient's [publicKey] and the senders [secretKey].
