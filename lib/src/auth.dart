@@ -3,13 +3,6 @@ import 'package:ffi_helper/ffi_helper.dart';
 import 'bindings/auth.dart' as bindings;
 import 'internal_helpers.dart';
 
-class AuthException implements Exception {
-  @override
-  String toString() {
-    return 'Failed to generate authentication tag';
-  }
-}
-
 /// Generates a key for [auth].
 UnmodifiableUint8ListView keyGen() {
   final keyPtr = Uint8Array.allocate(count: bindings.keyBytes);
