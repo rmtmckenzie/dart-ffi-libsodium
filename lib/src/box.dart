@@ -135,8 +135,6 @@ Uint8List openEasy(Uint8List ciphertext, Uint8List nonce, Uint8List publicKey,
 /// [publicKey] must be [publicKeyBytes] long; [secretKey] must be [secretKeyBytes] long.
 /// Throws [BeforeNumerousError] when computing shared key fails.
 Uint8List beforeNumerous(Uint8List publicKey, Uint8List secretKey) {
-  assert(publicKey.length == bindings.publicKeyBytes);
-  assert(secretKey.length == bindings.secretKeyBytes);
   final pkPtr = Uint8Array.fromTypedList(publicKey);
   final skPtr = Uint8Array.fromTypedList(secretKey);
   final sharedKeyPtr = Uint8Array.allocate(count: bindings.beforeNumerousBytes);
@@ -151,7 +149,8 @@ Uint8List beforeNumerous(Uint8List publicKey, Uint8List secretKey) {
   sharedKeyPtr.freeZero();
 
   if (result != 0) {
-    throw BeforeNumerousError();
+    _checkKeyPair(publicKey, secretKey);
+    throw Error();
   }
   return sharedKey;
 }
