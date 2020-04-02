@@ -18,9 +18,10 @@ extension FilledZeroArray on MemoryArray {
 
 /// Throws [ArgumentError] if simple equality check [==] between
 /// [value] and [expected] fails.
-void checkExpectedArgument(Object argument, Object expected,
+void checkExpectedArgument(final Object argument, final Object expected,
     [String name, String message]) {
   if (argument != expected) {
+    message ??= 'expected: $expected';
     throw ArgumentError.value(argument, name, message);
   }
 }
