@@ -61,15 +61,23 @@ class KeyPair {
   }
 }
 
+/// Throws [ArgumentError] when arguments for the crypto_box_easy interface
+/// are false.
+void _checkEasyArguments(
+    Uint8List nonce, Uint8List publicKey, Uint8List secretKey) {
+  checkExpectedArgument(nonce.length, bindings.nonceBytes, 'nonce.length');
+  checkExpectedArgument(
+      publicKey.length, bindings.publicKeyBytes, 'publicKey.length');
+  checkExpectedArgument(
+      secretKey.length, bindings.secretKeyBytes, 'secretKey.length');
+}
+
 /// Encrypts [message] with the recipient's [publicKey] and the senders [secretKey].
 /// [publicKey] must be [publicKeyBytes] long; [secretKey] must be [secretKeyBytes] long.
 /// [nonce] must be [nonceBytes] long and must be a unique value.
 /// Throws [EncryptionError] when encrypting message fails.
 Uint8List easy(Uint8List message, Uint8List nonce, Uint8List publicKey,
     Uint8List secretKey) {
-  assert(nonce.length == bindings.nonceBytes);
-  assert(publicKey.length == bindings.publicKeyBytes);
-  assert(secretKey.length == bindings.secretKeyBytes);
   final noncePtr = Uint8Array.fromTypedList(nonce);
   final pkPtr = Uint8Array.fromTypedList(publicKey);
   final skPtr = Uint8Array.fromTypedList(secretKey);
@@ -85,7 +93,8 @@ Uint8List easy(Uint8List message, Uint8List nonce, Uint8List publicKey,
   skPtr.freeZero();
 
   if (result != 0) {
-    throw EncryptionError();
+    _checkEasyArguments(nonce, publicKey, secretKey);
+    throw Error();
   }
   return Uint8List.fromList(cPtr.view);
 }
@@ -94,9 +103,6 @@ Uint8List easy(Uint8List message, Uint8List nonce, Uint8List publicKey,
 /// Throws [DecryptionError] when decrypting message fails.
 Uint8List openEasy(Uint8List ciphertext, Uint8List nonce, Uint8List publicKey,
     Uint8List secretKey) {
-  assert(nonce.length == bindings.nonceBytes);
-  assert(publicKey.length == bindings.publicKeyBytes);
-  assert(secretKey.length == bindings.secretKeyBytes);
   final noncePtr = Uint8Array.fromTypedList(nonce);
   final pkPtr = Uint8Array.fromTypedList(publicKey);
   final skPtr = Uint8Array.fromTypedList(secretKey);
@@ -111,7 +117,8 @@ Uint8List openEasy(Uint8List ciphertext, Uint8List nonce, Uint8List publicKey,
   skPtr.freeZero();
 
   if (result != 0) {
-    throw DecryptionError();
+    _checkEasyArguments(nonce, publicKey, secretKey);
+    throw Error();
   }
   return cPtr.view.sublist(0, ciphertext.length - bindings.macBytes);
 }
