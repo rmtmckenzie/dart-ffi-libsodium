@@ -18,10 +18,9 @@ extension FilledZeroArray on MemoryArray {
 
 /// Throws [ArgumentError] if simple equality check [==] between
 /// [value] and [expected] fails.
-void checkExpectedLengthOf(int actual, int expected,
-    [String name, String message]) {
+void checkExpectedLengthOf(int actual, int expected, String name) {
   if (actual != expected) {
-    message ??= '$name must be $expected bytes long, but is $actual bytes';
+    final message = '$name must be $expected bytes long, but is $actual bytes';
     throw ArgumentError(message);
   }
 }
