@@ -38,10 +38,8 @@ class FinalizeStreamError extends Error {
 /// a different fingerprint for the same [input]. [key] (when provided) must be between
 /// [keyBytesMin] and [keyBytesMax] long (recommended [keyBytes]). [outLength] (optional) controls
 /// the length of the generated hash and must be between [genericHashBytesMin] and [genericHashBytesMax] long (standart [genericHashBytes]).
-/// Throws [GenericHashError] when generating fingerprint fails.
 ///
-/// Please remember to use constant-time comparison when comparing two fingerprints
-/// when no information must be leaked.
+/// Please remember to use constant-time comparison when comparing two fingerprints.
 Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
   assert(key == null
       ? true
