@@ -74,7 +74,7 @@ class SubkeyGenerator {
 }
 
 /// Nonce extension for ciphers with a nonce shorter than 192 bits.
-/// It derives a subkey of [key] with a long 192 bits long [nonce]. [key] must be 32 bytes long.
+/// It derives a subkey of [key] with a 192 bits long [nonce]. [key] must be 32 bytes long.
 /// Now you can use the subkey for encryption and shorten the [nonce] to the required length.
 /// This way the [nonce] can be safely randomly generated for ciphers with short nonces.
 /// Optionally a 16 bytes [constant] can be provided to make the function unique
