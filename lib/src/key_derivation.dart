@@ -56,6 +56,23 @@ UnmodifiableUint8ListView deriveFromKey(
   return subkey;
 }
 
+/// Wrapper around [deriveFromKey] which automatically increases the [subkeyId]
+class SubkeyGenerator {
+  final UnmodifiableUint8ListView context, key;
+  int _subkeyId;
+  int get subkeyId => _subkeyId;
+
+  SubkeyGenerator(Uint8List context, Uint8List key, [this._subkeyId = 0])
+      : context = UnmodifiableUint8ListView(context),
+        key = UnmodifiableUint8ListView(key);
+
+  UnmodifiableUint8ListView next(int subkeyLength) {
+    final subkey = deriveFromKey(subkeyLength, _subkeyId, context, key);
+    _subkeyId++;
+    return subkey;
+  }
+}
+
 /// Nonce extension for ciphers with a nonce shorter than 192 bits.
 /// It derives a subkey of [key] with a long 192 bits long [nonce]. [key] must be 32 bytes long.
 /// Now you can use the subkey for encryption and shorten the [nonce] to the required length.
