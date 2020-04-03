@@ -41,14 +41,6 @@ class FinalizeStreamError extends Error {
 ///
 /// Please remember to use constant-time comparison when comparing two fingerprints.
 Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
-  assert(key == null
-      ? true
-      : key.length >= bindings.keyBytesMin &&
-          key.length <= bindings.keyBytesMax);
-  assert(outLength == null
-      ? true
-      : outLength >= bindings.genericHashBytesMin &&
-          outLength <= bindings.genericHashBytesMax);
   outLength ??= bindings.genericHashBytes;
   final outPtr = Uint8Array.allocate(count: outLength);
   final inPtr = Uint8Array.fromTypedList(input);
@@ -67,7 +59,18 @@ Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
   inPtr.free();
 
   if (result != 0) {
-    throw GenericHashError();
+    if (key != null &&
+        (key.length < bindings.keyBytesMin ||
+            key.length > bindings.keyBytesMax)) {
+      throw ArgumentError.value(key.length, 'key.length',
+          'must be between "${bindings.keyBytesMin}" and "${bindings.keyBytesMax}"');
+    }
+    if (outLength > bindings.genericHashBytesMax ||
+        key.length < bindings.genericHashBytesMin) {
+      throw ArgumentError.value(outLength, 'outLength',
+          'must be between "${bindings.genericHashBytesMax}" and "${bindings.genericHashBytesMin}"');
+    }
+    throw Error();
   }
   return Uint8List.fromList(outPtr.view);
 }
