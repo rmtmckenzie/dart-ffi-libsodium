@@ -28,7 +28,7 @@ void _checkGenericHashArguments(Uint8List key, int outLength) {
 }
 
 /// Generate a fingerprint for [input]. {@macro dart_sodium_generichash_arguments}
-/// Please remember to use constant-time comparison when comparing two fingerprints.
+/// Please remember to use constant-time comparison when comparing two fingerprints (see [memoryCompare]).
 Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
   outLength ??= bindings.genericHashBytes;
   final outPtr = Uint8Array.allocate(count: outLength);
