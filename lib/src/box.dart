@@ -31,7 +31,7 @@ class KeyPair {
 
   /// Generates a pair of public and secret key.
   /// {@macro dart_sodium_throw_generate_keypair_exception}
-  factory KeyPair.generate() {
+  factory KeyPair() {
     final pkPtr = Uint8Array.allocate(count: bindings.publicKeyBytes);
     final skPtr = Uint8Array.allocate(count: bindings.secretKeyBytes);
     final result = bindings.keyPair(pkPtr.rawPtr, skPtr.rawPtr);
