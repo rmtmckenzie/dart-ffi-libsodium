@@ -21,6 +21,7 @@ extension FilledZeroArray on MemoryArray {
 void checkExpectedArgument(final Object argument, final Object expected,
     [String name, String message]) {
   if (argument != expected) {
+    message ??= 'Unexpected length of $name';
     throw ArgumentError.value(argument, name, message);
   }
 }
