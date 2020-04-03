@@ -33,10 +33,6 @@ UnmodifiableUint8ListView keyGen() {
 /// [subkeyId] is the n-th generated subkey.
 UnmodifiableUint8ListView deriveFromKey(
     int subkeyLength, int subkeyId, Uint8List context, Uint8List key) {
-  assert(key.length == bindings.keyBytes);
-  assert(context.length <= bindings.contextBytes);
-  assert(subkeyLength <= bindings.subkeyBytesMax &&
-      subkeyLength >= bindings.subkeyBytesMin);
   final subkeyPtr = Uint8Array.allocate(count: subkeyLength);
   final contextPtr = Uint8Array.fromTypedList(context);
   final keyPtr = Uint8Array.fromTypedList(key);
@@ -49,7 +45,15 @@ UnmodifiableUint8ListView deriveFromKey(
   contextPtr.free();
 
   if (result != 0) {
-    throw KeyDerivationError();
+    checkExpectedArgument(key.length, bindings.keyBytes, 'key.length');
+    checkExpectedArgument(
+        context.length, bindings.contextBytes, 'context.length');
+    if (subkeyLength > bindings.subkeyBytesMax ||
+        subkeyLength < bindings.subkeyBytesMin) {
+      throw RangeError.range(subkeyLength, bindings.subkeyBytesMin,
+          bindings.subkeyBytesMax, 'subkeyLength');
+    }
+    throw Error();
   }
   return subkey;
 }
