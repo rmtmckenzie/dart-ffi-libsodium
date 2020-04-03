@@ -81,9 +81,6 @@ class SubkeyGenerator {
 /// for one machine or process.
 UnmodifiableUint8ListView hchacha20(Uint8List nonce, Uint8List key,
     [Uint8List constant]) {
-  assert(nonce.length == 16);
-  assert(key.length == 32);
-  assert(constant == null ? true : constant.length == 16);
   final inputPtr = Uint8Array.fromTypedList(nonce);
   final outPtr = Uint8Array.allocate(count: 32);
   final keyPtr = Uint8Array.fromTypedList(key);
@@ -100,7 +97,9 @@ UnmodifiableUint8ListView hchacha20(Uint8List nonce, Uint8List key,
   final out = UnmodifiableUint8ListView(Uint8List.fromList(outPtr.view));
   outPtr.freeZero();
   if (result != 0) {
-    throw KeyDerivationError();
+    checkExpectedArgument(nonce.length, 16, 'nonce.length');
+    checkExpectedArgument(key.length, 32, 'key.length');
+    constant ?? checkExpectedArgument(constant.length, 16, 'constant.length');
   }
   return out;
 }
