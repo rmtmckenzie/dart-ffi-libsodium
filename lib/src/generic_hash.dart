@@ -13,39 +13,20 @@ import 'bindings/generic_hash.dart' as bindings;
 /// the length of the generated hash and must be between [genericHashBytesMin] and [genericHashBytesMax] long (standart [genericHashBytes]).
 /// {@endtemplate}
 
-class GenericHashError extends Error {
-  @override
-  String toString() {
-    return 'Generating generic hash failed';
+void _checkGenericHashArguments(Uint8List key, int outLength) {
+  if (key != null &&
+      (key.length < bindings.keyBytesMin ||
+          key.length > bindings.keyBytesMax)) {
+    throw ArgumentError.value(key.length, 'key.length',
+        'must be between "${bindings.keyBytesMin}" and "${bindings.keyBytesMax}"');
+  }
+  if (outLength > bindings.genericHashBytesMax ||
+      key.length < bindings.genericHashBytesMin) {
+    throw ArgumentError.value(outLength, 'outLength',
+        'must be between "${bindings.genericHashBytesMax}" and "${bindings.genericHashBytesMin}"');
   }
 }
 
-class InitStreamError extends Error {
-  @override
-  String toString() {
-    return 'Initializing generic hash stream failed';
-  }
-}
-
-class UpdateStreamError extends Error {
-  @override
-  String toString() {
-    return 'Updating generic hash stream failed';
-  }
-}
-
-class FinalizeStreamError extends Error {
-  @override
-  String toString() {
-    return 'Finalize generic hash stream failed';
-  }
-}
-
-/// Generate a fingerprint for [input]. A different [key] (optional) produces
-/// a different fingerprint for the same [input]. [key] (when provided) must be between
-/// [keyBytesMin] and [keyBytesMax] long (recommended [keyBytes]). [outLength] (optional) controls
-/// the length of the generated hash and must be between [genericHashBytesMin] and [genericHashBytesMax] long (standart [genericHashBytes]).
-///
 /// Generate a fingerprint for [input]. {@macro dart_sodium_generichash_arguments}
 /// Please remember to use constant-time comparison when comparing two fingerprints.
 Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
@@ -67,17 +48,7 @@ Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
   inPtr.free();
 
   if (result != 0) {
-    if (key != null &&
-        (key.length < bindings.keyBytesMin ||
-            key.length > bindings.keyBytesMax)) {
-      throw ArgumentError.value(key.length, 'key.length',
-          'must be between "${bindings.keyBytesMin}" and "${bindings.keyBytesMax}"');
-    }
-    if (outLength > bindings.genericHashBytesMax ||
-        key.length < bindings.genericHashBytesMin) {
-      throw ArgumentError.value(outLength, 'outLength',
-          'must be between "${bindings.genericHashBytesMax}" and "${bindings.genericHashBytesMin}"');
-    }
+    _checkGenericHashArguments(key, outLength);
     throw Error();
   }
   return Uint8List.fromList(outPtr.view);
@@ -92,22 +63,8 @@ class GenericHashStream {
   /// Resume stream with a saved [state] and [outhLength];
   GenericHashStream.resume(this._state, this.outLength);
 
-  /// The same [key] results in the same fingerprint just as calling [GenericHashStream]
-  /// without any [key] at all. But a different [key] will also result in a different
-  /// fingerprint. When [key] is provided it must be between [keyBytesMin] and [keyBytesMax]
-  /// long (recommended is [keyBytes]). [outhLength] controls the length of the resulting hash
-  /// and must be between [genericHashBytesMin] and [genericHashBytesMax] (standard is [genericHashBytes]).
-  /// Throws [InitStreamError] when initializing stream fails.
   /// {@macro dart_sodium_generichash_arguments}
   factory GenericHashStream({Uint8List key, int outLength}) {
-    assert(key == null
-        ? true
-        : key.length >= bindings.keyBytesMin &&
-            key.length <= bindings.keyBytesMax);
-    assert(outLength == null
-        ? true
-        : outLength >= bindings.genericHashBytesMin &&
-            outLength <= bindings.genericHashBytesMax);
     outLength ??= bindings.genericHashBytes;
     final statePtr = Uint8Array.allocate(count: bindings.stateBytes);
 
@@ -124,13 +81,13 @@ class GenericHashStream {
     statePtr.freeZero();
 
     if (result != 0) {
-      throw InitStreamError();
+      _checkGenericHashArguments(key, outLength);
+      throw Error();
     }
     return GenericHashStream.resume(state, outLength);
   }
 
   /// Updates the stream with [input]. Call [update] of every part of the message.
-  /// Throws [UpdateStreamError] when updating stream fails.
   void update(Uint8List input) {
     final statePtr = Uint8Array.fromTypedList(_state);
     final inPtr = Uint8Array.fromTypedList(input);
@@ -141,13 +98,12 @@ class GenericHashStream {
     inPtr.free();
 
     if (result != 0) {
-      throw UpdateStreamError();
+      StateError('GenericHashStream state is bad');
     }
   }
 
   /// Generates the fingerprint of the multi-part message.
   /// The stream mustn't be used after calling [finalize].
-  /// Throws [FinalizeStreamError] when finalizing fails.
   Uint8List finalize() {
     final statePtr = Uint8Array.fromTypedList(_state);
     final outPtr = Uint8Array.allocate(count: outLength);
@@ -157,7 +113,7 @@ class GenericHashStream {
     outPtr.free();
 
     if (result != 0) {
-      throw FinalizeStreamError();
+      StateError('GenericHashStream state is bad');
     }
     return Uint8List.fromList(outPtr.view);
   }
