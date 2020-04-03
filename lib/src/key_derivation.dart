@@ -26,11 +26,9 @@ UnmodifiableUint8ListView keyGen() {
 
 /// Derives subkey from [key]. [subkeyLength] must be between [subkeyBytesMin] and [subkeyBytesMax] long.
 /// [key] must be [keyBytes] long.
-/// [context] must be 8 bytes long and describes what the subkey is used for.
-/// This way generated subkeys for two different domains will likely be different,
-/// even when using the same [key].
-/// Up to 2^64 subkeys per [key] and [context] can be safely generated.
+/// [context] must be 8 bytes long and describes the domain the subkey is used for (eg '__auth__').
 /// [subkeyId] is the n-th generated subkey.
+/// Up to 2^64 subkeys per [key] and [context] can be safely generated.
 UnmodifiableUint8ListView deriveFromKey(
     int subkeyLength, int subkeyId, Uint8List context, Uint8List key) {
   final subkeyPtr = Uint8Array.allocate(count: subkeyLength);
