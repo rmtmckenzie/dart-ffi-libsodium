@@ -6,6 +6,13 @@ import 'internal_helpers.dart';
 
 import 'bindings/generic_hash.dart' as bindings;
 
+/// {@template dart_sodium_generichash_arguments}
+/// A different [key] (optional) produces
+/// a different fingerprint for the same [input]. [key] (when provided) must be between
+/// [keyBytesMin] and [keyBytesMax] long (recommended [keyBytes]). [outLength] (optional) controls
+/// the length of the generated hash and must be between [genericHashBytesMin] and [genericHashBytesMax] long (standart [genericHashBytes]).
+/// {@endtemplate}
+
 class GenericHashError extends Error {
   @override
   String toString() {
@@ -39,6 +46,7 @@ class FinalizeStreamError extends Error {
 /// [keyBytesMin] and [keyBytesMax] long (recommended [keyBytes]). [outLength] (optional) controls
 /// the length of the generated hash and must be between [genericHashBytesMin] and [genericHashBytesMax] long (standart [genericHashBytes]).
 ///
+/// Generate a fingerprint for [input]. {@macro dart_sodium_generichash_arguments}
 /// Please remember to use constant-time comparison when comparing two fingerprints.
 Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
   outLength ??= bindings.genericHashBytes;
@@ -90,6 +98,7 @@ class GenericHashStream {
   /// long (recommended is [keyBytes]). [outhLength] controls the length of the resulting hash
   /// and must be between [genericHashBytesMin] and [genericHashBytesMax] (standard is [genericHashBytes]).
   /// Throws [InitStreamError] when initializing stream fails.
+  /// {@macro dart_sodium_generichash_arguments}
   factory GenericHashStream({Uint8List key, int outLength}) {
     assert(key == null
         ? true
