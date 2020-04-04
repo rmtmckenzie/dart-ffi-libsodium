@@ -8,7 +8,7 @@ class Authenticator {
   static const keyBytes = 32;
 
   /// Generates a key for [Authenticator].
-  static UnmodifiableUint8ListView keyGen() {
+  static UnmodifiableUint8ListView _keyGen() {
     final keyPtr = Uint8Array.allocate(count: keyBytes);
     bindings.keyGen(keyPtr.rawPtr);
     keyPtr.freeZero();
@@ -25,7 +25,7 @@ class Authenticator {
     if (key != null) {
       checkExpectedLengthOf(key.length, bindings.keyBytes, 'key');
     } else {
-      key = keyGen();
+      key = _keyGen();
     }
     return Authenticator._(UnmodifiableUint8ListView(key));
   }
