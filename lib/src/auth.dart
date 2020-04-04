@@ -17,18 +17,14 @@ class Authenticator {
   }
 
   final UnmodifiableUint8ListView key;
-  const Authenticator._(this.key);
 
-  /// If [key] is left empty, a key will be generated.
   /// [key] must be [keyBytes] long.
-  factory Authenticator([Uint8List key]) {
-    if (key != null) {
-      checkExpectedLengthOf(key.length, bindings.keyBytes, 'key');
-    } else {
-      key = _keyGen();
-    }
-    return Authenticator._(UnmodifiableUint8ListView(key));
+  Authenticator(Uint8List key) : key = UnmodifiableUint8ListView(key) {
+    checkExpectedLengthOf(key.length, bindings.keyBytes, 'key');
   }
+
+  /// Generates a key
+  Authenticator.generateKey() : key = _keyGen();
 
   /// Generates an authentication tag for [message].
   Uint8List authenticate(Uint8List message) {
