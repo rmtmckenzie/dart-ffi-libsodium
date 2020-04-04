@@ -5,15 +5,15 @@ import 'package:ffi_helper/ffi_helper.dart';
 import 'bindings/box.dart' as bindings;
 import 'internal_helpers.dart';
 
-/// {@template dart_sodium_throw_generate_keypair_exception}
+/// {@template box_throws_generate_keypair_exception}
 /// Throws [KeyPairException] when generating keys fails.
 /// {@endtemplate}
 
-/// {@template dart_sodium_keypair_length}
+/// {@template box_keypair_length}
 /// [publicKey] must be [publicKeyBytes] long. [secretKey] must be [secretKeyBytes] long.
 /// {@endtemplate}
 
-/// {@template dart_sodium_nonce_length}
+/// {@template box_nonce_length}
 /// [nonce] must be [nonceBytes] long and an unique value.
 /// {@endtemplate}
 
@@ -30,7 +30,7 @@ class KeyPair {
   const KeyPair._(this.publicKey, this.secretKey);
 
   /// Generates a pair of public and secret key.
-  /// {@macro dart_sodium_throw_generate_keypair_exception}
+  /// {@macro box_throws_generate_keypair_exception}
   factory KeyPair() {
     final pkPtr = Uint8Array.allocate(count: bindings.publicKeyBytes);
     final skPtr = Uint8Array.allocate(count: bindings.secretKeyBytes);
