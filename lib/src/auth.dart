@@ -6,6 +6,7 @@ import 'internal_helpers.dart';
 /// Authenticates messages with an authentication tag
 class Authenticator {
   static const keyBytes = 32;
+  static const authTagBytes = 16;
 
   /// Generates a key for [Authenticator].
   static UnmodifiableUint8ListView _keyGen() {
@@ -30,7 +31,7 @@ class Authenticator {
   Uint8List authenticate(Uint8List message) {
     final messagePtr = Uint8Array.fromTypedList(message);
     final keyPtr = Uint8Array.fromTypedList(key);
-    final tagPtr = Uint8Array.allocate(count: bindings.authBytes);
+    final tagPtr = Uint8Array.allocate(count: authTagBytes);
 
     final result = bindings.auth(
         tagPtr.rawPtr, messagePtr.rawPtr, message.length, keyPtr.rawPtr);
