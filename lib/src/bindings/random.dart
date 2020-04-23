@@ -1,35 +1,39 @@
 import 'dart:ffi';
 
 class RandomBytes {
-  RandomBytes(DynamicLibrary sodium) {
-    seedBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
-        'randombytes_seedbytes')();
-    random = sodium
-        .lookup<NativeFunction<Uint32 Function()>>('randombytes_random')
-        .asFunction();
-    buffer = sodium
-        .lookup<NativeFunction<Void Function(Pointer<Void>, IntPtr)>>(
-            'randombytes_buffer')
-        .asFunction();
-    deterministic = sodium
-        .lookup<
-            NativeFunction<
-                Void Function(Pointer<Void>, IntPtr,
-                    Pointer<Uint8>)>>('randombytes_buf_deterministic')
-        .asFunction();
-    close = sodium
-        .lookup<NativeFunction<Int8 Function()>>('randombytes_close')
-        .asFunction();
-    stir = sodium
-        .lookup<NativeFunction<Void Function()>>('randombytes_stir')
-        .asFunction();
-  }
+  RandomBytes(DynamicLibrary sodium)
+      : seedBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            'randombytes_seedbytes')(),
+        random = sodium
+            .lookup<NativeFunction<Uint32 Function()>>('randombytes_random')
+            .asFunction(),
+        uniform = sodium
+            .lookup<NativeFunction<Uint32 Function(Uint32)>>(
+                'randombytes_buf_uniform')
+            .asFunction(),
+        buffer = sodium
+            .lookup<NativeFunction<Void Function(Pointer<Void>, IntPtr)>>(
+                'randombytes_buffer')
+            .asFunction(),
+        deterministic = sodium
+            .lookup<
+                NativeFunction<
+                    Void Function(Pointer<Void>, IntPtr,
+                        Pointer<Uint8>)>>('randombytes_buf_deterministic')
+            .asFunction(),
+        close = sodium
+            .lookup<NativeFunction<Int8 Function()>>('randombytes_close')
+            .asFunction(),
+        stir = sodium
+            .lookup<NativeFunction<Void Function()>>('randombytes_stir')
+            .asFunction();
 
-  int seedBytes;
-  int Function() random;
-  int Function(int upperBound) uniform;
-  void Function(Pointer<Void> buf, int size) buffer;
-  void Function(Pointer<Void> buf, int size, Pointer<Uint8> seed) deterministic;
-  int Function() close;
-  void Function() stir;
+  final int seedBytes;
+  final int Function() random;
+  final int Function(int upperBound) uniform;
+  final void Function(Pointer<Void> buf, int size) buffer;
+  final void Function(Pointer<Void> buf, int size, Pointer<Uint8> seed)
+      deterministic;
+  final int Function() close;
+  final void Function() stir;
 }
