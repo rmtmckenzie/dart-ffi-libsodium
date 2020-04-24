@@ -6,8 +6,8 @@ typedef AuthVerifyDart = int Function(
 typedef AuthVerifyNative = Uint8 Function(
     Pointer<Uint8> tag, Pointer<Uint8> input, Uint64 inlen, Pointer<Uint8> key);
 
-class Auth {
-  Auth(DynamicLibrary sodium)
+class Authentication {
+  Authentication(DynamicLibrary sodium)
       : keyBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
             "crypto_auth_keybytes")(),
         authBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
