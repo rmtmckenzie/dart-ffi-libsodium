@@ -5,6 +5,11 @@ import 'package:dart_sodium/src/bindings/pwhash.dart';
 
 import 'random.dart';
 
+typedef SodiumMemoryCompareNative = Int8 Function(
+    Pointer<Void> a, Pointer<Void> b, IntPtr len);
+typedef SodiumMemoryCompareDart = int Function(
+    Pointer<Void> a, Pointer<Void> b, int len);
+
 class Libsodium {
   Libsodium(DynamicLibrary sodium)
       : init = sodium
@@ -14,7 +19,10 @@ class Libsodium {
             Pointer<Uint8> Function()>('sodium_version_string')(),
         randomBytes = RandomBytes(sodium),
         passwordHash = PasswordHash(sodium),
-        authentication = Authentication(sodium);
+        authentication = Authentication(sodium),
+        memoryCompare = sodium
+            .lookup<NativeFunction<SodiumMemoryCompareNative>>('sodium_memcmp')
+            .asFunction();
 
   factory Libsodium.open([String name = 'libsodium']) {
     final lib = DynamicLibrary.open(name);
@@ -26,4 +34,5 @@ class Libsodium {
   final RandomBytes randomBytes;
   final PasswordHash passwordHash;
   final Authentication authentication;
+  final SodiumMemoryCompareDart memoryCompare;
 }
