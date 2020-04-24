@@ -1,5 +1,8 @@
 import 'dart:ffi';
 
+import 'package:dart_sodium/src/bindings/auth.dart';
+import 'package:dart_sodium/src/bindings/pwhash.dart';
+
 import 'random.dart';
 
 class Libsodium {
@@ -9,7 +12,9 @@ class Libsodium {
             .asFunction(),
         versionString = sodium.lookupFunction<Pointer<Uint8> Function(),
             Pointer<Uint8> Function()>('sodium_version_string')(),
-        randomBytes = RandomBytes(sodium);
+        randomBytes = RandomBytes(sodium),
+        passwordHash = PasswordHash(sodium),
+        authentication = Authentication(sodium);
 
   factory Libsodium.open(String name) {
     final lib = DynamicLibrary.open(name);
@@ -19,4 +24,6 @@ class Libsodium {
   final int Function() init;
   final Pointer<Uint8> versionString;
   final RandomBytes randomBytes;
+  final PasswordHash passwordHash;
+  final Authentication authentication;
 }
