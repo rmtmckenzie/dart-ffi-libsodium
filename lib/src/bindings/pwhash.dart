@@ -20,36 +20,44 @@ final needsRehash = sodium.lookupFunction<
     int Function(Pointer<Uint8> str, int opsLimit,
         int memLimit)>("crypto_pwhash_str_needs_rehash");
 
-abstract class OpsLimit {
-  static final min = sodium.lookupFunction<Uint64 Function(), int Function()>(
-      "crypto_pwhash_opslimit_min")();
-  static final interactive =
-      sodium.lookupFunction<Uint64 Function(), int Function()>(
-          "crypto_pwhash_opslimit_interactive")();
-  static final moderate =
-      sodium.lookupFunction<Uint64 Function(), int Function()>(
-          "crypto_pwhash_opslimit_moderate")();
-  static final sensitive =
-      sodium.lookupFunction<Uint64 Function(), int Function()>(
-          "crypto_pwhash_opslimit_sensitive")();
-  static final max = sodium.lookupFunction<Uint64 Function(), int Function()>(
-      "crypto_pwhash_opslimit_max")();
+class OpsLimit {
+  OpsLimit(DynamicLibrary sodium)
+      : min = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            "crypto_pwhash_opslimit_min")(),
+        moderate = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            "crypto_pwhash_opslimit_moderate")(),
+        interactive = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            "crypto_pwhash_opslimit_interactive")(),
+        sensitive = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            "crypto_pwhash_opslimit_sensitive")(),
+        max = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            "crypto_pwhash_opslimit_max")();
+
+  final int min;
+  final int interactive;
+  final int moderate;
+  final int sensitive;
+  final int max;
 }
 
-abstract class MemLimit {
-  static final min = sodium.lookupFunction<Uint64 Function(), int Function()>(
-      "crypto_pwhash_memlimit_min")();
-  static final interactive =
-      sodium.lookupFunction<Uint64 Function(), int Function()>(
-          "crypto_pwhash_memlimit_interactive")();
-  static final moderate =
-      sodium.lookupFunction<Uint64 Function(), int Function()>(
-          "crypto_pwhash_memlimit_moderate")();
-  static final sensitive =
-      sodium.lookupFunction<Uint64 Function(), int Function()>(
-          "crypto_pwhash_memlimit_sensitive")();
-  static final max = sodium.lookupFunction<Uint64 Function(), int Function()>(
-      "crypto_pwhash_memlimit_max")();
+class MemLimit {
+  MemLimit(DynamicLibrary sodium)
+      : min = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            "crypto_pwhash_memlimit_min")(),
+        moderate = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            "crypto_pwhash_memlimit_moderate")(),
+        interactive = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            "crypto_pwhash_memlimit_interactive")(),
+        sensitive = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            "crypto_pwhash_memlimit_sensitive")(),
+        max = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            "crypto_pwhash_memlimit_max")();
+
+  final int min;
+  final int interactive;
+  final int moderate;
+  final int sensitive;
+  final int max;
 }
 
 final storeBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
@@ -62,3 +70,5 @@ final bytesMax = sodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_pwhash_bytes_max")();
 final bytesMin = sodium.lookupFunction<Uint64 Function(), int Function()>(
     "crypto_pwhash_bytes_min")();
+
+class Pwhash {}
