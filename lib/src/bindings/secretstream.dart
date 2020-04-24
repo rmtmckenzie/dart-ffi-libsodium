@@ -93,7 +93,8 @@ class SecretStream {
         rekey = sodium
             .lookup<NativeFunction<Void Function(Pointer<Uint8> state)>>(
                 'crypto_secretstream_xchacha20poly1305_rekey')
-            .asFunction();
+            .asFunction(),
+        tag = Tag(sodium);
 
   final int keyBytes;
   final int stateBytes;
@@ -105,5 +106,5 @@ class SecretStream {
   final SecretStreamInitPushPullDart initPull;
   final SecretStreamPullDart pull;
   final void Function(Pointer<Uint8> state) rekey;
-  final tag = Tag(sodium);
+  final Tag tag;
 }
