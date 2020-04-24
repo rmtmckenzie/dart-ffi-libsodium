@@ -1,4 +1,3 @@
-import 'sodium.dart';
 import 'dart:ffi';
 
 typedef AuthVerifyDart = int Function(
