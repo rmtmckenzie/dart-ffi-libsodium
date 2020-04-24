@@ -60,15 +60,20 @@ class MemLimit {
   final int max;
 }
 
-final storeBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
-    "crypto_pwhash_strbytes")();
-final passwdMax = sodium.lookupFunction<Uint64 Function(), int Function()>(
-    "crypto_pwhash_passwd_max")();
-final passwdMin = sodium.lookupFunction<Uint64 Function(), int Function()>(
-    "crypto_pwhash_passwd_min")();
-final bytesMax = sodium.lookupFunction<Uint64 Function(), int Function()>(
-    "crypto_pwhash_bytes_max")();
-final bytesMin = sodium.lookupFunction<Uint64 Function(), int Function()>(
-    "crypto_pwhash_bytes_min")();
+class PasswordHash {
+  PasswordHash(DynamicLibrary sodium)
+      : opslimit = OpsLimit(sodium),
+        memlimit = MemLimit(sodium),
+        storeBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            'crypto_pwhash_strbytes')(),
+        passwordMax = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            'crypto_pwhash_passwd_max')(),
+        passwordMin = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            'crypto_pwhash_passwd_min')();
 
-class Pwhash {}
+  final OpsLimit opslimit;
+  final MemLimit memlimit;
+  final int storeBytes;
+  final int passwordMax;
+  final int passwordMin;
+}
