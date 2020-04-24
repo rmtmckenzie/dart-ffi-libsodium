@@ -1,23 +1,27 @@
 import 'sodium.dart';
 import 'dart:ffi';
 
-final keyGen = sodium.lookupFunction<Void Function(Pointer<Uint8>),
-    void Function(Pointer<Uint8>)>("crypto_auth_keygen");
+typedef AuthVerifyDart = int Function(
+    Pointer<Uint8> tag, Pointer<Uint8> input, int inlen, Pointer<Uint8> key);
+typedef AuthVerifyNative = Uint8 Function(
+    Pointer<Uint8> tag, Pointer<Uint8> input, Uint64 inlen, Pointer<Uint8> key);
 
-final authBytes = sodium
-    .lookupFunction<Uint64 Function(), int Function()>("crypto_auth_bytes")();
-final keyBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
-    "crypto_auth_keybytes")();
+class Auth {
+  Auth(DynamicLibrary sodium)
+      : keyBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            "crypto_auth_keybytes")(),
+        authBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
+            "crypto_auth_bytes")(),
+        verify = sodium
+            .lookup<NativeFunction<AuthVerifyNative>>('crypto_auth_verify')
+            .asFunction(),
+        keygen = sodium
+            .lookup<NativeFunction<Void Function(Pointer<Uint8>)>>(
+                'crypto_auth_keygen')
+            .asFunction();
 
-typedef _AuthNative = Int16 Function(
-    Pointer<Uint8> out, Pointer<Uint8> msg, Uint64 msglen, Pointer<Uint8> key);
-typedef _AuthDart = int Function(
-    Pointer<Uint8> out, Pointer<Uint8> msg, int msglen, Pointer<Uint8> key);
-final auth = sodium.lookupFunction<_AuthNative, _AuthDart>("crypto_auth");
-
-typedef _VerifyNative = Int16 Function(
-    Pointer<Uint8> tag, Pointer<Uint8> msg, Uint64 msglen, Pointer<Uint8> key);
-typedef _VerifyDart = int Function(
-    Pointer<Uint8> tag, Pointer<Uint8> msg, int msglen, Pointer<Uint8> key);
-final verify =
-    sodium.lookupFunction<_VerifyNative, _VerifyDart>("crypto_auth_verify");
+  final int authBytes;
+  final int keyBytes;
+  AuthVerifyDart verify;
+  void Function(Pointer<Uint8> key) keygen;
+}
