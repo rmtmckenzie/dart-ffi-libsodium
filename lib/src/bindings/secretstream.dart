@@ -1,10 +1,4 @@
 import 'dart:ffi';
-import 'sodium.dart';
-
-final keyGen = sodium.lookupFunction<
-    Void Function(Pointer<Uint8> key),
-    void Function(
-        Pointer<Uint8> key)>("crypto_secretstream_xchacha20poly1305_keygen");
 
 class Tag {
   Tag(DynamicLibrary sodium)
