@@ -16,7 +16,7 @@ class Libsodium {
         passwordHash = PasswordHash(sodium),
         authentication = Authentication(sodium);
 
-  factory Libsodium.open(String name) {
+  factory Libsodium.open([String name = 'libsodium']) {
     final lib = DynamicLibrary.open(name);
     return Libsodium(lib);
   }
