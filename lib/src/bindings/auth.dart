@@ -3,7 +3,7 @@ import 'dart:ffi';
 
 typedef AuthVerifyDart = int Function(
     Pointer<Uint8> tag, Pointer<Uint8> input, int inlen, Pointer<Uint8> key);
-typedef AuthVerifyNative = Uint8 Function(
+typedef AuthVerifyNative = Int8 Function(
     Pointer<Uint8> tag, Pointer<Uint8> input, Uint64 inlen, Pointer<Uint8> key);
 
 class Authentication {
