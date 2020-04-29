@@ -55,6 +55,25 @@ typedef PwhashNeedsRehashNative = Int8 Function(
 typedef PwhashNeedsRehashDart = int Function(
     Pointer<Uint8> str, int opsLimit, int memLimit);
 
+typedef PwhashNative = Int8 Function(
+    Pointer<Uint8> out,
+    Uint64 outlen,
+    Pointer<Uint8> password,
+    Uint64 pwlen,
+    Pointer<Uint8> salt,
+    Uint64 opslimit,
+    IntPtr memlimit,
+    Int8 alg);
+typedef PwhashDart = int Function(
+    Pointer<Uint8> out,
+    int outlen,
+    Pointer<Uint8> password,
+    int pwlen,
+    Pointer<Uint8> salt,
+    int opslimit,
+    int memlimit,
+    int alg);
+
 class PasswordHash {
   PasswordHash(DynamicLibrary sodium)
       : opslimit = OpsLimit(sodium),
