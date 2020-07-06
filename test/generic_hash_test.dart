@@ -1,11 +1,13 @@
 import 'dart:convert';
 
-import 'package:dart_sodium/generic_hash.dart' as hash;
-import 'package:dart_sodium/sodium.dart' as sodium;
+import 'package:dart_sodium/generic_hash.dart';
+import 'package:dart_sodium/sodium.dart';
 import 'package:test/test.dart';
 
 void main() {
-  sodium.init();
+  LibSodium.init();
+  final hash = GenericHash();
+
   test('Hash a message with key', () {
     final key = hash.keyGen();
     final message = utf8.encode('hello world');
@@ -26,12 +28,12 @@ void main() {
     final key = hash.keyGen();
     final message = utf8.encode('hello world');
     final message2 = utf8.encode('hello to the world');
-    final hashStream = hash.GenericHashStream(key: key);
+    final hashStream = hash.stream(key: key);
     hashStream.update(message);
     hashStream.update(message2);
     final hashed = hashStream.finalize();
 
-    final hashStream2 = hash.GenericHashStream(key: key);
+    final hashStream2 = hash.stream(key: key);
     hashStream2.update(message);
     hashStream2.update(message2);
     final hashed2 = hashStream.finalize();
@@ -42,12 +44,12 @@ void main() {
   test('Hash multi part message without key', () {
     final message = utf8.encode('hello world');
     final message2 = utf8.encode('hello to the world');
-    final hashStream = hash.GenericHashStream();
+    final hashStream = hash.stream();
     hashStream.update(message);
     hashStream.update(message2);
     final hashed = hashStream.finalize();
 
-    final hashStream2 = hash.GenericHashStream();
+    final hashStream2 = hash.stream();
     hashStream2.update(message);
     hashStream2.update(message2);
     final hashed2 = hashStream.finalize();

@@ -3,4 +3,3 @@
 library sign;
 
 export 'src/sign.dart';
-export 'src/bindings/sign.dart' show publicKeyBytes, secretKeyBytes;

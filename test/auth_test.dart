@@ -1,18 +1,27 @@
 import 'dart:convert';
 
-import 'package:dart_sodium/auth.dart' as auth;
-import 'package:dart_sodium/sodium.dart' as sodium;
+import 'package:dart_sodium/auth.dart';
+import 'package:dart_sodium/sodium.dart';
 import 'package:test/test.dart';
 
 void main() {
-  sodium.init();
+  LibSodium.init();
   test('Authenticate and verify a message', () {
-    final key = auth.keyGen();
-    final message = utf8.encode('hello world');
-    final authTag = auth.auth(message, key);
+    final auth = Authenticator.withNewKey();
 
-    final isValid = auth.verify(authTag, message, key);
+    final message = utf8.encode('hello world');
+    final authTag = auth.authenticate(message);
+
+    final isValid = auth.verify(authTag, message);
 
     expect(isValid, true);
+  });
+
+  test('Encrypt and decrypt individual message w/ autogen nonce', () {
+    final auth = Authenticator.withNewKey();
+  });
+
+  test('Encrypt and decrypt individual message w/ autogen nonce', () {
+    final auth = Authenticator.withNewKey();
   });
 }

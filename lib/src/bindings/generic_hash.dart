@@ -1,52 +1,52 @@
-import 'sodium.dart';
 import 'dart:ffi';
 
-final genericHashBytes =
-    sodium.lookupFunction<Uint64 Function(), int Function()>(
-        'crypto_generichash_bytes')();
+import 'libsodium.dart';
 
-final genericHashBytesMin =
-    sodium.lookupFunction<Uint64 Function(), int Function()>(
-        'crypto_generichash_bytes_min')();
-final genericHashBytesMax =
-    sodium.lookupFunction<Uint64 Function(), int Function()>(
-        'crypto_generichash_bytes_max')();
+typedef GenericHashNative = Int16 Function(Pointer<Uint8> out, IntPtr outlen, Pointer<Uint8> input, Uint64 inlen, Pointer<Uint8> key, IntPtr keylen);
+typedef GenericHashDart = int Function(Pointer<Uint8> out, int outlen, Pointer<Uint8> input, int inlen, Pointer<Uint8> key, int keylen);
 
-final keyBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
-    'crypto_generichash_keybytes')();
-final keyBytesMax = sodium.lookupFunction<Uint64 Function(), int Function()>(
-    'crypto_generichash_keybytes_max')();
-final keyBytesMin = sodium.lookupFunction<Uint64 Function(), int Function()>(
-    'crypto_generichash_keybytes_min')();
+typedef InitNative = Int16 Function(Pointer<Uint8> state, Pointer<Uint8> key, IntPtr keylen, IntPtr outlen);
+typedef InitDart = int Function(Pointer<Uint8> state, Pointer<Uint8> key, int keylen, int outlen);
 
-final stateBytes = sodium.lookupFunction<Uint64 Function(), int Function()>(
-    'crypto_generichash_statebytes')();
+typedef UpdateNative = Int16 Function(Pointer<Uint8> state, Pointer<Uint8> input, Uint64 inlen);
+typedef UpdateDart = int Function(Pointer<Uint8> state, Pointer<Uint8> input, int inlen);
 
-typedef _GenericHashNative = Int16 Function(Pointer<Uint8> out, IntPtr outlen,
-    Pointer<Uint8> input, Uint64 inlen, Pointer<Uint8> key, IntPtr keylen);
-typedef _GenericHashDart = int Function(Pointer<Uint8> out, int outlen,
-    Pointer<Uint8> input, int inlen, Pointer<Uint8> key, int keylen);
+typedef FinishNative = Int16 Function(Pointer<Uint8> state, Pointer<Uint8> out, Uint64 outlen);
+typedef FinishDart = int Function(Pointer<Uint8> state, Pointer<Uint8> out, int outlen);
 
-final genericHash = sodium
-    .lookupFunction<_GenericHashNative, _GenericHashDart>('crypto_generichash');
+typedef KeyGenNative = Void Function(Pointer<Uint8> key);
+typedef KeyGenDart = void Function(Pointer<Uint8> key);
 
-typedef _InitNative = Int16 Function(
-    Pointer<Uint8> state, Pointer<Uint8> key, IntPtr keylen, IntPtr outlen);
-typedef _InitDart = int Function(
-    Pointer<Uint8> state, Pointer<Uint8> key, int keylen, int outlen);
+class GenericHash {
+  factory GenericHash([LibSodium libSodium]) {
+    return GenericHash._((libSodium ?? LibSodium()).sodium);
+  }
 
-final init =
-    sodium.lookupFunction<_InitNative, _InitDart>('crypto_generichash_init');
+  GenericHash._(DynamicLibrary sodium)
+      : genericHashBytes = sodium.lookupFunction<Uint64 Function(), int Function()>('crypto_generichash_bytes')(),
+        genericHashBytesMin = sodium.lookupFunction<Uint64 Function(), int Function()>('crypto_generichash_bytes_min')(),
+        genericHashBytesMax = sodium.lookupFunction<Uint64 Function(), int Function()>('crypto_generichash_bytes_max')(),
+        keyBytes = sodium.lookupFunction<Uint64 Function(), int Function()>('crypto_generichash_keybytes')(),
+        keyBytesMax = sodium.lookupFunction<Uint64 Function(), int Function()>('crypto_generichash_keybytes_max')(),
+        keyBytesMin = sodium.lookupFunction<Uint64 Function(), int Function()>('crypto_generichash_keybytes_min')(),
+        stateBytes = sodium.lookupFunction<Uint64 Function(), int Function()>('crypto_generichash_statebytes')(),
+        genericHash = sodium.lookup<NativeFunction<GenericHashNative>>('crypto_generichash').asFunction(),
+        init = sodium.lookup<NativeFunction<InitNative>>('crypto_generichash_init').asFunction(),
+        update = sodium.lookup<NativeFunction<UpdateNative>>('crypto_generichash_update').asFunction(),
+        finish = sodium.lookup<NativeFunction<FinishNative>>('crypto_generichash_final').asFunction(),
+        keyGen = sodium.lookup<NativeFunction<KeyGenNative>>('crypto_generichash_keygen').asFunction();
 
-final update = sodium.lookupFunction<
-    Int16 Function(Pointer<Uint8> state, Pointer<Uint8> input, Uint64 inlen),
-    int Function(Pointer<Uint8> state, Pointer<Uint8> input,
-        int inlen)>('crypto_generichash_update');
+  final int genericHashBytes;
+  final int genericHashBytesMin;
+  final int genericHashBytesMax;
+  final int keyBytes;
+  final int keyBytesMax;
+  final int keyBytesMin;
+  final int stateBytes;
 
-final finish = sodium.lookupFunction<
-    Int16 Function(Pointer<Uint8> state, Pointer<Uint8> out, Uint64 outlen),
-    int Function(Pointer<Uint8> state, Pointer<Uint8> out,
-        int outlen)>('crypto_generichash_final');
-
-final keyGen = sodium.lookupFunction<Void Function(Pointer<Uint8> key),
-    void Function(Pointer<Uint8> key)>('crypto_generichash_keygen');
+  final GenericHashDart genericHash;
+  final InitDart init;
+  final UpdateDart update;
+  final FinishDart finish;
+  final KeyGenDart keyGen;
+}

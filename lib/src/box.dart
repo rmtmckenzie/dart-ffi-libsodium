@@ -27,180 +27,162 @@ class GenerateKeyPairException implements Exception {
 /// Pair of public- and secret-key.
 class KeyPair {
   final UnmodifiableUint8ListView publicKey, secretKey;
+
   const KeyPair._(this.publicKey, this.secretKey);
 
   /// Generates a pair of public and secret key.
   /// {@macro box_throws_generate_keypair_exception}
-  factory KeyPair() {
-    final pkPtr = Uint8Array.allocate(count: bindings.publicKeyBytes);
-    final skPtr = Uint8Array.allocate(count: bindings.secretKeyBytes);
-    final result = bindings.keyPair(pkPtr.rawPtr, skPtr.rawPtr);
-    final publicKey = UnmodifiableUint8ListView(Uint8List.fromList(pkPtr.view));
-    final secretKey = UnmodifiableUint8ListView(Uint8List.fromList(skPtr.view));
-    pkPtr.freeZero();
-    skPtr.freeZero();
-    if (result != 0) {
-      throw GenerateKeyPairException();
-    }
-    return KeyPair._(publicKey, secretKey);
+  factory KeyPair([bindings.Box box]) {
+    final _box = box ?? bindings.Box();
+
+    return freeZero2(
+      Uint8Array.allocate(count: _box.publicKeyBytes),
+      Uint8Array.allocate(count: _box.secretKeyBytes),
+      (pkPtr, skPtr) {
+        if (_box.keyPair(pkPtr.rawPtr, skPtr.rawPtr) != 0) {
+          throw GenerateKeyPairException();
+        }
+        return KeyPair._(UnmodifiableUint8ListView(Uint8List.fromList(pkPtr.view)), UnmodifiableUint8ListView(Uint8List.fromList(skPtr.view)));
+      },
+    );
   }
 
   /// Derives [publicKey] and [secretKey] from [seed].
   /// {@macro dart_sodium_throw_generate_keypair_exception}
-  factory KeyPair.fromSeed(Uint8List seed) {
-    final pkPtr = Uint8Array.allocate(count: bindings.publicKeyBytes);
-    final skPtr = Uint8Array.allocate(count: bindings.secretKeyBytes);
-    final seedPtr = Uint8Array.fromTypedList(seed);
-    final result =
-        bindings.seedKeyPair(pkPtr.rawPtr, skPtr.rawPtr, seedPtr.rawPtr);
-    final publicKey = UnmodifiableUint8ListView(Uint8List.fromList(pkPtr.view));
-    final secretKey = UnmodifiableUint8ListView(Uint8List.fromList(skPtr.view));
+  factory KeyPair.fromSeed(Uint8List seed, [bindings.Box box]) {
+    final _box = box ?? bindings.Box();
+    checkExpectedLengthOf(seed.length, _box.seedBytes, 'seed');
 
-    pkPtr.freeZero();
-    skPtr.freeZero();
-    if (result != 0) {
-      throw GenerateKeyPairException();
-    }
-    return KeyPair._(publicKey, secretKey);
+    return free1freeZero2(seed.asArray, Uint8Array.allocate(count: _box.publicKeyBytes), Uint8Array.allocate(count: _box.secretKeyBytes),
+        (seedPtr, pkPtr, skPtr) {
+      final result = _box.seedKeyPair(pkPtr.rawPtr, skPtr.rawPtr, seedPtr.rawPtr);
+      if (result != 0) {
+        throw GenerateKeyPairException();
+      }
+      return KeyPair._(UnmodifiableUint8ListView(Uint8List.fromList(pkPtr.view)), UnmodifiableUint8ListView(Uint8List.fromList(skPtr.view)));
+    });
   }
 }
 
-void _checkKeyPair(Uint8List publicKey, Uint8List secretKey) {
-  checkExpectedLengthOf(publicKey.length, bindings.publicKeyBytes, 'publicKey');
-  checkExpectedLengthOf(secretKey.length, bindings.secretKeyBytes, 'secretKey');
-}
+class Box {
+  final bindings.Box _bindings;
 
-void _checkNonce(Uint8List nonce) {
-  checkExpectedLengthOf(nonce.length, bindings.nonceBytes, 'nonce');
-}
+  Box([bindings.Box _bindings]) : _bindings = _bindings ?? bindings.Box();
 
-/// Throws [ArgumentError] when arguments for the crypto_box_easy interface
-/// are false.
-void _checkEasyArguments(
-    Uint8List nonce, Uint8List publicKey, Uint8List secretKey) {
-  _checkNonce(nonce);
-  _checkKeyPair(publicKey, secretKey);
-}
+  int get nonceBytes => _bindings.nonceBytes;
+  int get seedBytes => _bindings.seedBytes;
 
-/// Throws [ArgumentError] when arguments for the crypto_box_afternm interface are false
-void _checkAfterNumerousArguments(Uint8List nonce, Uint8List key) {
-  _checkNonce(nonce);
-  checkExpectedLengthOf(key.length, bindings.beforeNumerousBytes, 'key');
-}
-
-/// Encrypts [message] with the recipient's [publicKey] and the senders [secretKey].
-/// {@macro dart_sodium_keypair_length}
-/// {@macro dart_sodium_nonce_length}
-Uint8List easy(Uint8List message, Uint8List nonce, Uint8List publicKey,
-    Uint8List secretKey) {
-  final noncePtr = Uint8Array.fromTypedList(nonce);
-  final pkPtr = Uint8Array.fromTypedList(publicKey);
-  final skPtr = Uint8Array.fromTypedList(secretKey);
-  final cPtr = Uint8Array.allocate(count: message.length + bindings.macBytes)
-    ..view.setAll(0, message);
-
-  final result = bindings.easy(cPtr.rawPtr, cPtr.rawPtr, message.length,
-      noncePtr.rawPtr, pkPtr.rawPtr, skPtr.rawPtr);
-
-  noncePtr.free();
-  cPtr.free();
-  pkPtr.freeZero();
-  skPtr.freeZero();
-
-  if (result != 0) {
-    _checkEasyArguments(nonce, publicKey, secretKey);
-    throw Error();
+  void _checkKeyPair(Uint8List publicKey, Uint8List secretKey) {
+    checkExpectedLengthOf(publicKey.length, _bindings.publicKeyBytes, 'publicKey');
+    checkExpectedLengthOf(secretKey.length, _bindings.secretKeyBytes, 'secretKey');
   }
-  return Uint8List.fromList(cPtr.view);
-}
 
-/// Opens [message] encrypted by [easy]. [nonce], [publicKey] and [secretKey] must be the same.
-Uint8List openEasy(Uint8List ciphertext, Uint8List nonce, Uint8List publicKey,
-    Uint8List secretKey) {
-  final noncePtr = Uint8Array.fromTypedList(nonce);
-  final pkPtr = Uint8Array.fromTypedList(publicKey);
-  final skPtr = Uint8Array.fromTypedList(secretKey);
-  final cPtr = Uint8Array.fromTypedList(ciphertext);
-
-  final result = bindings.openEasy(cPtr.rawPtr, cPtr.rawPtr, ciphertext.length,
-      noncePtr.rawPtr, pkPtr.rawPtr, skPtr.rawPtr);
-
-  noncePtr.free();
-  cPtr.free();
-  pkPtr.freeZero();
-  skPtr.freeZero();
-
-  if (result != 0) {
-    _checkEasyArguments(nonce, publicKey, secretKey);
-    throw Error();
+  void _checkNonce(Uint8List nonce) {
+    checkExpectedLengthOf(nonce.length, _bindings.nonceBytes, 'nonce');
   }
-  return cPtr.view.sublist(0, ciphertext.length - bindings.macBytes);
-}
 
-/// Generates a shared key to encrypt all onward messages. Can improve performance.
-/// {@macro dart_sodium_keypair_length}
-Uint8List beforeNumerous(Uint8List publicKey, Uint8List secretKey) {
-  final pkPtr = Uint8Array.fromTypedList(publicKey);
-  final skPtr = Uint8Array.fromTypedList(secretKey);
-  final sharedKeyPtr = Uint8Array.allocate(count: bindings.beforeNumerousBytes);
-
-  final result =
-      bindings.beforeNumerous(sharedKeyPtr.rawPtr, pkPtr.rawPtr, skPtr.rawPtr);
-
-  pkPtr.freeZero();
-  skPtr.freeZero();
-  final sharedKey =
-      UnmodifiableUint8ListView(Uint8List.fromList(sharedKeyPtr.view));
-  sharedKeyPtr.freeZero();
-
-  if (result != 0) {
+  /// Throws [ArgumentError] when arguments for the crypto_box_easy interface
+  /// are false.
+  void _checkEasyArguments(Uint8List nonce, Uint8List publicKey, Uint8List secretKey) {
+    _checkNonce(nonce);
     _checkKeyPair(publicKey, secretKey);
-    throw Error();
   }
-  return sharedKey;
-}
 
-/// Encrypts [message] with a shared key generated by [beforeNumerous].
-/// {@macro dart_sodium_nonce_length}
-Uint8List easyAfterNumerous(Uint8List message, Uint8List nonce, Uint8List key) {
-  final noncePtr = Uint8Array.fromTypedList(nonce);
-  final keyPtr = Uint8Array.fromTypedList(key);
-  final cPtr = Uint8Array.allocate(count: message.length + bindings.macBytes)
-    ..view.setAll(0, message);
+  /// Throws [ArgumentError] when arguments for the crypto_box_afternm interface are false
+  void _checkAfterNumerousArguments(Uint8List nonce, Uint8List key) {
+    _checkNonce(nonce);
+    checkExpectedLengthOf(key.length, _bindings.beforeNumerousBytes, 'key');
+  }
 
-  final result = bindings.easyAfterNumerous(
-      cPtr.rawPtr, cPtr.rawPtr, message.length, noncePtr.rawPtr, keyPtr.rawPtr);
+  /// Encrypts [message] with the recipient's [publicKey] and the senders [secretKey].
+  /// {@macro dart_sodium_keypair_length}
+  /// {@macro dart_sodium_nonce_length}
+  Uint8List easy(Uint8List message, Uint8List nonce, Uint8List publicKey, Uint8List secretKey) {
+    _checkEasyArguments(nonce, publicKey, secretKey);
+    return free2freeZero2(
+      nonce.asArray,
+      Uint8Array.allocate(count: message.length + _bindings.macBytes)..view.setAll(0, message),
+      publicKey.asArray,
+      secretKey.asArray,
+      (noncePtr, cPtr, pkPtr, skPtr) {
+        final result = _bindings.easy(cPtr.rawPtr, cPtr.rawPtr, message.length, noncePtr.rawPtr, pkPtr.rawPtr, skPtr.rawPtr);
+        if (result != 0) {
+          throw Error();
+        }
+        return Uint8List.fromList(cPtr.view);
+      },
+    );
+  }
 
-  noncePtr.free();
-  cPtr.free();
-  keyPtr.freeZero();
+  /// Opens [message] encrypted by [easy]. [nonce], [publicKey] and [secretKey] must be the same.
+  Uint8List openEasy(Uint8List ciphertext, Uint8List nonce, Uint8List publicKey, Uint8List secretKey) {
+    _checkEasyArguments(nonce, publicKey, secretKey);
+    return free2freeZero2(
+      nonce.asArray,
+      ciphertext.asArray,
+      publicKey.asArray,
+      secretKey.asArray,
+      (noncePtr, cPtr, pkPtr, skPtr) {
+        final result = _bindings.openEasy(cPtr.rawPtr, cPtr.rawPtr, ciphertext.length, noncePtr.rawPtr, pkPtr.rawPtr, skPtr.rawPtr);
+        if (result != 0) {
+          throw Error();
+        }
+        return cPtr.view.sublist(0, ciphertext.length - _bindings.macBytes);
+      },
+    );
+  }
 
-  if (result != 0) {
+  /// Generates a shared key to encrypt all onward messages. Can improve performance.
+  /// {@macro dart_sodium_keypair_length}
+  Uint8List beforeNumerous(Uint8List publicKey, Uint8List secretKey) {
+    _checkKeyPair(publicKey, secretKey);
+    return freeZero3(
+      publicKey.asArray,
+      secretKey.asArray,
+      Uint8Array.allocate(count: _bindings.beforeNumerousBytes),
+      (pkPtr, skPtr, sharedKeyPtr) {
+        final result = _bindings.beforeNm(sharedKeyPtr.rawPtr, pkPtr.rawPtr, skPtr.rawPtr);
+        if (result != 0) {
+          throw Error();
+        }
+        return UnmodifiableUint8ListView(Uint8List.fromList(sharedKeyPtr.view));
+      },
+    );
+  }
+
+  /// Encrypts [message] with a shared key generated by [beforeNumerous].
+  /// {@macro dart_sodium_nonce_length}
+  Uint8List easyAfterNumerous(Uint8List message, Uint8List nonce, Uint8List key) {
     _checkAfterNumerousArguments(nonce, key);
-    throw Error();
+    return free2freeZero1(
+      nonce.asArray,
+      Uint8Array.allocate(count: message.length + _bindings.macBytes)..view.setAll(0, message),
+      key.asArray,
+      (noncePtr, cPtr, keyPtr) {
+        final result = _bindings.easyAfterNm(cPtr.rawPtr, cPtr.rawPtr, message.length, noncePtr.rawPtr, keyPtr.rawPtr);
+        if (result != 0) {
+          throw Error();
+        }
+        return Uint8List.fromList(cPtr.view);
+      },
+    );
   }
-  return Uint8List.fromList(cPtr.view);
-}
 
-/// Decrypts [ciphertext] generated by [easyAfterNumerous].
-/// [key] and [nonce] must be the same.
-Uint8List openEasyAfterNumerous(
-    Uint8List ciphertext, Uint8List nonce, Uint8List key) {
-  assert(nonce.length == bindings.nonceBytes);
-  assert(key.length == bindings.beforeNumerousBytes);
-  final noncePtr = Uint8Array.fromTypedList(nonce);
-  final keyPtr = Uint8Array.fromTypedList(key);
-  final cPtr = Uint8Array.fromTypedList(ciphertext);
-
-  final result = bindings.openEasyAfterNumerous(cPtr.rawPtr, cPtr.rawPtr,
-      ciphertext.length, noncePtr.rawPtr, keyPtr.rawPtr);
-  noncePtr.free();
-  cPtr.free();
-  keyPtr.freeZero();
-
-  if (result != 0) {
+  /// Decrypts [ciphertext] generated by [easyAfterNumerous].
+  /// [key] and [nonce] must be the same.
+  Uint8List openEasyAfterNumerous(Uint8List ciphertext, Uint8List nonce, Uint8List key) {
     _checkAfterNumerousArguments(nonce, key);
-    throw Error();
+    return free2freeZero1(
+      nonce.asArray,
+      ciphertext.asArray,
+      key.asArray,
+      (noncePtr, cPtr, keyPtr) {
+        final result = _bindings.openEasyAfterNm(cPtr.rawPtr, cPtr.rawPtr, ciphertext.length, noncePtr.rawPtr, keyPtr.rawPtr);
+        if (result != 0) {
+          throw Error();
+        }
+        return cPtr.view.sublist(0, ciphertext.length - _bindings.macBytes);
+      },
+    );
   }
-  return cPtr.view.sublist(0, ciphertext.length - bindings.macBytes);
 }

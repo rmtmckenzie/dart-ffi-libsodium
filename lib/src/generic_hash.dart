@@ -1,10 +1,10 @@
-import 'dart:typed_data';
 import 'dart:ffi';
+import 'dart:typed_data';
 
 import 'package:ffi_helper/ffi_helper.dart';
-import 'internal_helpers.dart';
 
 import 'bindings/generic_hash.dart' as bindings;
+import 'internal_helpers.dart';
 
 /// {@template dart_sodium_generichash_arguments}
 /// A different [key] (optional) produces
@@ -13,68 +13,82 @@ import 'bindings/generic_hash.dart' as bindings;
 /// the length of the generated hash and must be between [genericHashBytesMin] and [genericHashBytesMax] long (standart [genericHashBytes]).
 /// {@endtemplate}
 
-void _checkGenericHashArguments(Uint8List key, int outLength) {
-  if (key != null &&
-      (key.length < bindings.keyBytesMin ||
-          key.length > bindings.keyBytesMax)) {
-    throw ArgumentError.value(key.length, 'key.length',
-        'must be between "${bindings.keyBytesMin}" and "${bindings.keyBytesMax}"');
-  }
-  if (outLength > bindings.genericHashBytesMax ||
-      key.length < bindings.genericHashBytesMin) {
-    throw ArgumentError.value(outLength, 'outLength',
-        'must be between "${bindings.genericHashBytesMax}" and "${bindings.genericHashBytesMin}"');
+mixin _ArgChecker {
+  bindings.GenericHash get _bindings;
+
+  void _checkGenericHashArguments(Uint8List key, int outLength) {
+    if (key != null && (key.length < _bindings.keyBytesMin || key.length > _bindings.keyBytesMax)) {
+      throw ArgumentError.value(key.length, 'key.length', 'must be between "${_bindings.keyBytesMin}" and "${_bindings.keyBytesMax}"');
+    }
+    if (outLength > _bindings.genericHashBytesMax || outLength < _bindings.genericHashBytesMin) {
+      throw ArgumentError.value(outLength, 'outLength', 'must be between "${_bindings.genericHashBytesMax}" and "${_bindings.genericHashBytesMin}"');
+    }
   }
 }
 
-/// Generate a fingerprint for [input]. {@macro dart_sodium_generichash_arguments}
-/// Please remember to use constant-time comparison when comparing two fingerprints (see [memoryCompare]).
-Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
-  outLength ??= bindings.genericHashBytes;
-  final outPtr = Uint8Array.allocate(count: outLength);
-  final inPtr = Uint8Array.fromTypedList(input);
+class GenericHash with _ArgChecker {
+  @override
+  final bindings.GenericHash _bindings;
 
-  var result = 0;
-  if (key == null) {
-    result = bindings.genericHash(outPtr.rawPtr, outLength, inPtr.rawPtr,
-        input.length, nullptr.cast(), 0);
-  } else {
-    final keyPtr = Uint8Array.fromTypedList(key);
-    result = bindings.genericHash(outPtr.rawPtr, outLength, inPtr.rawPtr,
-        input.length, keyPtr.rawPtr, key.length);
+  GenericHash([bindings.GenericHash _bindings]) : _bindings = _bindings ?? bindings.GenericHash();
+
+  /// Generate a fingerprint for [input]. {@macro dart_sodium_generichash_arguments}
+  /// Please remember to use constant-time comparison when comparing two fingerprints (see [memoryCompare]).
+  Uint8List genericHash(Uint8List input, {Uint8List key, int outLength}) {
+    if (outLength != null) {
+      _checkGenericHashArguments(key, outLength);
+    } else {
+      outLength = _bindings.genericHashBytes;
+    }
+
+    if (key == null) {
+      return free2(
+        Uint8Array.allocate(count: outLength),
+        input.asArray,
+        (outPtr, inPtr) {
+          final result = _bindings.genericHash(outPtr.rawPtr, outLength, inPtr.rawPtr, input.length, nullptr.cast(), 0);
+          if (result != 0) {
+            throw Error();
+          }
+          return Uint8List.fromList(outPtr.view);
+        },
+      );
+    } else {
+      return free2freeZero1(
+        Uint8Array.allocate(count: outLength),
+        input.asArray,
+        key?.asArray,
+        (outPtr, inPtr, keyPtr) {
+          final result = _bindings.genericHash(outPtr.rawPtr, outLength, inPtr.rawPtr, input.length, keyPtr.rawPtr, key.length);
+          if (result != 0) {
+            throw Error();
+          }
+          return Uint8List.fromList(outPtr.view);
+        },
+      );
+    }
+  }
+
+  /// Generates a key for generic hash.
+  UnmodifiableUint8ListView keyGen() {
+    final keyPtr = Uint8Array.allocate(count: _bindings.keyBytes);
+    _bindings.keyGen(keyPtr.rawPtr);
+    final key = UnmodifiableUint8ListView(Uint8List.fromList(keyPtr.view));
     keyPtr.freeZero();
+    return key;
   }
-  outPtr.free();
-  inPtr.free();
 
-  if (result != 0) {
-    _checkGenericHashArguments(key, outLength);
-    throw Error();
-  }
-  return Uint8List.fromList(outPtr.view);
-}
-
-/// Generates hash for a multi-part message
-class GenericHashStream {
-  final Uint8List _state;
-  UnmodifiableUint8ListView get state => UnmodifiableUint8ListView(_state);
-  final int outLength;
-
-  /// Resume stream with a saved [state] and [outhLength];
-  GenericHashStream.resume(this._state, this.outLength);
-
-  /// {@macro dart_sodium_generichash_arguments}
-  factory GenericHashStream({Uint8List key, int outLength}) {
-    outLength ??= bindings.genericHashBytes;
-    final statePtr = Uint8Array.allocate(count: bindings.stateBytes);
+  /// {@macro dart_sodium_generichash_arguments}, and pass in bindings object.
+  GenericHashStream stream({Uint8List key, int outLength}) {
+    outLength ??= _bindings.genericHashBytes;
+    final statePtr = Uint8Array.allocate(count: _bindings.stateBytes);
 
     var result = 0;
     if (key == null) {
-      result = bindings.init(statePtr.rawPtr, nullptr.cast(), 0, outLength);
+      result = _bindings.init(statePtr.rawPtr, nullptr.cast(), 0, outLength);
     } else {
-      final keyPtr = Uint8Array.fromTypedList(key);
-      result =
-          bindings.init(statePtr.rawPtr, keyPtr.rawPtr, key.length, outLength);
+      final keyPtr = key.asArray;
+      result = _bindings.init(statePtr.rawPtr, keyPtr.rawPtr, key.length, outLength);
       keyPtr.freeZero();
     }
     final state = Uint8List.fromList(statePtr.view);
@@ -84,46 +98,54 @@ class GenericHashStream {
       _checkGenericHashArguments(key, outLength);
       throw Error();
     }
-    return GenericHashStream.resume(state, outLength);
+    return GenericHashStream._resume(state, outLength, _bindings);
   }
+
+  /// Resume stream with a saved [state] and [outhLength];
+  GenericHashStream resumeStream(Uint8List state, int outLength) => GenericHashStream._resume(state, outLength, _bindings);
+}
+
+/// Generates hash for a multi-part message
+class GenericHashStream {
+  final int outLength;
+
+  UnmodifiableUint8ListView get state => UnmodifiableUint8ListView(_state);
+
+  final bindings.GenericHash _bindings;
+  final Uint8List _state;
+
+  /// Resume stream with a saved [state] and [outhLength], and pass in bindings object;
+  GenericHashStream._resume(this._state, this.outLength, this._bindings);
 
   /// Updates the stream with [input]. Call [update] of every part of the message.
   void update(Uint8List input) {
-    final statePtr = Uint8Array.fromTypedList(_state);
-    final inPtr = Uint8Array.fromTypedList(input);
+    free1freeZero1(
+      input.asArray,
+      _state.asArray,
+      (inPtr, statePtr) {
+        final result = _bindings.update(statePtr.rawPtr, inPtr.rawPtr, input.length);
+        if (result != 0) {
+          StateError('GenericHashStream state is bad');
+        }
 
-    final result = bindings.update(statePtr.rawPtr, inPtr.rawPtr, input.length);
-    _state.setAll(0, statePtr.view);
-    statePtr.freeZero();
-    inPtr.free();
-
-    if (result != 0) {
-      StateError('GenericHashStream state is bad');
-    }
+        _state.setAll(0, statePtr.view);
+      },
+    );
   }
 
   /// Generates the fingerprint of the multi-part message.
   /// The stream mustn't be used after calling [finalize].
   Uint8List finalize() {
-    final statePtr = Uint8Array.fromTypedList(_state);
-    final outPtr = Uint8Array.allocate(count: outLength);
-
-    final result = bindings.finish(statePtr.rawPtr, outPtr.rawPtr, outLength);
-    statePtr.freeZero();
-    outPtr.free();
-
-    if (result != 0) {
-      StateError('GenericHashStream state is bad');
-    }
-    return Uint8List.fromList(outPtr.view);
+    return free1freeZero1(
+      Uint8Array.allocate(count: outLength),
+      _state.asArray,
+      (outPtr, statePtr) {
+        final result = _bindings.finish(statePtr.rawPtr, outPtr.rawPtr, outLength);
+        if (result != 0) {
+          StateError('GenericHashStream state is bad');
+        }
+        return Uint8List.fromList(outPtr.view);
+      },
+    );
   }
-}
-
-/// Generates a key for generic hash.
-UnmodifiableUint8ListView keyGen() {
-  final keyPtr = Uint8Array.allocate(count: bindings.keyBytes);
-  bindings.keyGen(keyPtr.rawPtr);
-  final key = UnmodifiableUint8ListView(Uint8List.fromList(keyPtr.view));
-  keyPtr.freeZero();
-  return key;
 }

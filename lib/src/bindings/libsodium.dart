@@ -1,38 +1,32 @@
 import 'dart:ffi';
 
-import 'package:dart_sodium/src/bindings/auth.dart';
-import 'package:dart_sodium/src/bindings/pwhash.dart';
+import 'dart:io';
 
-import 'random.dart';
+typedef SodiumMemoryCompareNative = Int8 Function(Pointer<Void> a, Pointer<Void> b, IntPtr len);
+typedef SodiumMemoryCompareDart = int Function(Pointer<Void> a, Pointer<Void> b, int len);
 
-typedef SodiumMemoryCompareNative = Int8 Function(
-    Pointer<Void> a, Pointer<Void> b, IntPtr len);
-typedef SodiumMemoryCompareDart = int Function(
-    Pointer<Void> a, Pointer<Void> b, int len);
+class LibSodium {
+  static LibSodium _instance;
 
-class Libsodium {
-  Libsodium(DynamicLibrary sodium)
-      : init = sodium
-            .lookup<NativeFunction<Int8 Function()>>('sodium_init')
-            .asFunction(),
-        versionString = sodium.lookupFunction<Pointer<Uint8> Function(),
-            Pointer<Uint8> Function()>('sodium_version_string')(),
-        randomBytes = RandomBytes(sodium),
-        passwordHash = PasswordHash(sodium),
-        authentication = Authentication(sodium),
-        memoryCompare = sodium
-            .lookup<NativeFunction<SodiumMemoryCompareNative>>('sodium_memcmp')
-            .asFunction();
+  static final String defaultLibName = Platform.isMacOS ? 'libsodium.dylib' : 'libsodium';
 
-  factory Libsodium.open([String name = 'libsodium']) {
-    final lib = DynamicLibrary.open(name);
-    return Libsodium(lib);
+  LibSodium._(this.sodium)
+      : init = sodium.lookup<NativeFunction<Int8 Function()>>('sodium_init').asFunction(),
+        versionString = sodium.lookupFunction<Pointer<Uint8> Function(), Pointer<Uint8> Function()>('sodium_version_string')(),
+        memoryCompare = sodium.lookup<NativeFunction<SodiumMemoryCompareNative>>('sodium_memcmp').asFunction();
+
+  factory LibSodium() {
+    _instance ??= LibSodium.open();
+    return _instance;
+  }
+
+  factory LibSodium.open([String name]) {
+    final lib = DynamicLibrary.open(name ?? defaultLibName);
+    return LibSodium._(lib);
   }
 
   final int Function() init;
   final Pointer<Uint8> versionString;
-  final RandomBytes randomBytes;
-  final PasswordHash passwordHash;
-  final Authentication authentication;
   final SodiumMemoryCompareDart memoryCompare;
+  final DynamicLibrary sodium;
 }

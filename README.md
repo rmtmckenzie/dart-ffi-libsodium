@@ -32,6 +32,16 @@ dart_sodium is a wrapper library for the Sodium cryptography library (libsodium)
 
 Not every api is fully covered yet. dart_sodium tries to resemble libsodium as much as possible while following Dart's conventions. To avoid repetition dart_sodium's api documentation is rather terse. For more information about apis and algorithms and when to use them I would recommend the libsodium documentation.
 
+# Running
+
+On mac, must unsign dart executable:
+```bash
+codesign --remove-signature `which dart`
+```
+
+Also, on mac only loading must include `.dylib`. Default no-arg init handles
+this automatically.
+
 # How to use
 
 Before calling any other function of dart_sodium, you should call

@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:benchmark_harness/benchmark_harness.dart';
-import 'package:dart_sodium/sodium.dart' as sodium;
-import 'package:dart_sodium/random_bytes.dart' as rand_bytes;
+import 'package:dart_sodium/sodium.dart';
+import 'package:dart_sodium/random_bytes.dart';
 
 class ConstantTimeListCompareBenchmark extends BenchmarkBase {
   ConstantTimeListCompareBenchmark()
@@ -10,8 +10,8 @@ class ConstantTimeListCompareBenchmark extends BenchmarkBase {
   Uint8List a, b;
   @override
   void setup() {
-    sodium.init();
-    a = rand_bytes.buffer(32);
+    LibSodium.init();
+    a = RandomBytes().buffer(32);
     b = Uint8List.fromList(a);
     b[5] == a[5] + 1;
   }

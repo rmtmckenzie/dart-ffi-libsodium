@@ -3,4 +3,3 @@
 library secret_box;
 
 export 'src/secret_box.dart';
-export 'src/bindings/secretbox.dart' show keyBytes, macBytes, nonceBytes;

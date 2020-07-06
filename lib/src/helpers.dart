@@ -2,18 +2,25 @@ import 'dart:typed_data';
 
 import 'package:ffi_helper/ffi_helper.dart';
 
-import 'bindings/helpers.dart' as bindings;
+import 'bindings/libsodium.dart';
+import 'internal_helpers.dart';
 
-bool memoryCompare(Uint8List a, Uint8List b) {
-  if (a.length != b.length) {
-    throw ArgumentError('Both arguments must have the same length');
+class Helpers {
+  final LibSodium _bindings;
+
+  Helpers([LibSodium _bindings]) : _bindings = _bindings ?? LibSodium();
+
+  bool memoryCompare(Uint8List a, Uint8List b) {
+    if (a.length != b.length) {
+      throw ArgumentError('Both arguments must have the same length');
+    }
+
+    return free2(
+      a.asArray,
+      b.asArray,
+      (aPtr, bPtr) {
+        return _bindings.memoryCompare(aPtr.rawPtr.cast(), bPtr.rawPtr.cast(), a.length) == 0;
+      },
+    );
   }
-
-  final aPtr = Uint8Array.fromTypedList(a);
-  final bPtr = Uint8Array.fromTypedList(b);
-
-  final result = bindings.memoryCompare(aPtr.rawPtr, bPtr.rawPtr, a.length);
-  aPtr.free();
-  bPtr.free();
-  return result == 0;
 }

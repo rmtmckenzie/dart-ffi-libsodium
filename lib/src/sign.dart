@@ -1,11 +1,12 @@
 import 'dart:ffi';
 import 'dart:typed_data';
 
+import 'package:ffi/ffi.dart';
 import 'package:ffi_helper/ffi_helper.dart';
-import 'internal_helpers.dart';
-import 'box.dart' show KeyPairException;
 
 import 'bindings/sign.dart' as bindings;
+import 'internal_helpers.dart';
+import 'shared.dart';
 
 class SignError extends Error {
   @override
@@ -14,21 +15,28 @@ class SignError extends Error {
   }
 }
 
-class UpdateStreamException implements Exception {
+class KeyPairException implements SodiumException {
+  @override
+  String toString() {
+    return 'Failed to initialize keypair';
+  }
+}
+
+class UpdateStreamException implements SodiumException {
   @override
   String toString() {
     return 'Failed to update sign stream';
   }
 }
 
-class InvalidSignatureError extends Error {
+class InvalidSignatureException implements SodiumException {
   @override
   String toString() {
     return 'The signature appears to be invalid';
   }
 }
 
-class InitStreamException implements Exception {
+class InitStreamException implements SodiumException {
   @override
   String toString() {
     return 'Failed to initialize sign stream';
@@ -38,14 +46,17 @@ class InitStreamException implements Exception {
 /// Pair of public and secret key.
 class KeyPair {
   final UnmodifiableUint8ListView publicKey, secretKey;
+
   const KeyPair._(this.publicKey, this.secretKey);
 
   /// Generates a pair of public and secret key.
   /// Throws [KeyPairException] when generating keys fails.
-  factory KeyPair.generate() {
-    final pkPtr = Uint8Array.allocate(count: bindings.publicKeyBytes);
-    final skPtr = Uint8Array.allocate(count: bindings.secretKeyBytes);
-    final result = bindings.keyPair(pkPtr.rawPtr, skPtr.rawPtr);
+  factory KeyPair([bindings.Sign sign]) {
+    final _sign = sign ?? bindings.Sign();
+
+    final pkPtr = Uint8Array.allocate(count: _sign.publicKeyBytes);
+    final skPtr = Uint8Array.allocate(count: _sign.secretKeyBytes);
+    final result = _sign.keyPair(pkPtr.rawPtr, skPtr.rawPtr);
     final publicKey = UnmodifiableUint8ListView(Uint8List.fromList(pkPtr.view));
     final secretKey = UnmodifiableUint8ListView(Uint8List.fromList(skPtr.view));
     pkPtr.freeZero();
@@ -58,98 +69,141 @@ class KeyPair {
 
   /// Derives [publicKey] and [secretKey] from [seed].
   /// Throws [KeyPairException] when generating keys fails.
-  factory KeyPair.fromSeed(Uint8List seed) {
-    assert(seed.length == bindings.seedBytes);
-    final pkPtr = Uint8Array.allocate(count: bindings.publicKeyBytes);
-    final skPtr = Uint8Array.allocate(count: bindings.secretKeyBytes);
-    final seedPtr = Uint8Array.fromTypedList(seed);
-    final result =
-        bindings.seedKeyPair(pkPtr.rawPtr, skPtr.rawPtr, seedPtr.rawPtr);
-    final publicKey = UnmodifiableUint8ListView(Uint8List.fromList(pkPtr.view));
-    final secretKey = UnmodifiableUint8ListView(Uint8List.fromList(skPtr.view));
+  factory KeyPair.fromSeed(Uint8List seed, [bindings.Sign sign]) {
+    final _sign = sign ?? bindings.Sign();
 
-    pkPtr.freeZero();
-    skPtr.freeZero();
-    if (result != 0) {
-      throw KeyPairException();
-    }
-    return KeyPair._(publicKey, secretKey);
+    checkExpectedLengthOf(seed.length, _sign.seedBytes, 'seed');
+
+    return free2freeZero1(
+      seed.asArray,
+      Uint8Array.allocate(count: _sign.publicKeyBytes),
+      Uint8Array.allocate(count: _sign.secretKeyBytes),
+      (seedPtr, pkPtr, skPtr) {
+        final result = _sign.seedKeyPair(pkPtr.rawPtr, skPtr.rawPtr, seedPtr.rawPtr);
+        if (result != 0) {
+          throw KeyPairException();
+        }
+
+        final publicKey = UnmodifiableUint8ListView(Uint8List.fromList(pkPtr.view));
+        final secretKey = UnmodifiableUint8ListView(Uint8List.fromList(skPtr.view));
+        return KeyPair._(publicKey, secretKey);
+      },
+    );
   }
 }
 
-/// Signs [message] with [secretKey]. [secretKey] must be [secretKeyBytes] long.
-Uint8List sign(Uint8List message, Uint8List secretKey) {
-  assert(secretKey.length == bindings.secretKeyBytes);
-  final skPtr = Uint8Array.fromTypedList(secretKey);
-  final messagePtr = Uint8Array.fromTypedList(message);
-  final signedMessagePtr =
-      Uint8Array.allocate(count: message.length + bindings.signBytes);
+class Sign {
+  final bindings.Sign _binding;
 
-  final result = bindings.sign(signedMessagePtr.rawPtr, nullptr.cast(),
-      messagePtr.rawPtr, message.length, skPtr.rawPtr);
+  Sign([bindings.Sign binding]) : _binding = binding ?? bindings.Sign();
 
-  skPtr.freeZero();
-  messagePtr.free();
-  signedMessagePtr.free();
+  /// Signs [message] with [secretKey]. [secretKey] must be [secretKeyBytes] long.
+  Uint8List sign(Uint8List message, Uint8List secretKey) {
+    checkExpectedLengthOf(secretKey.length, _binding.secretKeyBytes, 'secret key');
 
-  if (result != 0) {
-    throw SignError();
+    return free2freeZero1(
+      message.asArray,
+      Uint8Array.allocate(count: message.length + _binding.signBytes),
+      secretKey.asArray,
+      (messagePtr, signedMessagePtr, skPtr) {
+        final result = _binding.sign(signedMessagePtr.rawPtr, nullptr.cast(), messagePtr.rawPtr, message.length, skPtr.rawPtr);
+        if (result != 0) {
+          throw SignError();
+        }
+        return Uint8List.fromList(signedMessagePtr.view);
+      },
+    );
   }
-  return Uint8List.fromList(signedMessagePtr.view);
+
+  /// Verifies the signature of [signedMessage] generated by [sign] and extracts the message.
+  /// Throws [InvalidSignatureException] when signature is invalid.
+  Uint8List open(Uint8List signedMessage, Uint8List publicKey) {
+    checkExpectedLengthOf(publicKey.length, _binding.publicKeyBytes, 'public key');
+
+    return free3(
+      signedMessage.asArray,
+      Uint8Array.allocate(count: signedMessage.length - _binding.signBytes),
+      publicKey.asArray,
+      (signedMessagePtr, messagePtr, pkPtr) {
+        final result = _binding.signOpen(messagePtr.rawPtr, nullptr.cast(), signedMessagePtr.rawPtr, signedMessage.length, pkPtr.rawPtr);
+        if (result != 0) {
+          throw InvalidSignatureException();
+        }
+        return Uint8List.fromList(messagePtr.view);
+      },
+    );
+  }
 }
 
-/// Verifies the signature of [signedMessage] generated by [sign] and extracts the message.
-/// Throws [InvalidSignatureError] when signature is invalid. When [onError] is provided,
-/// no Exception will be thrown and null will be returned.
-Uint8List open(Uint8List signedMessage, Uint8List publicKey,
-    {Function() onError}) {
-  assert(publicKey.length == bindings.publicKeyBytes);
-  final pkPtr = Uint8Array.fromTypedList(publicKey);
-  final signedMessagePtr = Uint8Array.fromTypedList(signedMessage);
-  final messagePtr =
-      Uint8Array.allocate(count: signedMessage.length - bindings.signBytes);
+class SignDetached {
+  final bindings.Sign _binding;
 
-  final result = bindings.signOpen(messagePtr.rawPtr, nullptr.cast(),
-      signedMessagePtr.rawPtr, signedMessage.length, pkPtr.rawPtr);
+  SignDetached([bindings.Sign binding]) : _binding = binding ?? bindings.Sign();
 
-  pkPtr.freeZero();
-  messagePtr.free();
-  signedMessagePtr.free();
+  int get signBytes => _binding.signBytes;
+  int get seedBytes => _binding.seedBytes;
 
-  if (result != 0) {
-    if (onError == null) {
-      throw InvalidSignatureError();
-    }
-    onError();
-    return null;
+  Uint8List sign(Uint8List message, Uint8List secretKey) {
+    checkExpectedLengthOf(secretKey.length, _binding.secretKeyBytes, 'secret key');
+
+    return free3freeZero1(
+      Uint8Array.allocate(count: _binding.signBytes),
+      Uint64Array.fromPointer(allocate<Uint64>()),
+      message.asArray,
+      secretKey.asArray,
+      (sigPtr, sigLenPtr, messagePtr, skPtr) {
+        final result = _binding.signDetached(sigPtr.rawPtr, sigLenPtr.rawPtr, messagePtr.rawPtr, messagePtr.length, skPtr.rawPtr);
+        if (result != 0) {
+          throw SignError();
+        }
+
+        return Uint8List.fromList(sigPtr.view);
+      },
+    );
   }
-  return Uint8List.fromList(messagePtr.view);
+
+  bool verify(Uint8List message, Uint8List signature, Uint8List publicKey) {
+    checkExpectedLengthOf(publicKey.length, _binding.publicKeyBytes, 'public key');
+    checkExpectedLengthOf(signature.length, _binding.signBytes, 'signature');
+
+    return free3(
+      signature.asArray,
+      message.asArray,
+      publicKey.asArray,
+      (sigPtr, messagePtr, pkPtr) {
+        final result = _binding.signVerifyDetached(sigPtr.rawPtr, messagePtr.rawPtr, messagePtr.length, pkPtr.rawPtr);
+        return result == 0;
+      },
+    );
+  }
 }
 
-Uint8List _initStream() {
-  final statePtr = Uint8Array.allocate(count: bindings.stateBytes);
-  final result = bindings.signInit(statePtr.rawPtr);
-
-  final state = Uint8List.fromList(statePtr.view);
-  statePtr.freeZero();
-  if (result != 0) {
-    throw InitStreamException();
-  }
-  return state;
+Uint8List _initStream(bindings.Sign binding) {
+  return freeZero1(
+    Uint8Array.allocate(count: binding.stateBytes),
+    (statePtr) {
+      final result = binding.signInit(statePtr.rawPtr);
+      if (result != 0) {
+        throw InitStreamException();
+      }
+      return Uint8List.fromList(statePtr.view);
+    },
+  );
 }
 
 mixin Update {
+  bindings.Sign get _binding;
+
   Uint8List _state;
 
   /// Updates stream with [message].
   /// Call [update] for every part of the message.
   /// Throws [UpdateException] when updating the state fails.
   void update(Uint8List message) {
-    final statePtr = Uint8Array.fromTypedList(_state);
-    final messagePtr = Uint8Array.fromTypedList(message);
+    final statePtr = _state.asArray;
+    final messagePtr = message.asArray;
 
-    final result =
-        bindings.signUpdate(statePtr.rawPtr, messagePtr.rawPtr, message.length);
+    final result = _binding.signUpdate(statePtr.rawPtr, messagePtr.rawPtr, message.length);
     _state.setAll(0, statePtr.view);
     statePtr.freeZero();
     messagePtr.free();
@@ -162,59 +216,74 @@ mixin Update {
 /// Generates signature for a multi-part message.
 class SignStream with Update {
   @override
+  final bindings.Sign _binding;
+
+  @override
   final Uint8List _state;
 
   UnmodifiableUint8ListView get state => UnmodifiableUint8ListView(_state);
 
   /// Resume stream with a saved [state].
-  SignStream.resume(this._state) : assert(_state.length == bindings.stateBytes);
-  SignStream() : _state = _initStream();
+  SignStream.resume(this._state, {bindings.Sign binding}) : _binding = binding ?? bindings.Sign() {
+    checkExpectedLengthOf(_state.length, _binding.stateBytes, 'state');
+  }
+
+  factory SignStream({bindings.Sign binding}) {
+    final _binding = binding ?? bindings.Sign();
+    return SignStream.resume(_initStream(_binding), binding: _binding);
+  }
 
   /// Generates the signature for the multi-part message.
   /// The [SignStream] shouldn't be used any more after calling [finalize].
   /// [secretKey] must be [secretKeyBytes] long.
   /// Throws [SignError] when generating signature fails.
   Uint8List finalize(Uint8List secretKey) {
-    final statePtr = Uint8Array.fromTypedList(_state);
-    final signPtr = Uint8Array.allocate(count: bindings.signBytes);
-    final skPtr = Uint8Array.fromTypedList(secretKey);
-
-    final result = bindings.signFinal(
-        statePtr.rawPtr, signPtr.rawPtr, nullptr.cast(), skPtr.rawPtr);
-    _state.setAll(0, statePtr.view);
-    statePtr.freeZero();
-    signPtr.free();
-    skPtr.freeZero();
-
-    if (result != 0) {
-      throw SignError();
-    }
-    return Uint8List.fromList(signPtr.view);
+    return free1freeZero2(
+      Uint8Array.allocate(count: _binding.signBytes),
+      _state.asArray,
+      secretKey.asArray,
+      (signPtr, statePtr, skPtr) {
+        final result = _binding.signFinal(statePtr.rawPtr, signPtr.rawPtr, nullptr.cast(), skPtr.rawPtr);
+        if (result != 0) {
+          throw SignError();
+        }
+        return Uint8List.fromList(signPtr.view);
+      },
+    );
   }
 }
 
 /// Stream to verify the signature of a multi-part message
 class VerifyStream with Update {
   @override
+  final bindings.Sign _binding;
+
+  @override
   final Uint8List _state;
+
   UnmodifiableUint8ListView get state => _state;
 
   /// Resume stream with a saved [state].
-  VerifyStream.resume(this._state)
-      : assert(_state.length == bindings.stateBytes);
-  VerifyStream() : _state = _initStream();
+  VerifyStream.resume(this._state, {bindings.Sign binding}) : _binding = binding ?? bindings.Sign() {
+    checkExpectedLengthOf(_state.length, _binding.stateBytes, 'state');
+  }
+
+  factory VerifyStream({bindings.Sign binding}) {
+    final _binding = binding ?? bindings.Sign();
+    return VerifyStream.resume(_initStream(_binding), binding: _binding);
+  }
 
   /// Verifies [signature] of a multi-part message generated by [SignStream].
   /// [publicKey] must be [publicKeyBytes] long.
   bool verify(Uint8List signature, Uint8List publicKey) {
-    assert(signature.length == bindings.signBytes);
-    assert(publicKey.length == bindings.publicKeyBytes);
-    final statePtr = Uint8Array.fromTypedList(_state);
-    final signPtr = Uint8Array.fromTypedList(signature);
-    final pkPtr = Uint8Array.fromTypedList(publicKey);
-
-    final result =
-        bindings.signFinalVerify(statePtr.rawPtr, signPtr.rawPtr, pkPtr.rawPtr);
-    return result == 0;
+    return free2freeZero1(
+      signature.asArray,
+      publicKey.asArray,
+      _state.asArray,
+      (signPtr, pkPtr, statePtr) {
+        final result = _binding.signFinalVerify(statePtr.rawPtr, signPtr.rawPtr, pkPtr.rawPtr);
+        return result == 0;
+      },
+    );
   }
 }

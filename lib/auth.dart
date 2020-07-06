@@ -3,4 +3,3 @@
 library auth;
 
 export 'src/auth.dart';
-export 'src/bindings/auth.dart' show authBytes, keyBytes;

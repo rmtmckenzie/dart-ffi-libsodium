@@ -1,16 +1,16 @@
 import 'dart:convert';
 
-import 'package:dart_sodium/secret_box.dart' as secret_box;
+import 'package:dart_sodium/secret_box.dart';
 import 'package:dart_sodium/random_bytes.dart' as random_bytes;
-import 'package:dart_sodium/sodium.dart' as sodium;
+import 'package:dart_sodium/sodium.dart';
 
 void main(List<String> args) {
-  sodium.init();
-  final key = secret_box.keyGen();
+  LibSodium.init();
+  final box = SecretBox.generateKey();
   final msg = utf8.encode('hello world');
 
-  final nonce = random_bytes.buffer(secret_box.nonceBytes);
-  final c = secret_box.easy(msg, nonce, key);
+  final encryptResult = box.encrypt(msg);
 
-  final decrypted = secret_box.openEasy(c, nonce, key);
+  final decrypted = box.decrypt(encryptResult.cipher, encryptResult.nonce);
+  print(utf8.decode(decrypted));
 }

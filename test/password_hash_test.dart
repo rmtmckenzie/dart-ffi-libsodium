@@ -1,16 +1,16 @@
 import 'dart:convert';
 
-import 'package:dart_sodium/password_hash.dart' as pwhash;
-import 'package:dart_sodium/sodium.dart' as sodium;
+import 'package:dart_sodium/password_hash.dart';
+import 'package:dart_sodium/sodium.dart';
 import 'package:test/test.dart';
 
 void main() {
-  sodium.init();
+  LibSodium.init();
+  final pwhash = PasswordHash();
+
   test('Hash and verify password', () {
-    final password = utf8.encode('my password');
-    final hash = pwhash.store(
-        password, pwhash.OpsLimit.interactive, pwhash.MemLimit.interactive);
-    final isValid = pwhash.verify(hash, password);
+    final hash = pwhash.store('my password', opsLimit: pwhash.memLimit.interactive);
+    final isValid = pwhash.verify(hash, 'my password');
 
     expect(isValid, true);
   });

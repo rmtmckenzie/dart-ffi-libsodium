@@ -3,4 +3,3 @@
 library secret_stream;
 
 export 'src/secret_stream.dart';
-export 'src/bindings/secretstream.dart' show aBytes, keyBytes, msgBytesMax;

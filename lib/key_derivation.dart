@@ -1,3 +1,5 @@
+/// Maps libsodium's crypto_kdf_* api.
+library key_derivation;
+
 export 'src/key_derivation.dart';
-export 'src/bindings/key_derivation.dart'
-    show contextBytes, keyBytes, subkeyBytesMax, subkeyBytesMin;
+

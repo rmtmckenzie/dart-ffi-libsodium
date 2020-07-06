@@ -2,24 +2,26 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:benchmark_harness/benchmark_harness.dart';
-import 'package:dart_sodium/sodium.dart' as sodium;
-import 'package:dart_sodium/secret_box.dart' as secret_box;
-import 'package:dart_sodium/random_bytes.dart' as rand_bytes;
+import 'package:dart_sodium/sodium.dart';
+import 'package:dart_sodium/secret_box.dart';
+import 'package:dart_sodium/random_bytes.dart';
 
 class SecretBoxBenchmark extends BenchmarkBase {
   SecretBoxBenchmark() : super('SecretBoxBenchmark');
   final Uint8List message = utf8.encode('hello world');
-  final Uint8List key = secret_box.keyGen();
+  SecretBox box;
+
   @override
   void setup() {
-    sodium.init();
+    LibSodium.init();
+    box = SecretBox.generateKey();
   }
 
   @override
   void run() {
-    final nonce = rand_bytes.buffer(secret_box.nonceBytes);
-    final encrypted = secret_box.easy(message, nonce, key);
-    secret_box.openEasy(encrypted, nonce, key);
+    final nonce = RandomBytes().buffer(box.nonceBytes);
+    final encryptResult = box.encrypt(message,nonce: nonce);
+    box.decrypt(encryptResult.cipher, nonce);
   }
 }
 
