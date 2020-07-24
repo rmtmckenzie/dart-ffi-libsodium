@@ -142,13 +142,13 @@ class KeyExchange {
 }
 
 class KeyPair {
-  final UnmodifiableUint8ListView secretKey, publicKey;
+  final Uint8List secretKey, publicKey;
 
   const KeyPair._(this.publicKey, this.secretKey);
 }
 
 abstract class SessionKeys {
-  final UnmodifiableUint8ListView receiverKey, toReceiverKey;
+  final Uint8List receiverKey, toReceiverKey;
 
   SessionKeys._(this.receiverKey, this.toReceiverKey);
 }
