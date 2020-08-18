@@ -1,5 +1,4 @@
 import 'dart:ffi';
-
 import 'dart:io';
 
 typedef SodiumMemoryCompareNative = Int8 Function(Pointer<Void> a, Pointer<Void> b, IntPtr len);
@@ -8,7 +7,17 @@ typedef SodiumMemoryCompareDart = int Function(Pointer<Void> a, Pointer<Void> b,
 class LibSodium {
   static LibSodium _instance;
 
-  static final String defaultLibName = Platform.isMacOS ? 'libsodium.dylib' : 'libsodium';
+  static final String defaultLibName = () {
+    String lib;
+    if (Platform.isMacOS) {
+      lib = 'libsodium.dylib';
+    } else if (Platform.isLinux) {
+      lib = 'libsodium.so';
+    } else {
+      lib = 'libsodium';
+    }
+    return lib;
+  }();
 
   LibSodium._(this.sodium)
       : init = sodium.lookup<NativeFunction<Int8 Function()>>('sodium_init').asFunction(),
