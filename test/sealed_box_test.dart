@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:dart_sodium/box.dart';
 import 'package:dart_sodium/random_bytes.dart';
@@ -19,7 +18,7 @@ void main() {
     final keyPair = sealedBox.generateKeyPair();
 
     final encrypted = sealedBox.seal(message, publicKey: keyPair.publicKey);
-    final decrypted = sealedBox.open(encrypted,  keyPair);
+    final decrypted = sealedBox.open(encrypted, keyPair);
 
     expect(message, decrypted);
   });

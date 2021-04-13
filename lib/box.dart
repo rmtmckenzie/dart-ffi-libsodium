@@ -3,5 +3,3 @@
 library box;
 
 export 'src/box.dart';
-export 'src/bindings/box.dart'
-    show nonceBytes, publicKeyBytes, secretKeyBytes, sealBytes;

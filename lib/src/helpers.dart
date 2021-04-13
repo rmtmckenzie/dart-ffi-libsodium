@@ -1,7 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:ffi_helper/ffi_helper.dart';
-
 import 'bindings/libsodium.dart';
 import 'internal_helpers.dart';
 
@@ -19,7 +17,9 @@ class Helpers {
       a.asArray,
       b.asArray,
       (aPtr, bPtr) {
-        return _bindings.memoryCompare(aPtr.rawPtr.cast(), bPtr.rawPtr.cast(), a.length) == 0;
+        return _bindings.memoryCompare(
+                aPtr.rawPtr.cast(), bPtr.rawPtr.cast(), a.length) ==
+            0;
       },
     );
   }

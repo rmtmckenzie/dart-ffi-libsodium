@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:dart_sodium/secret_box.dart';
-import 'package:dart_sodium/random_bytes.dart' as random_bytes;
 import 'package:dart_sodium/sodium.dart';
 
 void main(List<String> args) {
