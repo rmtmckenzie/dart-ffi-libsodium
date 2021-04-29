@@ -2,9 +2,8 @@ import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:dart_sodium/random_bytes.dart';
-import 'package:dart_sodium/src/internal_helpers.dart';
+import 'package:dart_sodium/src/helpers/internal_helpers.dart';
 import 'package:dart_sodium/src/shared.dart';
-import 'package:ffi/ffi.dart';
 import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/aead.dart' as bindings;
@@ -26,7 +25,7 @@ class AeadXChacha20Poly1305IETF {
 
     final key = freeZero1(
       Uint8Array.allocate(count: _binding.keyBytes),
-          (keyPtr) {
+      (keyPtr) {
         _binding.keyGen(keyPtr.rawPtr);
         return Uint8List.fromList(keyPtr.view);
       },
@@ -35,7 +34,8 @@ class AeadXChacha20Poly1305IETF {
     return AeadXChacha20Poly1305IETF._(UnmodifiableUint8ListView(key), _binding, _randomBytes);
   }
 
-  factory AeadXChacha20Poly1305IETF.fromKey(Uint8List key, [bindings.AeadXChacha20Poly1305IETF secretBox, RandomBytes randomBytes]) {
+  factory AeadXChacha20Poly1305IETF.fromKey(Uint8List key,
+      [bindings.AeadXChacha20Poly1305IETF secretBox, RandomBytes randomBytes]) {
     final _binding = secretBox ?? bindings.AeadXChacha20Poly1305IETF();
     final _randomBytes = randomBytes ?? RandomBytes();
     checkExpectedLengthOf(key.length, _binding.keyBytes, 'key');
@@ -51,12 +51,12 @@ class AeadXChacha20Poly1305IETF {
 
     return free5freeZero1(
       Uint8Array.allocate(count: message.length + _bindings.aBytes),
-      Uint64Array.fromPointer(allocate<Uint64>()),
+      Uint64Array.allocate(),
       message.asArray,
       additionalData?.asArray,
       nonce.asArray,
       key.asArray,
-          (cipherPtr, cipherLengthPtr, messagePtr, additionalDataPtr, noncePtr, keyPtr) {
+      (cipherPtr, cipherLengthPtr, messagePtr, additionalDataPtr, noncePtr, keyPtr) {
         final result = _bindings.encrypt(
           cipherPtr.rawPtr,
           cipherLengthPtr.rawPtr,
@@ -71,7 +71,8 @@ class AeadXChacha20Poly1305IETF {
         if (result != 0) {
           throw Exception();
         }
-        return EncryptResult(cipher: Uint8List.fromList(cipherPtr.view.sublist(0, cipherLengthPtr.view.first)), nonce: nonce);
+        return EncryptResult(
+            cipher: Uint8List.fromList(cipherPtr.view.sublist(0, cipherLengthPtr.view.first)), nonce: nonce);
       },
     );
   }
@@ -81,12 +82,12 @@ class AeadXChacha20Poly1305IETF {
 
     return free5freeZero1(
       Uint8Array.allocate(count: cipher.length - _bindings.aBytes),
-      Uint64Array.fromPointer(allocate<Uint64>()),
+      Uint64Array.allocate(),
       cipher.asArray,
       additionalData?.asArray,
       nonce.asArray,
       key.asArray,
-          (messagePtr, messageLengthPtr, cipherPtr, additionalDataPtr, noncePtr, keyPtr) {
+      (messagePtr, messageLengthPtr, cipherPtr, additionalDataPtr, noncePtr, keyPtr) {
         final result = _bindings.decrypt(
           messagePtr.rawPtr,
           messageLengthPtr.rawPtr,

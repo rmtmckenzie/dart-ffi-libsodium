@@ -5,7 +5,7 @@ import 'package:dart_sodium/src/shared.dart';
 import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/pwhash.dart' as bindings;
-import 'internal_helpers.dart';
+import 'helpers/internal_helpers.dart';
 
 class PasswordHashException implements SodiumException {
   @override

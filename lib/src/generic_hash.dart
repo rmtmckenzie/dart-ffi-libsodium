@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/generic_hash.dart' as bindings;
-import 'internal_helpers.dart';
+import 'helpers/internal_helpers.dart';
 
 /// {@template dart_sodium_generichash_arguments}
 /// A different [key] (optional) produces
@@ -18,10 +18,12 @@ mixin _ArgChecker {
 
   void _checkGenericHashArguments(Uint8List key, int outLength) {
     if (key != null && (key.length < _bindings.keyBytesMin || key.length > _bindings.keyBytesMax)) {
-      throw ArgumentError.value(key.length, 'key.length', 'must be between "${_bindings.keyBytesMin}" and "${_bindings.keyBytesMax}"');
+      throw ArgumentError.value(
+          key.length, 'key.length', 'must be between "${_bindings.keyBytesMin}" and "${_bindings.keyBytesMax}"');
     }
     if (outLength > _bindings.genericHashBytesMax || outLength < _bindings.genericHashBytesMin) {
-      throw ArgumentError.value(outLength, 'outLength', 'must be between "${_bindings.genericHashBytesMax}" and "${_bindings.genericHashBytesMin}"');
+      throw ArgumentError.value(outLength, 'outLength',
+          'must be between "${_bindings.genericHashBytesMax}" and "${_bindings.genericHashBytesMin}"');
     }
   }
 }
@@ -59,7 +61,8 @@ class GenericHash with _ArgChecker {
         input.asArray,
         key?.asArray,
         (outPtr, inPtr, keyPtr) {
-          final result = _bindings.genericHash(outPtr.rawPtr, outLength, inPtr.rawPtr, input.length, keyPtr.rawPtr, key.length);
+          final result =
+              _bindings.genericHash(outPtr.rawPtr, outLength, inPtr.rawPtr, input.length, keyPtr.rawPtr, key.length);
           if (result != 0) {
             throw Error();
           }
@@ -102,7 +105,8 @@ class GenericHash with _ArgChecker {
   }
 
   /// Resume stream with a saved [state] and [outhLength];
-  GenericHashStream resumeStream(Uint8List state, int outLength) => GenericHashStream._resume(state, outLength, _bindings);
+  GenericHashStream resumeStream(Uint8List state, int outLength) =>
+      GenericHashStream._resume(state, outLength, _bindings);
 }
 
 /// Generates hash for a multi-part message

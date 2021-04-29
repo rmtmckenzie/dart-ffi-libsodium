@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/key_derivation.dart' as bindings;
-import 'internal_helpers.dart';
+import 'helpers/internal_helpers.dart';
 
 class KeyDerivationError extends Error {
   @override
@@ -43,7 +43,8 @@ class KeyDerivation {
       context.asArray,
       key.asArray,
       (subkeyPtr, contextPtr, keyPtr) {
-        final result = _bindings.deriveFromKey(subkeyPtr.rawPtr, subkeyLength, subkeyId, contextPtr.rawPtr, keyPtr.rawPtr);
+        final result =
+            _bindings.deriveFromKey(subkeyPtr.rawPtr, subkeyLength, subkeyId, contextPtr.rawPtr, keyPtr.rawPtr);
         if (result != 0) {
           throw Error();
         }

@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/box.dart' as bindings;
-import 'internal_helpers.dart';
+import 'helpers/internal_helpers.dart';
 
 /// {@template box_throws_generate_keypair_exception}
 /// Throws [KeyPairException] when generating keys fails.
@@ -42,7 +42,8 @@ class KeyPair {
         if (_box.keyPair(pkPtr.rawPtr, skPtr.rawPtr) != 0) {
           throw GenerateKeyPairException();
         }
-        return KeyPair._(UnmodifiableUint8ListView(Uint8List.fromList(pkPtr.view)), UnmodifiableUint8ListView(Uint8List.fromList(skPtr.view)));
+        return KeyPair._(UnmodifiableUint8ListView(Uint8List.fromList(pkPtr.view)),
+            UnmodifiableUint8ListView(Uint8List.fromList(skPtr.view)));
       },
     );
   }
@@ -53,13 +54,15 @@ class KeyPair {
     final _box = box ?? bindings.Box();
     checkExpectedLengthOf(seed.length, _box.seedBytes, 'seed');
 
-    return free1freeZero2(seed.asArray, Uint8Array.allocate(count: _box.publicKeyBytes), Uint8Array.allocate(count: _box.secretKeyBytes),
+    return free1freeZero2(
+        seed.asArray, Uint8Array.allocate(count: _box.publicKeyBytes), Uint8Array.allocate(count: _box.secretKeyBytes),
         (seedPtr, pkPtr, skPtr) {
       final result = _box.seedKeyPair(pkPtr.rawPtr, skPtr.rawPtr, seedPtr.rawPtr);
       if (result != 0) {
         throw GenerateKeyPairException();
       }
-      return KeyPair._(UnmodifiableUint8ListView(Uint8List.fromList(pkPtr.view)), UnmodifiableUint8ListView(Uint8List.fromList(skPtr.view)));
+      return KeyPair._(UnmodifiableUint8ListView(Uint8List.fromList(pkPtr.view)),
+          UnmodifiableUint8ListView(Uint8List.fromList(skPtr.view)));
     });
   }
 }
@@ -105,7 +108,8 @@ class Box {
       publicKey.asArray,
       secretKey.asArray,
       (noncePtr, cPtr, pkPtr, skPtr) {
-        final result = _bindings.easy(cPtr.rawPtr, cPtr.rawPtr, message.length, noncePtr.rawPtr, pkPtr.rawPtr, skPtr.rawPtr);
+        final result =
+            _bindings.easy(cPtr.rawPtr, cPtr.rawPtr, message.length, noncePtr.rawPtr, pkPtr.rawPtr, skPtr.rawPtr);
         if (result != 0) {
           throw Error();
         }
@@ -123,7 +127,8 @@ class Box {
       publicKey.asArray,
       secretKey.asArray,
       (noncePtr, cPtr, pkPtr, skPtr) {
-        final result = _bindings.openEasy(cPtr.rawPtr, cPtr.rawPtr, ciphertext.length, noncePtr.rawPtr, pkPtr.rawPtr, skPtr.rawPtr);
+        final result = _bindings.openEasy(
+            cPtr.rawPtr, cPtr.rawPtr, ciphertext.length, noncePtr.rawPtr, pkPtr.rawPtr, skPtr.rawPtr);
         if (result != 0) {
           throw Error();
         }
@@ -177,7 +182,8 @@ class Box {
       ciphertext.asArray,
       key.asArray,
       (noncePtr, cPtr, keyPtr) {
-        final result = _bindings.openEasyAfterNm(cPtr.rawPtr, cPtr.rawPtr, ciphertext.length, noncePtr.rawPtr, keyPtr.rawPtr);
+        final result =
+            _bindings.openEasyAfterNm(cPtr.rawPtr, cPtr.rawPtr, ciphertext.length, noncePtr.rawPtr, keyPtr.rawPtr);
         if (result != 0) {
           throw Error();
         }

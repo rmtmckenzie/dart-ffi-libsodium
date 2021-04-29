@@ -1,11 +1,10 @@
 import 'dart:ffi';
 import 'dart:typed_data';
 
-import 'package:ffi/ffi.dart';
 import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/sign.dart' as bindings;
-import 'internal_helpers.dart';
+import 'helpers/internal_helpers.dart';
 import 'shared.dart';
 
 class SignError extends Error {
@@ -106,7 +105,8 @@ class Sign {
       Uint8Array.allocate(count: message.length + _binding.signBytes),
       secretKey.asArray,
       (messagePtr, signedMessagePtr, skPtr) {
-        final result = _binding.sign(signedMessagePtr.rawPtr, nullptr.cast(), messagePtr.rawPtr, message.length, skPtr.rawPtr);
+        final result =
+            _binding.sign(signedMessagePtr.rawPtr, nullptr.cast(), messagePtr.rawPtr, message.length, skPtr.rawPtr);
         if (result != 0) {
           throw SignError();
         }
@@ -125,7 +125,8 @@ class Sign {
       Uint8Array.allocate(count: signedMessage.length - _binding.signBytes),
       publicKey.asArray,
       (signedMessagePtr, messagePtr, pkPtr) {
-        final result = _binding.signOpen(messagePtr.rawPtr, nullptr.cast(), signedMessagePtr.rawPtr, signedMessage.length, pkPtr.rawPtr);
+        final result = _binding.signOpen(
+            messagePtr.rawPtr, nullptr.cast(), signedMessagePtr.rawPtr, signedMessage.length, pkPtr.rawPtr);
         if (result != 0) {
           throw InvalidSignatureException();
         }
@@ -148,11 +149,12 @@ class SignDetached {
 
     return free3freeZero1(
       Uint8Array.allocate(count: _binding.signBytes),
-      Uint64Array.fromPointer(allocate<Uint64>()),
+      Uint64Array.allocate(),
       message.asArray,
       secretKey.asArray,
       (sigPtr, sigLenPtr, messagePtr, skPtr) {
-        final result = _binding.signDetached(sigPtr.rawPtr, sigLenPtr.rawPtr, messagePtr.rawPtr, messagePtr.length, skPtr.rawPtr);
+        final result =
+            _binding.signDetached(sigPtr.rawPtr, sigLenPtr.rawPtr, messagePtr.rawPtr, messagePtr.length, skPtr.rawPtr);
         if (result != 0) {
           throw SignError();
         }

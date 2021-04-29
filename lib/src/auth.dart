@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/auth.dart';
-import 'internal_helpers.dart';
+import 'helpers/internal_helpers.dart';
 
 /// Authenticates messages with an authentication tag
 class Authenticator {
@@ -17,7 +17,8 @@ class Authenticator {
   }
 
   /// Instantiates with a given key.
-  factory Authenticator.fromKey(Uint8List key, [Authentication authentication]) => Authenticator._(key, authentication ?? Authentication());
+  factory Authenticator.fromKey(Uint8List key, [Authentication authentication]) =>
+      Authenticator._(key, authentication ?? Authentication());
 
   /// Instantiates with a newly generated key.
   factory Authenticator.withNewKey([Authentication authentication]) {
@@ -37,7 +38,7 @@ class Authenticator {
       message.asArray, // messagePtr
       Uint8Array.allocate(count: _bindings.authBytes), // tagPtr
       key.asArray, // keyPtr
-      (messagePtr,  tagPtr, keyPtr) {
+      (messagePtr, tagPtr, keyPtr) {
         final result = _bindings.auth(tagPtr.rawPtr, messagePtr.rawPtr, message.length, keyPtr.rawPtr);
         if (result != 0) {
           throw Exception();

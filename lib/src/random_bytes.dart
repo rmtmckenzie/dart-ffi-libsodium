@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/random.dart' as bindings;
-import 'internal_helpers.dart';
+import 'helpers/internal_helpers.dart';
 
 class RandomBytes {
   final bindings.RandomBytes _randomBytes;

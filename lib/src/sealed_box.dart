@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:dart_sodium/box.dart';
-import 'package:dart_sodium/src/internal_helpers.dart';
+import 'package:dart_sodium/src/helpers/internal_helpers.dart';
 import 'package:ffi_helper/ffi_helper.dart';
 import 'package:meta/meta.dart';
 
@@ -33,7 +33,8 @@ class SealedBox {
       keyPair.publicKey.asArray,
       keyPair.secretKey.asArray,
       (messagePtr, cipherPtr, publicKeyPtr, secretKeyPtr) {
-        final result = _bindings.open(messagePtr.rawPtr, cipherPtr.rawPtr, cipherPtr.length, publicKeyPtr.rawPtr, secretKeyPtr.rawPtr);
+        final result = _bindings.open(
+            messagePtr.rawPtr, cipherPtr.rawPtr, cipherPtr.length, publicKeyPtr.rawPtr, secretKeyPtr.rawPtr);
         if (result != 0) {
           throw Exception('result: $result');
         }

@@ -1,11 +1,10 @@
 import 'dart:ffi';
 import 'dart:typed_data';
 
-import 'package:ffi/ffi.dart';
 import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/secretstream.dart' as bindings;
-import 'internal_helpers.dart';
+import 'helpers/internal_helpers.dart';
 
 class PullError extends Error {
   @override
@@ -239,7 +238,7 @@ class PullStream with Rekey {
       additionalData?.asArray,
       chunk.asArray,
       Uint8Array.allocate(count: chunk.length - _binding.aBytes),
-      Uint8Array.fromPointer(allocate<Uint8>()),
+      Uint8Array.allocate(),
       _state.asArray,
       (aPtr, cPtr, messagePtr, tagPtr, statePtr) {
         final result = _binding.pull(

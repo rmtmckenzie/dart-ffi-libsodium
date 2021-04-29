@@ -3,11 +3,9 @@ import 'dart:typed_data';
 import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/secretbox.dart' as bindings;
-import 'internal_helpers.dart';
+import 'helpers/internal_helpers.dart';
 import 'random_bytes.dart';
 import 'shared.dart';
-
-
 
 /// Authenticated encryption of single messages.
 class SecretBox {
@@ -60,7 +58,8 @@ class SecretBox {
       Uint8Array.allocate(count: message.length + _bindings.macBytes),
       key.asArray,
       (messagePtr, noncePtr, cipherTextPtr, keyPtr) {
-        final result = _bindings.easy(cipherTextPtr.rawPtr, messagePtr.rawPtr, message.length, noncePtr.rawPtr, keyPtr.rawPtr);
+        final result =
+            _bindings.easy(cipherTextPtr.rawPtr, messagePtr.rawPtr, message.length, noncePtr.rawPtr, keyPtr.rawPtr);
         if (result != 0) {
           throw Exception();
         }
@@ -79,7 +78,8 @@ class SecretBox {
       Uint8Array.allocate(count: ciphertext.length - _bindings.macBytes),
       key.asArray,
       (cPtr, noncePtr, messagePtr, keyPtr) {
-        final result = _bindings.openEasy(messagePtr.rawPtr, cPtr.rawPtr, ciphertext.length, noncePtr.rawPtr, keyPtr.rawPtr);
+        final result =
+            _bindings.openEasy(messagePtr.rawPtr, cPtr.rawPtr, ciphertext.length, noncePtr.rawPtr, keyPtr.rawPtr);
         if (result != 0) {
           throw Exception();
         }

@@ -3,7 +3,7 @@ import 'package:ffi/ffi.dart' as ffi;
 
 import 'bindings/libsodium.dart' as bindings;
 
-class InitException implements SodiumException  {
+class InitException implements SodiumException {
   @override
   String toString() {
     return 'Failed to initialize libsodium';
@@ -33,7 +33,7 @@ class LibSodium {
     if (result != 0) {
       throw InitException();
     }
-    final libSodium =  LibSodium._(binding);
+    final libSodium = LibSodium._(binding);
     final version = libSodium.version;
     if (version.substring(0, 2) != '1.') {
       throw StateError('The installed version of libsodium must be > 1.0.18 and < 2: $version');
@@ -43,6 +43,6 @@ class LibSodium {
 
   /// Version string of the installed dynamic library of libsodium
   String get version {
-    return ffi.Utf8.fromUtf8(binding.versionString.cast());
+    return binding.versionString.cast<ffi.Utf8>().toDartString();
   }
 }

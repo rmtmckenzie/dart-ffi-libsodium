@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/key_exchange.dart' as bindings;
-import 'internal_helpers.dart';
+import 'helpers/internal_helpers.dart';
 
 class KeyPairError extends Error {
   @override
@@ -68,7 +68,8 @@ class KeyExchange {
     );
   }
 
-  UnmodifiableUint8ListView generateSessionKey(Uint8List clientPublicKey, Uint8List clientSecretKey, Uint8List serverPublicKey) {
+  UnmodifiableUint8ListView generateSessionKey(
+      Uint8List clientPublicKey, Uint8List clientSecretKey, Uint8List serverPublicKey) {
     assert(clientPublicKey.length == _bindings.publicKeyBytes);
     assert(serverPublicKey.length == _bindings.publicKeyBytes);
     assert(clientSecretKey.length == _bindings.secretKeyBytes);
@@ -76,7 +77,8 @@ class KeyExchange {
     final cpkPtr = clientPublicKey.asArray;
     final spkPtr = serverPublicKey.asArray;
     final keyPtr = Uint8Array.allocate(count: _bindings.sessionKeyBytes);
-    final result = _bindings.clientSessionKeys(keyPtr.rawPtr, nullptr.cast(), cpkPtr.rawPtr, cskPtr.rawPtr, spkPtr.rawPtr);
+    final result =
+        _bindings.clientSessionKeys(keyPtr.rawPtr, nullptr.cast(), cpkPtr.rawPtr, cskPtr.rawPtr, spkPtr.rawPtr);
 
     final key = UnmodifiableUint8ListView(Uint8List.fromList(keyPtr.view));
     keyPtr.freeZero();
@@ -90,7 +92,8 @@ class KeyExchange {
     return key;
   }
 
-  ClientSessionKeys generateClientSessionKeys(Uint8List clientPublicKey, Uint8List clientSecretKey, Uint8List serverPublicKey) {
+  ClientSessionKeys generateClientSessionKeys(
+      Uint8List clientPublicKey, Uint8List clientSecretKey, Uint8List serverPublicKey) {
     checkExpectedLengthOf(clientPublicKey.length, _bindings.publicKeyBytes, 'client public key');
     checkExpectedLengthOf(serverPublicKey.length, _bindings.publicKeyBytes, 'server public key');
     checkExpectedLengthOf(clientSecretKey.length, _bindings.secretKeyBytes, 'client secret key');
@@ -102,7 +105,8 @@ class KeyExchange {
       Uint8Array.allocate(count: _bindings.sessionKeyBytes), // rkPtr
       Uint8Array.allocate(count: _bindings.sessionKeyBytes), // tkPtr
       (spkPtr, cpkPtr, cskPtr, rkPtr, tkPtr) {
-        final result = _bindings.clientSessionKeys(rkPtr.rawPtr, tkPtr.rawPtr, cpkPtr.rawPtr, cskPtr.rawPtr, spkPtr.rawPtr);
+        final result =
+            _bindings.clientSessionKeys(rkPtr.rawPtr, tkPtr.rawPtr, cpkPtr.rawPtr, cskPtr.rawPtr, spkPtr.rawPtr);
         if (result != 0) {
           throw KeyPairError();
         }
@@ -115,7 +119,8 @@ class KeyExchange {
     );
   }
 
-  ServerSessionKeys generateServerSessionKeys(Uint8List serverPublicKey, Uint8List serverSecretKey, Uint8List clientPublicKey) {
+  ServerSessionKeys generateServerSessionKeys(
+      Uint8List serverPublicKey, Uint8List serverSecretKey, Uint8List clientPublicKey) {
     checkExpectedLengthOf(clientPublicKey.length, _bindings.publicKeyBytes, 'client public key');
     checkExpectedLengthOf(serverPublicKey.length, _bindings.publicKeyBytes, 'server public key');
     checkExpectedLengthOf(serverSecretKey.length, _bindings.secretKeyBytes, 'server secret key');
@@ -127,7 +132,8 @@ class KeyExchange {
       Uint8Array.allocate(count: _bindings.sessionKeyBytes), // rkPtr
       Uint8Array.allocate(count: _bindings.sessionKeyBytes), // tkPtr
       (cpkPtr, spkPtr, sskPtr, rkPtr, tkPtr) {
-        final result = _bindings.serverSessionKeys(rkPtr.rawPtr, tkPtr.rawPtr, spkPtr.rawPtr, sskPtr.rawPtr, cpkPtr.rawPtr);
+        final result =
+            _bindings.serverSessionKeys(rkPtr.rawPtr, tkPtr.rawPtr, spkPtr.rawPtr, sskPtr.rawPtr, cpkPtr.rawPtr);
         if (result != 0) {
           throw KeyPairError();
         }
