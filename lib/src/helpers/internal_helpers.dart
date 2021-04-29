@@ -2,7 +2,7 @@ import 'dart:ffi' as ffi;
 import 'dart:ffi';
 import 'dart:typed_data';
 
-import 'package:ffi_helper/ffi_helper.dart';
+import 'package:dart_sodium/src/helpers/memory_array.dart';
 
 extension ZeroList on List<int> {
   void fillZero() {
@@ -37,8 +37,7 @@ class NullArray<T extends ffi.NativeType> extends MemoryArray<T> {
 /// [actual] and [expected] fails.
 void checkExpectedLengthOf(int actual, int expected, String name) {
   if (actual != expected) {
-    throw ArgumentError(
-        '$name must be $expected bytes long, but is $actual bytes');
+    throw ArgumentError('$name must be $expected bytes long, but is $actual bytes');
   }
 }
 
@@ -49,8 +48,7 @@ void checkInRange(int actual, int min, int max, String name) {
   }
 }
 
-R free1<T extends NativeType, R>(
-    MemoryArray<T> a, R Function(MemoryArray<T> a) operation) {
+R free1<T extends NativeType, R>(MemoryArray<T> a, R Function(MemoryArray<T> a) operation) {
   try {
     return operation(a ?? NullArray<T>());
   } finally {
@@ -59,9 +57,7 @@ R free1<T extends NativeType, R>(
 }
 
 R free2<T1 extends NativeType, T2 extends NativeType, R>(
-    MemoryArray<T1> a1,
-    MemoryArray<T2> a2,
-    R Function(MemoryArray<T1> a1, MemoryArray<T2> a2) operation) {
+    MemoryArray<T1> a1, MemoryArray<T2> a2, R Function(MemoryArray<T1> a1, MemoryArray<T2> a2) operation) {
   try {
     return operation(
       a1 ?? NullArray<T1>(),
@@ -73,12 +69,8 @@ R free2<T1 extends NativeType, T2 extends NativeType, R>(
   }
 }
 
-R free3<T1 extends NativeType, T2 extends NativeType, T3 extends NativeType, R>(
-    MemoryArray<T1> a1,
-    MemoryArray<T2> a2,
-    MemoryArray<T3> a3,
-    R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3)
-        operation) {
+R free3<T1 extends NativeType, T2 extends NativeType, T3 extends NativeType, R>(MemoryArray<T1> a1, MemoryArray<T2> a2,
+    MemoryArray<T3> a3, R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3) operation) {
   try {
     return operation(
       a1 ?? NullArray<T1>(),
@@ -92,8 +84,7 @@ R free3<T1 extends NativeType, T2 extends NativeType, T3 extends NativeType, R>(
   }
 }
 
-R freeZero1<T extends NativeType, R>(
-    MemoryArray<T> a, R Function(MemoryArray<T> a) operation) {
+R freeZero1<T extends NativeType, R>(MemoryArray<T> a, R Function(MemoryArray<T> a) operation) {
   try {
     return operation(a ?? NullArray<T>());
   } finally {
@@ -102,9 +93,7 @@ R freeZero1<T extends NativeType, R>(
 }
 
 R freeZero2<T1 extends NativeType, T2 extends NativeType, R>(
-    MemoryArray<T1> a1,
-    MemoryArray<T2> a2,
-    R Function(MemoryArray<T1> a1, MemoryArray<T2> a2) operation) {
+    MemoryArray<T1> a1, MemoryArray<T2> a2, R Function(MemoryArray<T1> a1, MemoryArray<T2> a2) operation) {
   try {
     return operation(
       a1 ?? NullArray<T1>(),
@@ -116,13 +105,11 @@ R freeZero2<T1 extends NativeType, T2 extends NativeType, R>(
   }
 }
 
-R freeZero3<T1 extends NativeType, T2 extends NativeType, T3 extends NativeType,
-        R>(
+R freeZero3<T1 extends NativeType, T2 extends NativeType, T3 extends NativeType, R>(
     MemoryArray<T1> a1,
     MemoryArray<T2> a2,
     MemoryArray<T3> a3,
-    R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3)
-        operation) {
+    R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3) operation) {
   try {
     return operation(
       a1 ?? NullArray<T1>(),
@@ -152,13 +139,11 @@ R free1freeZero1<T1 extends NativeType, T2 extends NativeType, R>(
   }
 }
 
-R free1freeZero2<T1 extends NativeType, T2 extends NativeType,
-    T3 extends NativeType, R>(
+R free1freeZero2<T1 extends NativeType, T2 extends NativeType, T3 extends NativeType, R>(
   MemoryArray<T1> a1,
   MemoryArray<T2> a2,
   MemoryArray<T3> a3,
-  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3)
-      operation,
+  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3) operation,
 ) {
   try {
     return operation(
@@ -173,13 +158,11 @@ R free1freeZero2<T1 extends NativeType, T2 extends NativeType,
   }
 }
 
-R free2freeZero1<T1 extends NativeType, T2 extends NativeType,
-    T3 extends NativeType, R>(
+R free2freeZero1<T1 extends NativeType, T2 extends NativeType, T3 extends NativeType, R>(
   MemoryArray<T1> a1,
   MemoryArray<T2> a2,
   MemoryArray<T3> a3,
-  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3)
-      operation,
+  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3) operation,
 ) {
   try {
     return operation(
@@ -194,15 +177,12 @@ R free2freeZero1<T1 extends NativeType, T2 extends NativeType,
   }
 }
 
-R free2freeZero2<T1 extends NativeType, T2 extends NativeType,
-    T3 extends NativeType, T4 extends NativeType, R>(
+R free2freeZero2<T1 extends NativeType, T2 extends NativeType, T3 extends NativeType, T4 extends NativeType, R>(
   MemoryArray<T1> a1,
   MemoryArray<T2> a2,
   MemoryArray<T3> a3,
   MemoryArray<T4> a4,
-  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3,
-          MemoryArray<T4> a4)
-      operation,
+  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3, MemoryArray<T4> a4) operation,
 ) {
   try {
     return operation(
@@ -219,15 +199,14 @@ R free2freeZero2<T1 extends NativeType, T2 extends NativeType,
   }
 }
 
-R free2freeZero3<T1 extends NativeType, T2 extends NativeType,
-    T3 extends NativeType, T4 extends NativeType, T5 extends NativeType, R>(
+R free2freeZero3<T1 extends NativeType, T2 extends NativeType, T3 extends NativeType, T4 extends NativeType,
+    T5 extends NativeType, R>(
   MemoryArray<T1> a1,
   MemoryArray<T2> a2,
   MemoryArray<T3> a3,
   MemoryArray<T4> a4,
   MemoryArray<T5> a5,
-  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3,
-          MemoryArray<T4> a4, MemoryArray<T5> a5)
+  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3, MemoryArray<T4> a4, MemoryArray<T5> a5)
       operation,
 ) {
   try {
@@ -247,15 +226,12 @@ R free2freeZero3<T1 extends NativeType, T2 extends NativeType,
   }
 }
 
-R free3freeZero1<T1 extends NativeType, T2 extends NativeType,
-    T3 extends NativeType, T4 extends NativeType, R>(
+R free3freeZero1<T1 extends NativeType, T2 extends NativeType, T3 extends NativeType, T4 extends NativeType, R>(
   MemoryArray<T1> a1,
   MemoryArray<T2> a2,
   MemoryArray<T3> a3,
   MemoryArray<T4> a4,
-  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3,
-          MemoryArray<T4> a4)
-      operation,
+  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3, MemoryArray<T4> a4) operation,
 ) {
   try {
     return operation(
@@ -272,15 +248,14 @@ R free3freeZero1<T1 extends NativeType, T2 extends NativeType,
   }
 }
 
-R free4freeZero1<T1 extends NativeType, T2 extends NativeType,
-    T3 extends NativeType, T4 extends NativeType, T5 extends NativeType, R>(
+R free4freeZero1<T1 extends NativeType, T2 extends NativeType, T3 extends NativeType, T4 extends NativeType,
+    T5 extends NativeType, R>(
   MemoryArray<T1> a1,
   MemoryArray<T2> a2,
   MemoryArray<T3> a3,
   MemoryArray<T4> a4,
   MemoryArray<T5> a5,
-  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3,
-          MemoryArray<T4> a4, MemoryArray<T5> a5)
+  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3, MemoryArray<T4> a4, MemoryArray<T5> a5)
       operation,
 ) {
   try {
@@ -300,22 +275,16 @@ R free4freeZero1<T1 extends NativeType, T2 extends NativeType,
   }
 }
 
-R free5freeZero1<
-    T1 extends NativeType,
-    T2 extends NativeType,
-    T3 extends NativeType,
-    T4 extends NativeType,
-    T5 extends NativeType,
-    T6 extends NativeType,
-    R>(
+R free5freeZero1<T1 extends NativeType, T2 extends NativeType, T3 extends NativeType, T4 extends NativeType,
+    T5 extends NativeType, T6 extends NativeType, R>(
   MemoryArray<T1> a1,
   MemoryArray<T2> a2,
   MemoryArray<T3> a3,
   MemoryArray<T4> a4,
   MemoryArray<T5> a5,
   MemoryArray<T6> a6,
-  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3,
-          MemoryArray<T4> a4, MemoryArray<T5> a5, MemoryArray<T6> a6)
+  R Function(MemoryArray<T1> a1, MemoryArray<T2> a2, MemoryArray<T3> a3, MemoryArray<T4> a4, MemoryArray<T5> a5,
+          MemoryArray<T6> a6)
       operation,
 ) {
   try {

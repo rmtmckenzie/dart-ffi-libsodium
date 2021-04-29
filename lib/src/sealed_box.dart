@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:dart_sodium/box.dart';
 import 'package:dart_sodium/src/helpers/internal_helpers.dart';
-import 'package:ffi_helper/ffi_helper.dart';
+import 'package:dart_sodium/src/helpers/memory_array.dart';
 import 'package:meta/meta.dart';
 
 import 'bindings/box.dart' as bindings;

@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:ffi_helper/ffi_helper.dart';
+import 'package:dart_sodium/src/helpers/memory_array.dart';
 
 import 'bindings/auth.dart';
 import 'helpers/internal_helpers.dart';

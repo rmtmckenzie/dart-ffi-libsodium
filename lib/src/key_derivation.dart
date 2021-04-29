@@ -1,7 +1,7 @@
 import 'dart:ffi';
 import 'dart:typed_data';
 
-import 'package:ffi_helper/ffi_helper.dart';
+import 'package:dart_sodium/src/helpers/memory_array.dart';
 
 import 'bindings/key_derivation.dart' as bindings;
 import 'helpers/internal_helpers.dart';

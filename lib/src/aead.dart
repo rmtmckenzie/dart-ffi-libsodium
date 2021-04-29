@@ -3,8 +3,8 @@ import 'dart:typed_data';
 
 import 'package:dart_sodium/random_bytes.dart';
 import 'package:dart_sodium/src/helpers/internal_helpers.dart';
+import 'package:dart_sodium/src/helpers/memory_array.dart';
 import 'package:dart_sodium/src/shared.dart';
-import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/aead.dart' as bindings;
 

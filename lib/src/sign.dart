@@ -1,7 +1,7 @@
 import 'dart:ffi';
 import 'dart:typed_data';
 
-import 'package:ffi_helper/ffi_helper.dart';
+import 'package:dart_sodium/src/helpers/memory_array.dart';
 
 import 'bindings/sign.dart' as bindings;
 import 'helpers/internal_helpers.dart';
@@ -142,6 +142,7 @@ class SignDetached {
   SignDetached([bindings.Sign binding]) : _binding = binding ?? bindings.Sign();
 
   int get signBytes => _binding.signBytes;
+
   int get seedBytes => _binding.seedBytes;
 
   Uint8List sign(Uint8List message, Uint8List secretKey) {

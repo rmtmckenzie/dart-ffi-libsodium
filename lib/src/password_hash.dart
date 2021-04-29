@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:dart_sodium/src/helpers/memory_array.dart';
 import 'package:dart_sodium/src/shared.dart';
-import 'package:ffi_helper/ffi_helper.dart';
 
 import 'bindings/pwhash.dart' as bindings;
 import 'helpers/internal_helpers.dart';

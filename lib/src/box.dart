@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:ffi_helper/ffi_helper.dart';
+import 'package:dart_sodium/src/helpers/memory_array.dart';
 
 import 'bindings/box.dart' as bindings;
 import 'helpers/internal_helpers.dart';
@@ -73,6 +73,7 @@ class Box {
   Box([bindings.Box _bindings]) : _bindings = _bindings ?? bindings.Box();
 
   int get nonceBytes => _bindings.nonceBytes;
+
   int get seedBytes => _bindings.seedBytes;
 
   void _checkKeyPair(Uint8List publicKey, Uint8List secretKey) {
